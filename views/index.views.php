@@ -14,7 +14,11 @@
       <h2 class="font-bold text-3xl mb-6 text-slate-800">Login to Your Account</h2>
       <form action="/" class="space-y-5" method="POST">
         <div class="flex flex-col gap-3">
-          <span class="login-error text-sm font-semibold text-pink-700 hidden"></span>
+          <?php if (!empty($error)): ?>
+            <span class="login-error text-sm font-semibold text-pink-700"> <?= htmlspecialchars($error) ?></span>
+          <?php else:  ?>
+            <span class="login-error text-sm font-semibold text-pink-700 hidden"></span>
+          <?php endif; ?>
           <input type="text" placeholder="Username" class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 input-username" name="inputUsername">
           <input type="password" placeholder="Password" class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 input-password" name="inputPassword">
         </div>

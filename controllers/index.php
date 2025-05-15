@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     header("Location: /dashboard");
     exit();
   } else {
-    $error = "Invalid username or password";
+    $error = " ❌ Invalid username or password";
     require("views/index.views.php");
     exit();
   }
