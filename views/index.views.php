@@ -10,8 +10,8 @@
     </div>
 
     <!-- Login Form Section -->
-    <div class="w-full p-8">
-      <h2 class="font-bold text-3xl mb-6 text-slate-800">Login to Your Account</h2>
+    <div class="w-full px-8 py-15">
+      <h2 class="font-bold text-3xl mb-6 text-slate-800 text-center">Login to your Account</h2>
       <form action="/" class="space-y-5" method="POST">
         <div class="flex flex-col gap-3">
           <?php if (!empty($error)): ?>

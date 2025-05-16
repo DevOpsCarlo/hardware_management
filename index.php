@@ -11,7 +11,8 @@ $uri = parse_url($_SERVER["REQUEST_URI"])["path"];
 $routes = [
   '/' => 'controllers/index.php',
   '/dashboard' => 'controllers/dashboard.php',
-  '/logout' => 'controllers/logout.php'
+  '/logout' => 'controllers/logout.php',
+
 ];
 
 if (array_key_exists($uri, $routes)) {
