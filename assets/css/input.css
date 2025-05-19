@@ -11,4 +11,7 @@ body {
   .sidebar-link {
     @apply hover:bg-slate-50 hover:text-slate-900 hover:rounded-sm p-2;
   }
+  .active {
+    @apply bg-slate-50 text-slate-900 rounded-sm p-2;
+  }
 }

@@ -7,6 +7,12 @@
 <script>
   let table = new DataTable('#myTable');
 </script>
+
+
+<!-- Sidebar  -->
+<script src="assets/js/sidebar.js"></script>
+
+
 </body>
 
 </html>

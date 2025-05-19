@@ -11,7 +11,11 @@
 
     <!-- Login Form Section -->
     <div class="w-full px-8 py-15">
-      <h2 class="font-bold text-3xl mb-6 text-slate-800 text-center">Login to your Account</h2>
+      <div class="mb-6 flex flex-col gap-4">
+        <h2 class="font-bold text-3xl text-slate-800 text-center">Login</h2>
+        <h5 class="text-slate-500 text-base">Login to your Account</h5>
+      </div>
+
       <form action="/" class="space-y-5" method="POST">
         <div class="flex flex-col gap-3">
           <?php if (!empty($error)): ?>

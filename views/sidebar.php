@@ -6,12 +6,39 @@
   <nav class="flex flex-col space-y-10 px-4 text-base">
     <div class="flex flex-col space-y-1 font-bold sm:space-y-0 md:space-y-4 tracking-wide">
       <a href="" class="sidebar-link">Dashboard</a>
-      <a href="" class="sidebar-link">Hardware</a>
-      <a href="" class="sidebar-link">Users</a>
-      <a href="" class="sidebar-link">Assignments</a>
-      <a href="" class="sidebar-link">Maintenance Request</a>
-      <a href="" class="sidebar-link">Reports Logs</a>
+
+      <!-- Inventory -->
+      <div class="">
+        <!-- Menu toggle -->
+        <div class="flex justify-between items-center toggle-submenu cursor-pointer sidebar-link">
+          <a class="">Inventory</a>
+          <i class="fa-solid fa-chevron-down mr-5 icon"></i>
+        </div>
+        <!-- Submenu -->
+        <div class="flex flex-col px-3 gap-2 mt-4 <?= urlContains("/add-category") || urlContains("/add-hardware") || urlContains("/hardwares") ? "" : "hidden" ?> submenu">
+          <a href="/add-category" class="sidebar-link">Add Category</a>
+          <a href="" class="sidebar-link">Add Hardware</a>
+          <a href="" class="sidebar-link">Hardwares</a>
+        </div>
+      </div>
+
+      <!-- Management -->
+      <div class="">
+        <div class="flex justify-between items-center toggle-submenu cursor-pointer sidebar-link">
+          <a class="">Management</a>
+          <i class="fa-solid fa-chevron-down mr-5 icon"></i>
+        </div>
+        <div class="flex flex-col px-3 gap-2 mt-4 hidden submenu">
+          <a href="" class="sidebar-link">Users</a>
+          <a href="" class="sidebar-link">Assignments</a>
+          <a href="" class="sidebar-link">Maintenance Request</a>
+          <a href="" class="sidebar-link">Reports Logs</a>
+        </div>
+      </div>
+
     </div>
+
+    <!-- Logout -->
     <a href="/logout" class="sidebar-link font-bold tracking-wide">Logout</a>
   </nav>
 </aside>
