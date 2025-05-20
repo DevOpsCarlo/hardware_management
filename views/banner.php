@@ -7,8 +7,8 @@
       </div>
     </div>
     <div>
-      <button class="flex items-center bg-red-500 hover:bg-red-600 text-white w-full rounded-sm font-bold text-sm py-3 px-4 cursor-pointer">
-        <i class="fa-solid fa-plus"></i>
+      <button class="flex items-center bg-red-500 hover:bg-red-600 text-white w-full *:text-sm py-2 px-3 cursor-pointer">
+        <i class="fa-thin fa-plus"></i>
         <p class="whitespace-nowrap ml-2">Add Hardware</p>
       </button>
     </div>

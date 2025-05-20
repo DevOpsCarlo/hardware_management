@@ -5,7 +5,7 @@
   </div>
   <nav class="flex flex-col space-y-10 px-4 text-base">
     <div class="flex flex-col space-y-1 font-bold sm:space-y-0 md:space-y-4 tracking-wide">
-      <a href="" class="sidebar-link">Dashboard</a>
+      <a href="/dashboard" class="sidebar-link">Dashboard</a>
 
       <!-- Inventory -->
       <div class="">
@@ -16,9 +16,9 @@
         </div>
         <!-- Submenu -->
         <div class="flex flex-col px-3 gap-2 mt-4 <?= urlContains("/add-category") || urlContains("/add-hardware") || urlContains("/hardwares") ? "" : "hidden" ?> submenu">
-          <a href="/add-category" class="sidebar-link">Add Category</a>
-          <a href="" class="sidebar-link">Add Hardware</a>
-          <a href="" class="sidebar-link">Hardwares</a>
+          <a href="/add-category" class="sidebar-link <?= urlIs('/add-category') ? "active" : "" ?>">Add Category</a>
+          <a href="" class="sidebar-link <?= urlIs("/add-hardware") ? "active" : "" ?>">Add Hardware</a>
+          <a href="" class="sidebar-link <?= urlIs("/hardwares") ? "active" : "" ?>">Hardwares</a>
         </div>
       </div>
 
