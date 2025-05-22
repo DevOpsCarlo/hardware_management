@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
 }
 
 
-$stmt = $pdo->prepare("SELECT * FROM categories ORDER BY created_at DESC");
+$stmt = $pdo->prepare("SELECT * FROM categories ORDER BY created_at ASC");
 $stmt->execute();
 $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

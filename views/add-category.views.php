@@ -124,5 +124,6 @@ unset($_SESSION['category_error'], $_SESSION['category_form_data'], $_SESSION['c
 
 
 
+<script src="assets/js/add-category.js"></script>
 
 <?php require("views/partials/footer.php") ?>
