@@ -79,52 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // DELETE CATEGORY BTN
-  // for (let i = 0; i < deleteCategory.length; i++) {
-  //   deleteCategory[i].addEventListener("click", (e) => {
-  //     const categoryId = e.target.getAttribute("data-id");
-  //     const categoryName = e.target.getAttribute("data-name");
 
-  //     // Show confirmation dialog before deletion
-  //     Swal.fire({
-  //       icon: "warning",
-  //       title: "Delete category?",
-  //       text: `"${categoryName}" will be deleted. This cannot be undone.`,
-  //       showCancelButton: true,
-  //       confirmButtonColor: "#d33",
-  //       cancelButtonColor: "#3085d6",
-  //       confirmButtonText: "Delete",
-  //     }).then((result) => {
-  //       if (result.isConfirmed) {
-  //         // Proceed with the deletion (send POST request)
-  //         const formData = new FormData();
-  //         formData.append("delete_category_id", categoryId);
-
-  //         fetch("/add-category", {
-  //           method: "POST",
-  //           body: formData,
-  //         })
-  //           .then((response) => response.text())
-  //           .then((data) => {
-  //             // Show success message
-  //             Swal.fire(
-  //               "Deleted!",
-  //               `${categoryName} has been deleted.`,
-  //               "success"
-  //             );
-  //             // Optionally, remove the deleted row from the table
-  //             e.target.closest("tr").remove();
-  //           })
-  //           .catch((error) => {
-  //             Swal.fire(
-  //               "Error!",
-  //               "Something went wrong. Please try again later.",
-  //               "error"
-  //             );
-  //           });
-  //       }
-  //     });
-  //   });
-  // }
   document.querySelectorAll(".delete-category-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       const categoryId = btn.getAttribute("data-id");

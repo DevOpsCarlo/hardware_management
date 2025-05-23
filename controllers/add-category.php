@@ -66,7 +66,11 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
 }
 
 
-$stmt = $pdo->prepare("SELECT * FROM categories ORDER BY created_at ASC");
+// $stmt = $pdo->prepare("SELECT * FROM categories ORDER BY created_at ASC");
+// $stmt->execute();
+// $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$stmt = $pdo->prepare(" SELECT c.id AS category_id, c.name AS category_name, c.created_at, SUM(i.quantity) AS total_quantity FROM categories c LEFT JOIN inventory i ON c.id = i.category_id GROUP BY c.id ORDER BY c.created_at ASC ");
 $stmt->execute();
 $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

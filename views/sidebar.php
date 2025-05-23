@@ -30,6 +30,7 @@
         </div>
         <div class="flex flex-col px-3 gap-2 mt-4 hidden submenu">
           <a href="" class="sidebar-link">Users</a>
+          <a href="" class="sidebar-link">Branch</a>
           <a href="" class="sidebar-link">Assignments</a>
           <a href="" class="sidebar-link">Maintenance Request</a>
           <a href="" class="sidebar-link">Reports Logs</a>

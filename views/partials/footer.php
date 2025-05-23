@@ -5,7 +5,9 @@
 
 <!-- Initialize DataTables -->
 <script>
-  let table = new DataTable('#myTable');
+  let inventoryTable = new DataTable('#inventoryTable');
+  let detailedTable = new DataTable('#detailedTable');
+  let categoryTable = new DataTable('#categoryTable');
 </script>
 
 

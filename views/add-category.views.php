@@ -11,9 +11,9 @@ unset($_SESSION['category_error'], $_SESSION['category_form_data'], $_SESSION['c
 
 <main class="grid grid-cols-1 sm:grid-cols-12 min-h-screen">
   <?php require("views/sidebar.php"); ?>
-  <section class="col-span-12 md:col-span-10 space-y-7">
+  <section class="col-span-12 md:col-span-10 ">
     <?php require("views/banner.php"); ?>
-    <article class="my-6 px-6 text-2xl font-bold text-slate-800 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <article class="mt-6 px-6 text-2xl font-bold text-slate-800 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <div class="flex items-center justify-between col-span-1 md:col-span-2 lg:col-span-10 mb-8">
         <h2 class="">Add Categories</h2>
         <button class="flex items-center text-sm bg-red-500 py-1 px-3 text-white gap-2 hover:bg-red-600 cursor-pointer font-light" id="add-category-btn">
@@ -72,17 +72,19 @@ unset($_SESSION['category_error'], $_SESSION['category_form_data'], $_SESSION['c
         </div>
       </div>
 
-      <article class="col-span-10 text-sm mt-8">
+
+      <!-- CATEGORY TABLE  -->
+      <article class="col-span-10 text-sm mt-0">
         <div>
           <h4 class="text-slate-700 font-semibold text-base">Category Lists:</h4>
           <div>
-            <table id="myTable" class="display">
+            <table id="categoryTable" class="display">
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>name</th>
+                  <th>Category</th>
                   <th>Created At</th>
-                  <th>Count</th>
+                  <th>Quantity</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -91,15 +93,15 @@ unset($_SESSION['category_error'], $_SESSION['category_form_data'], $_SESSION['c
                   <?php foreach ($categories as $index => $category): ?>
                     <tr>
                       <td><?= $index + 1 ?></td>
-                      <td><?= htmlspecialchars(ucfirst($category['name'])) ?></td>
+                      <td><?= htmlspecialchars(ucfirst($category['category_name'])) ?></td>
                       <td><?= date("M d, Y", strtotime($category['created_at'])) ?></td>
-                      <td>2</td>
+                      <td><?= $category['total_quantity'] > 0 ? $category['total_quantity'] : 0 ?></td>
                       <td class="relative">
                         <i class="fa-solid fa-ellipsis-vertical cursor-pointer select-option"></i>
                         <div class="absolute top-3 left-5 mt-2 w-20 bg-white border rounded shadow group-hover:block z-10 hidden options">
                           <ul class="text-xs text-slate-700 font-light ">
-                            <li class="px-4 py-2 hover:bg-slate-100 border-b-1"><button class="cursor-pointer block w-full text-left edit-category-btn" data-id="<?= $category['id'] ?>" data-name="<?= htmlspecialchars($category['name']) ?>">Edit</button></li>
-                            <li class="px-4 py-2 hover:bg-slate-100 border-b-1"><button class="cursor-pointer w-full text-left delete-category-btn" data-name="<?= htmlspecialchars($category['name']) ?>" data-id="<?= $category['id'] ?>">Delete</button></li>
+                            <li class="px-4 py-2 hover:bg-slate-100 border-b-1"><button class="cursor-pointer block w-full text-left edit-category-btn" data-id="<?= $category['category_id'] ?>" data-name="<?= htmlspecialchars($category['category_name']) ?>">Edit</button></li>
+                            <li class="px-4 py-2 hover:bg-slate-100 border-b-1"><button class="cursor-pointer w-full text-left delete-category-btn" data-name="<?= htmlspecialchars($category['category_name']) ?>" data-id="<?= $category['category_id'] ?>">Delete</button></li>
                             <li class="px-4 py-2 hover:bg-slate-100"><a href="/view" class="cursor-pointer w-full text-left">View</a></li>
                           </ul>
                         </div>
