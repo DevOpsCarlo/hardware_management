@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const tabButtons = document.querySelectorAll(".tab-button");
   const tabContents = document.querySelectorAll(".tab-content");
   const addInventory = document.querySelector(".add-inventory-btn");
-  const selectedMenu = document.querySelectorAll(".select-menu");
+
   const menu = document.querySelectorAll(".menu");
 
   // ADD INVENTORY TAB
@@ -74,71 +74,195 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // ELIPSIS MENU - ADDEN INVENTORY TABLE
-  for (let i = 0; i < selectedMenu.length; i++) {
-    selectedMenu[i].addEventListener("click", (e) => {
-      e.stopPropagation();
-      // CLOSE OTHER SELECTED MENU FIRST
-      for (let j = 0; j < selectedMenu.length; j++) {
-        if (i !== j) {
-          menu[j].classList.add("hidden");
+  // CLICK HANDLING FOR ELIPSIS
+  document
+    .querySelector("#inventory-list-table")
+    .addEventListener("click", function (e) {
+      // Handle ellipsis toggle
+      if (e.target.classList.contains("select-menu")) {
+        e.stopPropagation();
+
+        // Close all other menus
+        document
+          .querySelectorAll(".menu")
+          .forEach((m) => m.classList.add("hidden"));
+
+        // Toggle current
+        const menuElement = e.target.nextElementSibling;
+        if (menuElement && menuElement.classList.contains("menu")) {
+          menuElement.classList.toggle("hidden");
         }
       }
-      menu[i].classList.toggle("hidden");
-    });
-  }
 
-  // DELETE INVENTORY ROW
+      //EDIT INVENTORY
+      if (e.target.classList.contains("edit-inventory-btn")) {
+        e.stopPropagation();
 
-  document.querySelectorAll(".delete-inventory-btn").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      const inventoryId = btn.getAttribute("data-id");
-      const inventoryName = btn.getAttribute("data-name");
+        // Get form elements
+        const form = document.querySelector("form");
+        const manufacturerInput = form.querySelector(".input-manufacturer");
+        const quantityInput = form.querySelector(".input-qty");
+        const categorySelect = form.querySelector("select[name='category_id']");
+        const inventoryIdInput = form.querySelector("#inventory-id");
+        const submitButton = form.querySelector(".add-inventory-btn");
 
-      Swal.fire({
-        icon: "warning",
-        title: "Delete Category?",
-        text: `Are you sure you want to delete "${inventoryName}"?`,
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Delete",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          const formData = new FormData();
-          formData.append("delete_inventory_id", inventoryId);
+        // Populate values from data-attributes
+        const id = e.target.dataset.id;
+        const name = e.target.dataset.name;
+        const qty = e.target.dataset.qty;
+        const categoryId = e.target.dataset.categoryId;
 
-          fetch("/manage-hardware", {
-            method: "POST",
-            body: formData,
-          })
-            .then((res) => res.text())
-            .then(() => {
-              Swal.fire({
-                icon: "success",
-                text: `"${inventoryName}" was deleted successfully!`,
-                showConfirmButton: false,
-                timer: 2000,
-                timerProgressBar: true,
-                position: "top-end",
-                toast: true,
-              });
-              // Remove row from DOM
-              btn.closest("tr").remove();
+        manufacturerInput.value = name;
+        quantityInput.value = qty;
+        categorySelect.value = categoryId;
+        inventoryIdInput.value = id;
+
+        submitButton.textContent = "Update Inventory";
+        form.action = "/manage-hardware";
+      }
+
+      // Handle delete inventory
+      if (e.target.classList.contains("delete-inventory-btn")) {
+        e.stopPropagation();
+        const inventoryId = e.target.getAttribute("data-id");
+        const inventoryName = e.target.getAttribute("data-name");
+
+        Swal.fire({
+          icon: "warning",
+          title: "Delete Category?",
+          text: `Are you sure you want to delete "${inventoryName}"?`,
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "Delete",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            const formData = new FormData();
+            formData.append("delete_inventory_id", inventoryId);
+
+            fetch("/manage-hardware", {
+              method: "POST",
+              body: formData,
             })
-            .catch(() => {
-              Swal.fire("Error", "Could not delete the inventory.", "error");
-            });
-        }
-      });
-    });
-  });
+              .then((res) => res.text())
+              .then(() => {
+                Swal.fire({
+                  icon: "success",
+                  text: `"${inventoryName}" was deleted successfully!`,
+                  showConfirmButton: false,
+                  timer: 2000,
+                  timerProgressBar: true,
+                  position: "top-end",
+                  toast: true,
+                });
 
-  // CLOSE ALL MENUS ELIPSIS
+                // Remove the row
+                e.target.closest("tr").remove();
+              })
+              .catch(() => {
+                Swal.fire("Error", "Could not delete the inventory.", "error");
+              });
+          }
+        });
+      }
+    });
+
+  document
+    .querySelector("#detailed-list-table")
+    .addEventListener("click", function (e) {
+      // Handle ellipsis toggle
+      if (e.target.classList.contains("select-menu")) {
+        e.stopPropagation();
+
+        // Close all other menus
+        document
+          .querySelectorAll(".menu")
+          .forEach((m) => m.classList.add("hidden"));
+
+        // Toggle current
+        const menuElement = e.target.nextElementSibling;
+        if (menuElement && menuElement.classList.contains("menu")) {
+          menuElement.classList.toggle("hidden");
+        }
+      }
+
+      //EDIT INVENTORY
+      if (e.target.classList.contains("edit-inventory-btn")) {
+        e.stopPropagation();
+
+        // Get form elements
+        const form = document.querySelector("form");
+        const manufacturerInput = form.querySelector(".input-manufacturer");
+        const quantityInput = form.querySelector(".input-qty");
+        const categorySelect = form.querySelector("select[name='category_id']");
+        const inventoryIdInput = form.querySelector("#inventory-id");
+        const submitButton = form.querySelector(".add-inventory-btn");
+
+        // Populate values from data-attributes
+        const id = e.target.dataset.id;
+        const name = e.target.dataset.name;
+        const qty = e.target.dataset.qty;
+        const categoryId = e.target.dataset.categoryId;
+
+        manufacturerInput.value = name;
+        quantityInput.value = qty;
+        categorySelect.value = categoryId;
+        inventoryIdInput.value = id;
+
+        submitButton.textContent = "Update Inventory";
+        form.action = "/manage-hardware";
+      }
+
+      // Handle delete inventory
+      if (e.target.classList.contains("delete-inventory-btn")) {
+        e.stopPropagation();
+        const inventoryId = e.target.getAttribute("data-id");
+        const inventoryName = e.target.getAttribute("data-name");
+
+        Swal.fire({
+          icon: "warning",
+          title: "Delete Category?",
+          text: `Are you sure you want to delete "${inventoryName}"?`,
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "Delete",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            const formData = new FormData();
+            formData.append("delete_inventory_id", inventoryId);
+
+            fetch("/manage-hardware", {
+              method: "POST",
+              body: formData,
+            })
+              .then((res) => res.text())
+              .then(() => {
+                Swal.fire({
+                  icon: "success",
+                  text: `"${inventoryName}" was deleted successfully!`,
+                  showConfirmButton: false,
+                  timer: 2000,
+                  timerProgressBar: true,
+                  position: "top-end",
+                  toast: true,
+                });
+
+                // Remove the row
+                e.target.closest("tr").remove();
+              })
+              .catch(() => {
+                Swal.fire("Error", "Could not delete the inventory.", "error");
+              });
+          }
+        });
+      }
+    });
+
+  // ✅ CLOSE ALL MENUS ON OUTSIDE CLICK
   document.addEventListener("click", () => {
-    // Close all menus
-    for (let j = 0; j < selectedMenu.length; j++) {
-      menu[j].classList.add("hidden");
-    }
+    document
+      .querySelectorAll(".menu")
+      .forEach((m) => m.classList.add("hidden"));
   });
 });

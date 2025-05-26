@@ -78,7 +78,7 @@ unset($_SESSION['category_error'], $_SESSION['category_form_data'], $_SESSION['c
         <div>
           <h4 class="text-slate-700 font-semibold text-base">Category Lists:</h4>
           <div>
-            <table id="categoryTable" class="display">
+            <table id="categoryTable" class="display font-light">
               <thead>
                 <tr>
                   <th>#</th>

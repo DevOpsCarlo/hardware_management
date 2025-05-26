@@ -47,82 +47,160 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Elipsis menu
-  for (let i = 0; i < selectedOption.length; i++) {
-    selectedOption[i].addEventListener("click", (e) => {
-      e.stopPropagation();
+  // for (let i = 0; i < selectedOption.length; i++) {
+  //   selectedOption[i].addEventListener("click", (e) => {
+  //     e.stopPropagation();
+  //     console.log(i);
+  //     // Close all other options first
+  //     for (let j = 0; j < selectedOption.length; j++) {
+  //       if (i !== j) {
+  //         // Check if it's not the current one
+  //         options[j].classList.add("hidden");
+  //       }
+  //     }
 
-      // Close all other options first
-      for (let j = 0; j < selectedOption.length; j++) {
-        if (i !== j) {
-          // Check if it's not the current one
-          options[j].classList.add("hidden");
+  //     options[i].classList.toggle("hidden");
+  //   });
+  // }
+
+  document
+    .querySelector("#categoryTable")
+    .addEventListener("click", function (e) {
+      if (e.target.classList.contains("select-option")) {
+        e.stopPropagation();
+
+        const selectedIcon = e.target;
+
+        // Close all other options
+        options.forEach((opt) => opt.classList.add("hidden"));
+
+        // Toggle the options for the clicked one
+        const optionsMenu = selectedIcon.nextElementSibling;
+        if (optionsMenu && optionsMenu.classList.contains("options")) {
+          optionsMenu.classList.toggle("hidden");
         }
       }
 
-      options[i].classList.toggle("hidden");
+      // Edit button
+      if (e.target.classList.contains("edit-category-btn")) {
+        e.stopPropagation();
+        const categoryId = e.target.getAttribute("data-id");
+        const categoryName = e.target.getAttribute("data-name");
+
+        categoryModal.classList.remove("hidden");
+        modalTitle.textContent = "Edit Category";
+        addBtn.textContent = "Update Category";
+        categoryForm.action = "/add-category";
+        inputCategoryName.value = categoryName;
+        categoryIdInput.value = categoryId;
+      }
+
+      // Delete button
+      if (e.target.classList.contains("delete-category-btn")) {
+        e.stopPropagation();
+        const categoryId = e.target.getAttribute("data-id");
+        const categoryName = e.target.getAttribute("data-name");
+
+        Swal.fire({
+          icon: "warning",
+          title: "Delete Category?",
+          text: `Are you sure you want to delete "${categoryName}"?`,
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "Delete",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            const formData = new FormData();
+            formData.append("delete_category_id", categoryId);
+
+            fetch("/add-category", {
+              method: "POST",
+              body: formData,
+            })
+              .then((res) => res.text())
+              .then(() => {
+                Swal.fire({
+                  icon: "success",
+                  text: `"${categoryName}" was deleted successfully!`,
+                  showConfirmButton: false,
+                  timer: 2000,
+                  timerProgressBar: true,
+                  position: "top-end",
+                  toast: true,
+                });
+
+                // Remove row
+                e.target.closest("tr").remove();
+              })
+              .catch(() => {
+                Swal.fire("Error", "Could not delete the category.", "error");
+              });
+          }
+        });
+      }
     });
-  }
 
   // EDIT CATEGORY BTN
-  for (let i = 0; i < editCategory.length; i++) {
-    editCategory[i].addEventListener("click", (e) => {
-      const categoryId = e.target.getAttribute("data-id");
-      const categoryName = e.target.getAttribute("data-name");
+  // for (let i = 0; i < editCategory.length; i++) {
+  //   editCategory[i].addEventListener("click", (e) => {
+  //     const categoryId = e.target.getAttribute("data-id");
+  //     const categoryName = e.target.getAttribute("data-name");
 
-      categoryModal.classList.toggle("hidden");
-      modalTitle.textContent = "Edit Category";
-      addBtn.textContent = "Update Category";
-      categoryForm.action = "/add-category";
-      inputCategoryName.value = categoryName;
-      categoryIdInput.value = categoryId;
-    });
-  }
+  //     categoryModal.classList.toggle("hidden");
+  //     modalTitle.textContent = "Edit Category";
+  //     addBtn.textContent = "Update Category";
+  //     categoryForm.action = "/add-category";
+  //     inputCategoryName.value = categoryName;
+  //     categoryIdInput.value = categoryId;
+  //   });
+  // }
 
   // DELETE CATEGORY BTN
 
-  document.querySelectorAll(".delete-category-btn").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      const categoryId = btn.getAttribute("data-id");
-      const categoryName = btn.getAttribute("data-name");
+  // document.querySelectorAll(".delete-category-btn").forEach((btn) => {
+  //   btn.addEventListener("click", (e) => {
+  //     const categoryId = btn.getAttribute("data-id");
+  //     const categoryName = btn.getAttribute("data-name");
 
-      Swal.fire({
-        icon: "warning",
-        title: "Delete Category?",
-        text: `Are you sure you want to delete "${categoryName}"?`,
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Delete",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          const formData = new FormData();
-          formData.append("delete_category_id", categoryId);
+  //     Swal.fire({
+  //       icon: "warning",
+  //       title: "Delete Category?",
+  //       text: `Are you sure you want to delete "${categoryName}"?`,
+  //       showCancelButton: true,
+  //       confirmButtonColor: "#d33",
+  //       cancelButtonColor: "#3085d6",
+  //       confirmButtonText: "Delete",
+  //     }).then((result) => {
+  //       if (result.isConfirmed) {
+  //         const formData = new FormData();
+  //         formData.append("delete_category_id", categoryId);
 
-          fetch("/add-category", {
-            method: "POST",
-            body: formData,
-          })
-            .then((res) => res.text())
-            .then(() => {
-              Swal.fire({
-                icon: "success",
-                text: `"${categoryName}" was deleted successfully!`,
-                showConfirmButton: false,
-                timer: 2000,
-                timerProgressBar: true,
-                position: "top-end",
-                toast: true,
-              });
-              // Remove row from DOM
-              btn.closest("tr").remove();
-            })
-            .catch(() => {
-              Swal.fire("Error", "Could not delete the category.", "error");
-            });
-        }
-      });
-    });
-  });
+  //         fetch("/add-category", {
+  //           method: "POST",
+  //           body: formData,
+  //         })
+  //           .then((res) => res.text())
+  //           .then(() => {
+  //             Swal.fire({
+  //               icon: "success",
+  //               text: `"${categoryName}" was deleted successfully!`,
+  //               showConfirmButton: false,
+  //               timer: 2000,
+  //               timerProgressBar: true,
+  //               position: "top-end",
+  //               toast: true,
+  //             });
+  //             // Remove row from DOM
+  //             btn.closest("tr").remove();
+  //           })
+  //           .catch(() => {
+  //             Swal.fire("Error", "Could not delete the category.", "error");
+  //           });
+  //       }
+  //     });
+  //   });
+  // });
 
   // CLOSE ALL MENUS ELIPSIS
   document.addEventListener("click", () => {
