@@ -81,9 +81,8 @@ unset($_SESSION['category_error'], $_SESSION['category_form_data'], $_SESSION['c
             <table id="categoryTable" class="display font-light">
               <thead>
                 <tr>
-                  <th>#</th>
+                  <th>No.</th>
                   <th>Category</th>
-                  <th>Created At</th>
                   <th>Quantity</th>
                   <th>Action</th>
                 </tr>
@@ -94,7 +93,6 @@ unset($_SESSION['category_error'], $_SESSION['category_form_data'], $_SESSION['c
                     <tr>
                       <td><?= $index + 1 ?></td>
                       <td><?= htmlspecialchars(ucfirst($category['category_name'])) ?></td>
-                      <td><?= date("M d, Y", strtotime($category['created_at'])) ?></td>
                       <td><?= $category['total_quantity'] > 0 ? $category['total_quantity'] : 0 ?></td>
                       <td class="relative">
                         <i class="fa-solid fa-ellipsis-vertical cursor-pointer select-option"></i>
@@ -108,8 +106,7 @@ unset($_SESSION['category_error'], $_SESSION['category_form_data'], $_SESSION['c
                       </td>
                     </tr>
                   <?php endforeach; ?>
-                <?php else: ?>
-                  <tr class="col-span-5">No categories found.</tr>
+
                 <?php endif; ?>
               </tbody>
             </table>

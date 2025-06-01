@@ -51,7 +51,7 @@
               icon: 'error',
               text: '<?= $inventoryErrorMessage ?>',
               showConfirmButton: true,
-              position: 'top-end'
+              position: 'center'
             });
           </script>
         <?php
@@ -90,7 +90,7 @@
             </div>
 
             <div class="flex flex-col items-end">
-              <button type="submit" class="bg-red-500 w-1/4 px-3 py-2 mt-1 text-white rounded hover:bg-red-600 add-inventory-btn cursor-pointer ">
+              <button type="submit" class="bg-red-500 w-1/4 px-3 py-2 mt-1 text-white rounded hover:bg-red-600 add-inventory-btn cursor-pointer " name="add-inventory-btn">
                 Add Inventory
               </button>
             </div>
