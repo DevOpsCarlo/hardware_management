@@ -16,6 +16,7 @@ $routes = [
   '/hardwares' => 'controllers/hardwares.php',
   '/logout' => 'controllers/logout.php',
   '/assigned-asset' => 'controllers/assigned-asset.php',
+  '/manage-hardware/inventory-list' => 'controllers/inventory-list.php'
 
 
 ];

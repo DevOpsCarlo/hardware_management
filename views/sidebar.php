@@ -15,9 +15,9 @@
           <i class="fa-solid fa-chevron-down mr-5 icon"></i>
         </div>
         <!-- Submenu -->
-        <div class="flex flex-col px-3 gap-2 mt-4 <?= urlContains("/add-category") || urlContains("/manage-hardware") || urlContains("/hardwares") ? "" : "hidden" ?> submenu">
+        <div class="flex flex-col px-3 gap-2 mt-4 <?= urlContains("/add-category") || urlContains("/manage-hardware") || urlContains("/manage-hardware.inventory-list") || urlContains("/hardwares") ? "" : "hidden" ?> submenu">
           <a href="/add-category" class="sidebar-link <?= urlIs('/add-category') ? "active" : "" ?>">Add Category</a>
-          <a href="/manage-hardware" class="sidebar-link <?= urlIs("/manage-hardware") ? "active" : "" ?>">Manage Hardware</a>
+          <a href="/manage-hardware" class="sidebar-link <?= urlIs("/manage-hardware") || urlIs("/manage-hardware/inventory-list") ? "active" : "" ?>">Manage Hardware</a>
           <a href="" class="sidebar-link <?= urlIs("/hardwares") ? "active" : "" ?>">Hardwares</a>
         </div>
       </div>
