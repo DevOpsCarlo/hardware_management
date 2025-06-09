@@ -16,6 +16,8 @@
 
       unset($_SESSION['category_form_data'], $_SESSION['category_edit_mode']);
       ?>
+
+
      <article class="col-span-10 text-sm font-light" id="detailed-list-table">
        <div>
          <h4 class="text-slate-700 font-semibold text-base">All inventory list</h4>
@@ -38,19 +40,6 @@
              <?php $itemCounter = 1; ?>
              <tbody class="text-sm font-light">
                <?php foreach ($inventories as $inventory): ?>
-
-                 <!-- $allInventoryAssets = $assetsByInventory[$inventory['inventory_id']] ?? [];
-                  $inventoryAssets = array_filter($allInventoryAssets, function ($asset) {
-                    return empty($asset['related_laptop_id']);
-                  });
-                  $inventoryAssets = array_values($inventoryAssets);
-
-                  $quantity = $inventory['quantity'];
-
-                  // Loop $quantity times to always show that many rows
-                  for ($i = 0; $i < $quantity; $i++):
-                    $asset = $inventoryAssets[$i] ?? null;  // Get asset if exists, else null
-                   -->
                  <?php
                   // Get all assets for this inventory
                   $allInventoryAssets = $assetsByInventory[$inventory['inventory_id']] ?? [];
@@ -111,11 +100,12 @@
                                data-dateof-purchase="<?= htmlspecialchars($asset['date_of_purchase'] ?? '') ?>"
                                data-warranty-date="<?= htmlspecialchars($asset['warranty_date'] ?? '') ?>"
                                data-asset-photo="<?= htmlspecialchars($asset['asset_photo'] ?? '') ?>"
+                               data-asset-id="<?= htmlspecialchars($asset['id'] ?? 0) ?>"
                                <?php if ($relatedCharger): ?>
-                               data-charger-id="<?= htmlspecialchars($relatedCharger['id']) ?>"
+                               data-charger-id="<?= htmlspecialchars($relatedCharger['id'] ?? 0) ?>"
                                data-charger-asset-number="<?= htmlspecialchars($relatedCharger['asset_number']) ?>"
                                data-charger-model="<?= htmlspecialchars($relatedCharger['model']) ?>"
-                               data-charger-serial-number="<?= htmlspecialchars($relatedCharger['serial_number']) ?>"
+                               data-charger-serial-number="<?= htmlspecialchars($relatedCharger['serial_number'] ?? "") ?>"
                                data-charger-conditions="<?= htmlspecialchars($relatedCharger['conditions']) ?>"
                                data-charger-status="<?= htmlspecialchars($relatedCharger['status']) ?>"
                                <?php endif; ?>>
@@ -124,8 +114,9 @@
 
                            </li>
                            <li class="px-4 py-2 hover:bg-slate-100 border-b-1">
-                             <button class="cursor-pointer w-full text-left delete-inventory-btn"
+                             <button class="cursor-pointer w-full text-left delete-asset-btn"
                                data-id="<?= htmlspecialchars($inventory['inventory_id']) ?>"
+                               data-asset-id="<?= htmlspecialchars($asset['id'] ?? 0) ?>"
                                item-number="<?= $itemCounter - 1 ?>">
                                Delete
                              </button>
@@ -145,14 +136,14 @@
 
 
 
-     <div class="fixed inset-0 top-0 left-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 hidden" id="assign-asset-modal">
+     <div class="fixed inset-0 top-0 left-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 <?= (!empty($_SESSION['form_errors'])) ? '' : 'hidden' ?>" id="assign-asset-modal">
        <div class="w-full max-w-5xl bg-slate-100 col-span-4 mx-auto rounded-sm p-7 shadow-lg" id="category-modal-box">
          <h2 class="text-slate-800 font-bold text-2xl mb-2 modal-title">Hardware details</h2>
          <form class="text-sm font-light col-span-10 grid gap-2" id="assign-asset-form" method="POST" action="/manage-hardware/inventory-list" enctype="multipart/form-data">
            <div class="hidden">
              <input type="text" name="item_number" id="modal-item-number">
              <input type="text" name="inventory_id" id="modal-inventory-id">
-             <input type="hidden" name="asset-id" value="<?= htmlspecialchars($asset['id'] ?? 0) ?>">
+             <input type="hidden" name="asset-id" value="<?= htmlspecialchars($asset['id'] ?? 0) ?>" id="asset-id">
            </div>
 
            <figure class="border border-slate-200 p-4 grid gap-2">
@@ -172,7 +163,7 @@
              <div class="flex items-center justify-center gap-1">
                <div class="flex flex-col gap-1 w-full">
                  <label class="text-xs font-bold" for="">Asset No.</label>
-                 <input class="w-full border rounded px-3 py-1 bg-slate-200" readonly name="asset-number" id="modal-asset-number" placeholder="Will be auto-generated" value="<?= htmlspecialchars($asset['asset_number']) ?>">
+                 <input class="w-full border rounded px-3 py-1 bg-slate-200" readonly name="asset-number" id="modal-asset-number" value="<?= htmlspecialchars($asset['asset_number']) ?>">
                </div>
 
                <div class="flex flex-col gap-1 w-full">
@@ -185,11 +176,22 @@
              <div class="flex items-center justify-center gap-1">
                <div class="flex flex-col gap-1 w-full">
                  <label class="text-xs font-bold" for="">Serial No.</label>
-                 <input type="text" name="input-serial-number" class="w-full border rounded px-3 py-1" placeholder="Enter serial number" id="input-serial-number" value="<?= htmlspecialchars($asset['serial_number'] ?? '') ?>">
+                 <div class="flex w-full">
+                   <input type="text" name="input-serial-number" class="w-full border rounded px-3 py-1" placeholder="Enter serial number" id="input-serial-number" value="<?= htmlspecialchars($asset['serial_number'] ?? '') ?>">
+                   <?php if (!empty($_SESSION['form_errors']['serial'])): ?>
+                     <p class="text-pink-600 text-xs w-full"><?= htmlspecialchars($_SESSION['form_errors']['serial']) ?></p>
+                   <?php endif; ?>
+                 </div>
+
                </div>
                <div class="flex flex-col gap-1 w-full">
                  <label class="text-xs font-bold" for="">IP Address</label>
-                 <input type="text" name="input-ip-address" class="w-full border rounded px-3 py-1" placeholder="Enter IP address (optional)" id="input-ip-address" value="<?= htmlspecialchars($asset['ip_address'] ?? '') ?>">
+                 <div class="flex w-full">
+                   <input type="text" name="input-ip-address" class="w-full border rounded px-3 py-1" placeholder="Enter IP address (optional)" id="input-ip-address" value="<?= htmlspecialchars($asset['ip_address'] ?? '') ?>">
+                   <?php if (!empty($_SESSION['form_errors']['ip'])): ?>
+                     <p class="text-pink-600 text-xs"><?= htmlspecialchars($_SESSION['form_errors']['ip']) ?></p>
+                   <?php endif; ?>
+                 </div>
                </div>
              </div>
 
@@ -224,7 +226,7 @@
                  <label class="text-xs font-bold" for="">Condition</label>
                  <?php
                   $conditionOptions = ['New', 'Good', 'Fair', 'Poor'];
-                  $currentCondition = $asset['condition'] ?? '';
+                  $currentCondition = $asset['conditions'] ?? '';
                   ?>
                  <select name="condition" class="w-full border rounded px-3 py-1" id="select-conditions">
                    <?php foreach ($conditionOptions as $condition): ?>
@@ -259,7 +261,8 @@
            <figure class="border border-slate-200 p-4 grid gap-1  <?= $laptopChargerAsset ? '' : 'hidden' ?>" id="laptop-charger-section">
 
              <input type="hidden" name="asset-type" id="asset-type" value="laptop charger">
-             <input type="hidden" name="charger-id" id="charger-id" value="">
+             <input type="hidden" name="charger-id" value="<?= htmlspecialchars($relatedCharger['id'] ?? 0) ?>" id="charger-id">
+
              <h4 class="mb-2 text-slate-600 text-lg font-semibold">Laptop charger info</h4>
              <div class="flex items-center gap-2">
                <div class="flex flex-col gap-1 w-full">
@@ -274,8 +277,8 @@
 
              <div class="flex items-center justify-between gap-2 mt-2">
                <div class="flex flex-col gap-1 w-full">
-                 <label for="">Serial No.</label>
-                 <input type="text" name="charger-serial-number" class="w-full border rounded px-3 py-1" placeholder="Enter charger serial no.">
+                 <label>Serial No.</label>
+                 <input type="text" name="charger-serial-number" class="w-full border rounded px-3 py-1" placeholder="Enter charger serial no." id="charger-serial-number">
                </div>
                <div class="flex flex-col gap-1 w-full">
                  <label for="">Condition</label>
@@ -289,7 +292,8 @@
              </div>
            </figure>
 
-           <button type="submit" class="mt-4 bg-red-500 hover:bg-red-600 cursor-pointer font-bold text-sm text-white px-4 py-2 rounded" name="assigned-btn" id="form-assign-asset"><?= $editMode ? 'Update Asset' : 'Assign Asset' ?></button>
+           <button type="submit" class="mt-4 bg-red-500 hover:bg-red-600 cursor-pointer font-bold text-sm text-white px-4 py-2 rounded" name="assigned-btn" id="form-assign-asset">Assign Asset</button>
          </form>
        </div>
      </div>
+     <?php unset($_SESSION['form_errors']); ?>

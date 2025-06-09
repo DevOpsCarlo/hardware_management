@@ -1,9 +1,7 @@
 <?php
 $pageTitle = 'Inventory List';
 
-
-
-// Update the asset creation section
+// Update the asset creation/update section
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['assigned-btn'])) {
 
   // Get form data
@@ -21,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['assigned-btn'])) {
   $chargerModel = $_POST['charger-model'] ?? '';
   $chargerSerialNumber = $_POST['charger-serial-number'] ?? '';
   $chargerCondition = $_POST['charger-condition'] ?? 'New';
+  $chargerId = isset($_POST['charger-id']) ? intval($_POST['charger-id']) : 0;
 
   // Validate required fields
   if (empty($inventoryId)) {
@@ -54,31 +53,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['assigned-btn'])) {
     $isLaptopCharger = isLaptopCharger($categoryName);
     $accessorySuffix = getLaptopAccessorySuffix($categoryName);
 
-    // Generate asset number based on type
-    if ($isMainLaptop) {
-      // Main laptop gets standard numbering: TRA-01-0001
-      $assetNumber = generateNextAssetNumber($categoryCode);
-    } elseif ($isLaptopCharger) {
-      // Laptop chargers get their own tracked numbering with suffix: TRA-01-0001C
-      $assetNumber = generateNextLaptopChargerAssetNumber($categoryCode);
-    } elseif ($accessorySuffix) {
-      // Other laptop accessories get base number + suffix: TRA-01-0001M
-      $baseAssetNumber = getLastAssetNumber($categoryCode);
-      if ($baseAssetNumber) {
-        // Use the same base number as the last laptop
-        $assetNumber = $baseAssetNumber . $accessorySuffix;
-      } else {
-        // If no laptop exists, create base number and add suffix
-        $newBaseNumber = generateNextAssetNumber($categoryCode);
-        $assetNumber = $newBaseNumber . $accessorySuffix;
-        // Update the tracking for the base number
-        updateLastAssetNumber($categoryCode, $newBaseNumber);
-      }
-    } else {
-      // Other categories get their own numbering: TRA-03-0001, TRA-05-0001
-      $assetNumber = generateNextAssetNumber($categoryCode);
-    }
-
     // Handle file upload for asset photo
     $assetPhotoPath = null;
     if (isset($_FILES['asset_photo']) && $_FILES['asset_photo']['error'] == UPLOAD_ERR_OK) {
@@ -99,94 +73,241 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['assigned-btn'])) {
       }
     }
 
-    // Count already assigned assets before insertion
-    $assignedStmt = $pdo->prepare("SELECT COUNT(*) FROM assets WHERE inventory_id = ?");
-    $assignedStmt->execute([$inventoryId]);
-    $assignedCount = (int) $assignedStmt->fetchColumn();
+    // Determine if this is an update or create operation
+    if ($assetId > 0) {
+      // UPDATE EXISTING ASSET
 
-    // Get allowed quantity
-    $inventoryQtyStmt = $pdo->prepare("SELECT quantity FROM inventory WHERE id = ?");
-    $inventoryQtyStmt->execute([$inventoryId]);
-    $inventoryQty = (int) $inventoryQtyStmt->fetchColumn();
+      // Get current asset photo if no new photo uploaded
+      if ($assetPhotoPath === null) {
+        $currentAssetStmt = $pdo->prepare("SELECT asset_photo FROM assets WHERE id = ?");
+        $currentAssetStmt->execute([$assetId]);
+        $currentAsset = $currentAssetStmt->fetch(PDO::FETCH_ASSOC);
+        $assetPhotoPath = $currentAsset['asset_photo'] ?? null;
+      }
 
-    // Check if the serial number is already exist in the database 
-    $serialNumberExistStmt = $pdo->prepare("SELECT COUNT(*) FROM assets WHERE LOWER(serial_number) = LOWER(?) AND id != ?");
-    $serialNumberExistStmt->execute([$serialNumber, $assetId]);
-    $count = $serialNumberExistStmt->fetchColumn();
+      // Update the main asset
+      $updateStmt = $pdo->prepare("UPDATE assets SET 
+        model = ?, 
+        serial_number = ?, 
+        ip_address = ?, 
+        status = ?, 
+        conditions = ?, 
+        date_of_purchase = ?, 
+        warranty_date = ?, 
+        asset_photo = ?
+        WHERE id = ?");
 
-    if ($count > 0) {
-      $_SESSION['iventory_error'] = "Serial number already exists!";
-      $_SESSION['inventory_form_data'] = ['name' => $serialNumber, 'id' => $assetId];
-      $_SESSION['inventory_edit_mode'] = $assetId > 0;
-      header("Location: /hardware-management/inventory-list");
-      exit;
-    }
-
-    // Stop if no remaining units
-    if ($assignedCount >= $inventoryQty) {
-      $_SESSION['inventory_error'] = 'No more items available to assign from inventory.';
-      header('Location: /manage-hardware/inventory-list');
-      exit;
-    }
-
-    // Prepare the SQL query to insert the asset
-    $stmt = $pdo->prepare("INSERT INTO assets 
-            (asset_number, model, category_code, item_type, serial_number, ip_address, status, conditions, date_of_purchase, warranty_date, inventory_id, asset_photo) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-    $stmt->execute([
-      $assetNumber,
-      $model,
-      $categoryCode,
-      $categoryName,
-      $serialNumber,
-      $ipAddress,
-      $status,
-      $condition,
-      $dateOfPurchase,
-      $warrantyDate,
-      $inventoryId,
-      $assetPhotoPath
-    ]);
-
-    $laptopAssetId = $pdo->lastInsertId();
-    $successMessage = "Asset {$assetNumber} has been successfully created.";
-
-    // If this is a main laptop and charger info is provided, create a separate charger asset
-    if ($isMainLaptop && !empty($chargerModel)) {
-      // Generate charger asset number with its own tracking
-      $chargerAssetNumber = generateNextLaptopChargerAssetNumber($categoryCode);
-
-      $chargerStmt = $pdo->prepare("INSERT INTO assets 
-              (asset_number, model, category_code, item_type, serial_number, status, conditions, related_laptop_id, inventory_id, date_of_purchase, warranty_date) 
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-      $chargerStmt->execute([
-        $chargerAssetNumber,
+      $updateStmt->execute([
         $model,
-        $categoryCode, // Same category code "01"
-        'Laptop Charger',
-        $chargerSerialNumber,
+        $serialNumber,
+        $ipAddress,
         $status,
-        $chargerCondition,
-        $laptopAssetId,
-        $inventoryId,
+        $condition,
         $dateOfPurchase,
-        $warrantyDate
+        $warrantyDate,
+        $assetPhotoPath,
+        $assetId
       ]);
 
-      // Update charger tracking
-      updateLastLaptopChargerAssetNumber($categoryCode, $chargerAssetNumber);
+      // Get the updated asset info for success message
+      $assetInfoStmt = $pdo->prepare("SELECT asset_number FROM assets WHERE id = ?");
+      $assetInfoStmt->execute([$assetId]);
+      $assetInfo = $assetInfoStmt->fetch(PDO::FETCH_ASSOC);
+      $assetNumber = $assetInfo['asset_number'];
 
-      // Update success message to include charger
-      $successMessage = "Asset {$assetNumber} and charger {$chargerAssetNumber} have been successfully created.";
-    }
+      $successMessage = "Asset {$assetNumber} has been successfully updated.";
 
-    // Update the last asset number based on item type
-    if ($isMainLaptop || (!$accessorySuffix && !$isLaptopCharger)) {
-      updateLastAssetNumber($categoryCode, $assetNumber);
-    } elseif ($isLaptopCharger) {
-      updateLastLaptopChargerAssetNumber($categoryCode, $assetNumber);
+      // Handle charger update if this is a laptop and charger info is provided
+      if ($isMainLaptop && !empty($chargerModel)) {
+        if ($chargerId > 0) {
+          // Update existing charger
+          $updateChargerStmt = $pdo->prepare("UPDATE assets SET 
+            model = ?, 
+            serial_number = ?, 
+            status = ?, 
+            conditions = ?, 
+            date_of_purchase = ?, 
+            warranty_date = ?
+            WHERE id = ?");
+
+          $updateChargerStmt->execute([
+            $chargerModel,
+            $chargerSerialNumber,
+            $status,
+            $chargerCondition,
+            $dateOfPurchase,
+            $warrantyDate,
+            $chargerId
+          ]);
+
+          // Get charger asset number for success message
+          $chargerInfoStmt = $pdo->prepare("SELECT asset_number FROM assets WHERE id = ?");
+          $chargerInfoStmt->execute([$chargerId]);
+          $chargerInfo = $chargerInfoStmt->fetch(PDO::FETCH_ASSOC);
+          $chargerAssetNumber = $chargerInfo['asset_number'];
+
+          $successMessage = "Asset {$assetNumber} and charger {$chargerAssetNumber} have been successfully updated.";
+        } else {
+          // Create new charger for existing laptop
+          $chargerAssetNumber = generateNextLaptopChargerAssetNumber($categoryCode);
+
+          $chargerStmt = $pdo->prepare("INSERT INTO assets 
+            (asset_number, model, category_code, item_type, serial_number, status, conditions, related_laptop_id, inventory_id, date_of_purchase, warranty_date) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+          $chargerStmt->execute([
+            $chargerAssetNumber,
+            $chargerModel,
+            $categoryCode,
+            'Laptop Charger',
+            $chargerSerialNumber,
+            $status,
+            $chargerCondition,
+            $assetId,
+            $inventoryId,
+            $dateOfPurchase,
+            $warrantyDate
+          ]);
+
+          updateLastLaptopChargerAssetNumber($categoryCode, $chargerAssetNumber);
+          $successMessage = "Asset {$assetNumber} has been updated and charger {$chargerAssetNumber} has been created.";
+        }
+      }
+    } else {
+      // CREATE NEW ASSET
+      // Check for duplicate serial number (exclude current asset if updating)
+      $serialNumberExistStmt = $pdo->prepare("SELECT COUNT(*) FROM assets WHERE LOWER(serial_number) = LOWER(?) AND id != ?");
+      $serialNumberExistStmt->execute([$serialNumber, $assetId]);
+      $count = $serialNumberExistStmt->fetchColumn();
+
+      if ($count > 0) {
+        $serialError = "Serial number already exists!";
+        $_SESSION['form_errors']['serial'] = $serialError;
+        $_SESSION['inventory_form_data'] = ['serial_number' => $serialNumber, 'id' => $assetId];
+        $_SESSION['inventory_edit_mode'] = $assetId > 0;
+        header("Location: /manage-hardware/inventory-list");
+        exit;
+      }
+
+      // Check for duplicate IP address (exclude current asset if updating)
+      if (!empty($ipAddress)) {
+        $ipExistStmt = $pdo->prepare("
+        SELECT COUNT(*) FROM assets 
+        WHERE ip_address = ? AND id != ?
+      ");
+        $ipExistStmt->execute([$ipAddress, $assetId]);
+        $ipCount = $ipExistStmt->fetchColumn();
+
+        if ($ipCount > 0) {
+          $ipError = "IP address already exists!";
+          $_SESSION['form_errors']['ip'] = $ipError;
+          $_SESSION['inventory_form_data'] = ['ip_address' => $ipAddress, 'id' => $assetId];
+          header("Location: /manage-hardware/inventory-list");
+          exit;
+        }
+      }
+
+      // Count already assigned assets before insertion
+      $assignedStmt = $pdo->prepare("SELECT COUNT(*) FROM assets WHERE inventory_id = ?");
+      $assignedStmt->execute([$inventoryId]);
+      $assignedCount = (int) $assignedStmt->fetchColumn();
+
+      // Get allowed quantity
+      $inventoryQtyStmt = $pdo->prepare("SELECT quantity FROM inventory WHERE id = ?");
+      $inventoryQtyStmt->execute([$inventoryId]);
+      $inventoryQty = (int) $inventoryQtyStmt->fetchColumn();
+
+      // Stop if no remaining units
+      if ($assignedCount >= $inventoryQty) {
+        $_SESSION['inventory_error'] = 'No more items available to assign from inventory.';
+        header('Location: /manage-hardware/inventory-list');
+        exit;
+      }
+
+      // Generate asset number based on type
+      if ($isMainLaptop) {
+        // Main laptop gets standard numbering: TRA-01-0001
+        $assetNumber = generateNextAssetNumber($categoryCode);
+      } elseif ($isLaptopCharger) {
+        // Laptop chargers get their own tracked numbering with suffix: TRA-01-0001C
+        $assetNumber = generateNextLaptopChargerAssetNumber($categoryCode);
+      } elseif ($accessorySuffix) {
+        // Other laptop accessories get base number + suffix: TRA-01-0001M
+        $baseAssetNumber = getLastAssetNumber($categoryCode);
+        if ($baseAssetNumber) {
+          // Use the same base number as the last laptop
+          $assetNumber = $baseAssetNumber . $accessorySuffix;
+        } else {
+          // If no laptop exists, create base number and add suffix
+          $newBaseNumber = generateNextAssetNumber($categoryCode);
+          $assetNumber = $newBaseNumber . $accessorySuffix;
+          // Update the tracking for the base number
+          updateLastAssetNumber($categoryCode, $newBaseNumber);
+        }
+      } else {
+        // Other categories get their own numbering: TRA-03-0001, TRA-05-0001
+        $assetNumber = generateNextAssetNumber($categoryCode);
+      }
+
+      // Prepare the SQL query to insert the asset
+      $stmt = $pdo->prepare("INSERT INTO assets 
+        (asset_number, model, category_code, item_type, serial_number, ip_address, status, conditions, date_of_purchase, warranty_date, inventory_id, asset_photo) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+      $stmt->execute([
+        $assetNumber,
+        $model,
+        $categoryCode,
+        $categoryName,
+        $serialNumber,
+        $ipAddress,
+        $status,
+        $condition,
+        $dateOfPurchase,
+        $warrantyDate,
+        $inventoryId,
+        $assetPhotoPath
+      ]);
+
+      $laptopAssetId = $pdo->lastInsertId();
+      $successMessage = "Asset {$assetNumber} has been successfully created.";
+
+      // If this is a main laptop and charger info is provided, create a separate charger asset
+      if ($isMainLaptop && !empty($chargerModel)) {
+        // Generate charger asset number with its own tracking
+        $chargerAssetNumber = generateNextLaptopChargerAssetNumber($categoryCode);
+
+        $chargerStmt = $pdo->prepare("INSERT INTO assets 
+          (asset_number, model, category_code, item_type, serial_number, status, conditions, related_laptop_id, inventory_id, date_of_purchase, warranty_date) 
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+        $chargerStmt->execute([
+          $chargerAssetNumber,
+          $chargerModel,
+          $categoryCode, // Same category code "01"
+          'Laptop Charger',
+          $chargerSerialNumber,
+          $status,
+          $chargerCondition,
+          $laptopAssetId,
+          $inventoryId,
+          $dateOfPurchase,
+          $warrantyDate
+        ]);
+
+        // Update charger tracking
+        updateLastLaptopChargerAssetNumber($categoryCode, $chargerAssetNumber);
+
+        // Update success message to include charger
+        $successMessage = "Asset {$assetNumber} and charger {$chargerAssetNumber} have been successfully created.";
+      }
+
+      // Update the last asset number based on item type
+      if ($isMainLaptop || (!$accessorySuffix && !$isLaptopCharger)) {
+        updateLastAssetNumber($categoryCode, $assetNumber);
+      } elseif ($isLaptopCharger) {
+        updateLastLaptopChargerAssetNumber($categoryCode, $assetNumber);
+      }
     }
 
     // Set success message and redirect
@@ -199,7 +320,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['assigned-btn'])) {
     exit;
   }
 }
-
 
 // Add this function at the top of your file to map category names to codes
 function getCategoryCode($categoryName)
@@ -265,7 +385,6 @@ function isLaptopCharger($categoryName)
   $categoryLower = strtolower(trim($categoryName));
   return in_array($categoryLower, ['laptop charger']);
 }
-
 
 // Function to generate the next asset number
 function generateNextAssetNumber($categoryCode)
@@ -375,6 +494,7 @@ function updateLastLaptopChargerAssetNumber($categoryCode, $newAssetNumber)
     $stmt->execute([$categoryCode, $defaultAssetNumber, $newAssetNumber]);
   }
 }
+
 if (isset($_GET['get_next_asset_number']) && isset($_GET['category_name'])) {
   header('Content-Type: application/json');
 
@@ -391,8 +511,6 @@ if (isset($_GET['get_next_asset_number']) && isset($_GET['category_name'])) {
   echo json_encode(['asset_number' => $nextAssetNumber]);
   exit;
 }
-
-
 
 //FETCH INVENTORY
 $stmt = $pdo->prepare("
@@ -411,10 +529,8 @@ $stmt = $pdo->prepare("
 $stmt->execute();
 $inventories = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-
 $stmt = $pdo->prepare("
     SELECT * FROM assets
-   
 ");
 $stmt->execute();
 $assets = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -428,6 +544,5 @@ foreach ($assets as $asset) {
   }
   $assetsByInventory[$invId][] = $asset;
 }
-
 
 require("views/inventory-list.views.php");

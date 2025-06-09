@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const tabButtons = document.querySelectorAll(".tab-button");
   const tabContents = document.querySelectorAll(".tab-content");
   const addInventory = document.querySelector(".add-inventory-btn");
+  const formAssignBtn = document.getElementById("form-assign-asset");
 
   // ADD INVENTORY TAB VALIDATION
   if (addInventory) {
@@ -159,6 +160,11 @@ document.addEventListener("DOMContentLoaded", function () {
       e.stopPropagation();
       deleteInventory(e.target);
     }
+
+    // DELETE ASSET
+    if (e.target.classList.contaienr("delete-asset-btn")) {
+      e.stopPropagation();
+    }
   }
 
   // EDIT INVENTORY FUNCTION
@@ -202,8 +208,40 @@ document.addEventListener("DOMContentLoaded", function () {
   function deleteInventory(target) {
     const inventoryId = target.getAttribute("data-id");
     const inventoryName = target.getAttribute("data-name");
-
     if (!inventoryId || !inventoryName) {
+      console.error("Missing inventory data");
+      return;
+    }
+
+    // Check if SweetAlert is available
+    if (typeof Swal !== "undefined") {
+      Swal.fire({
+        icon: "warning",
+        title: "Delete Inventory?",
+        text: `Are you sure you want to delete "${inventoryName}"?`,
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Delete",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          performDelete(inventoryId, inventoryName, target);
+        }
+      });
+    } else {
+      // Fallback to native confirm
+      if (confirm(`Are you sure you want to delete "${inventoryName}"?`)) {
+        performDelete(inventoryId, inventoryName, target);
+      }
+    }
+  }
+
+  function deleteAsset(target) {
+    const inventoryId = target.getAttribute("data-id");
+    const assetId = target.getAttribute("data-asset-id");
+    console.log("inventory id:", inventoryId);
+    console.log("asset id: ", assetId);
+    if (!inventoryId || !assetId) {
       console.error("Missing inventory data");
       return;
     }
@@ -277,12 +315,20 @@ document.addEventListener("DOMContentLoaded", function () {
   function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
-
+  const chargerSerialInput = document.getElementById("charger-serial-number");
+  const chargerConditionSelect = document.querySelector(
+    'select[name="charger-condition"]'
+  );
+  function clearChargerFields() {
+    if (chargerSerialInput) chargerSerialInput.value = "";
+    if (chargerConditionSelect) chargerConditionSelect.value = "New";
+  }
   // OPEN ASSIGN ASSET MODAL
 
   async function openAssignAssetModal(target) {
     const modal = document.getElementById("assign-asset-modal");
     if (!modal) return;
+    const chargerModelInput = document.getElementById("model-charger");
 
     const itemNumberInput = document.getElementById("modal-item-number");
     const inventoryIdInput = document.getElementById("modal-inventory-id");
@@ -294,6 +340,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const chargerAssetNumberInput = document.getElementById(
       "charger-asset-number"
     );
+    const assetIdInput = document.getElementById("asset-id");
+    const chargerIdInput = document.getElementById("charger-id");
+
     const assetNumberInput = document.getElementById("modal-asset-number");
     const inputModel = document.getElementById("input-model");
     const inputSerialNumber = document.getElementById("input-serial-number");
@@ -301,8 +350,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const inputDatePurchase = document.getElementById("date-purchase");
     const inputWarrantyDate = document.getElementById("warranty-date");
     const selectStatus = document.getElementById("select-status");
-    const selectConditions = document.getElementById("select-condtions");
-
+    const selectConditions = document.getElementById("select-conditions");
+    // const assetId = document.getElementById("asset-id");
     // Get data from button attributes
     const itemNumber = target.getAttribute("data-item-number");
     const inventoryId = target.getAttribute("data-id");
@@ -317,12 +366,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const conditions = target.getAttribute("data-conditions");
     const dateOfPurchase = target.getAttribute("data-dateof-purchase");
     const warrantyDate = target.getAttribute("data-warranty-date");
-
+    const assetId = target.getAttribute("data-asset-id");
     // Get charger data from button attributes
     const chargerId = target.getAttribute("data-charger-id");
-    console.log(chargerId);
     const chargerAssetNumber = target.getAttribute("data-charger-asset-number");
-    console.log(chargerAssetNumber);
     const chargerModel = target.getAttribute("data-charger-model");
     const chargerSerialNumber = target.getAttribute(
       "data-charger-serial-number"
@@ -330,7 +377,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const chargerConditions = target.getAttribute("data-charger-conditions");
     const chargerStatus = target.getAttribute("data-charger-status");
 
+    if (assetId != 0) {
+      formAssignBtn.textContent = "Update Asset";
+    } else {
+      formAssignBtn.textContent = "Assign Asset";
+    }
     // Populate form fields
+    if (assetIdInput) assetIdInput.value = assetId || "";
+    if (chargerIdInput) chargerIdInput.value = chargerId || "";
     if (itemNumberInput) itemNumberInput.value = itemNumber || "";
     if (inventoryIdInput) inventoryIdInput.value = inventoryId || "";
     if (manufacturerInput) manufacturerInput.value = manufacturer || "";
@@ -383,59 +437,50 @@ document.addEventListener("DOMContentLoaded", function () {
       assetPhotoInput.dataset.listenerAdded = "true";
     }
     const existingAssetNumber = target.getAttribute("data-asset-number");
+    // if (chargerSection) {
+    if (categoryName && categoryName.toLowerCase() === "laptop") {
+      chargerSection.classList.remove("hidden");
 
-    if (chargerSection) {
-      if (categoryName && categoryName.toLowerCase() === "laptop") {
-        chargerSection.classList.remove("hidden");
+      // Populate charger fields if data exists
+      if (chargerId) {
+        if (chargerAssetNumberInput)
+          chargerAssetNumberInput.value = chargerAssetNumber;
 
-        // Populate charger fields if data exists
-        if (chargerId) {
-          if (chargerAssetNumberInput)
-            chargerAssetNumberInput.value = chargerAssetNumber || "";
-          const chargerModelInput = document.getElementById("model-charger");
-          const chargerSerialInput = document.querySelector(
-            'input[name="charger-serial-number"]'
-          );
-          const chargerConditionSelect = document.querySelector(
-            'select[name="charger-condition"]'
-          );
+        if (chargerModelInput) chargerModelInput.value = manufacturer;
+        if (chargerSerialInput) chargerSerialInput.value = chargerSerialNumber;
 
-          if (chargerModelInput)
-            // chargerModel
-            chargerModelInput.value = manufacturer || "";
-          if (chargerSerialInput)
-            chargerSerialInput.value = chargerSerialNumber || "";
-          if (chargerConditionSelect)
-            chargerConditionSelect.value = chargerConditions || "New";
-        } else {
-          // Creating new laptop - fetch next charger asset number
-          try {
-            const chargerResponse = await fetch(
-              `/manage-hardware/inventory-list?get_next_asset_number=1&category_name=${encodeURIComponent(
-                "laptop charger"
-              )}`
-            );
-            const chargerData = await chargerResponse.json();
-            if (chargerAssetNumberInput)
-              chargerAssetNumberInput.value = chargerData.asset_number;
-          } catch (error) {
-            console.error("Error fetching charger asset number:", error);
-          }
-        }
-
-        const assetTypeInput = document.getElementById("asset-type");
-        if (assetTypeInput) assetTypeInput.value = "laptop charger";
+        if (chargerConditionSelect)
+          chargerConditionSelect.value = chargerConditions;
       } else {
-        chargerSection.classList.add("hidden");
+        // Creating new laptop - fetch next charger asset number
+        try {
+          const chargerResponse = await fetch(
+            `/manage-hardware/inventory-list?get_next_asset_number=1&category_name=${encodeURIComponent(
+              "laptop charger"
+            )}`
+          );
+          const chargerData = await chargerResponse.json();
+          if (chargerAssetNumberInput)
+            chargerAssetNumberInput.value = chargerData.asset_number;
+        } catch (error) {
+          console.error("Error fetching charger asset number:", error);
+        }
       }
+
+      const assetTypeInput = document.getElementById("asset-type");
+      if (assetTypeInput) assetTypeInput.value = "laptop charger";
+    } else {
+      chargerSection.classList.add("hidden");
     }
+    // }
     if (existingAssetNumber) {
       // Use existing asset number from row data
       if (assetNumberInput) {
         assetNumberInput.value = existingAssetNumber;
       }
     } else {
-      // 🔥 FETCH NEXT ASSET NUMBER FROM SERVER
+      //  FETCH NEXT ASSET NUMBER FROM SERVER
+      clearChargerFields();
       try {
         const response = await fetch(
           `/manage-hardware/inventory-list?get_next_asset_number=1&category_name=${encodeURIComponent(
@@ -447,28 +492,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (assetNumberInput) {
           assetNumberInput.value = data.asset_number;
         }
-
-        // Handle laptop charger section
-        // if (chargerSection && chargerAssetNumberInput) {
-        //   if (categoryName && categoryName.toLowerCase() === "laptop") {
-        //     chargerSection.classList.remove("hidden");
-
-        //     // Fetch next charger asset number
-        //     const chargerResponse = await fetch(
-        //       // `/manage-hardware/inventory-list?get_next_asset_number=1&category_name=laptop_charger`
-        //       `/manage-hardware/inventory-list?get_next_asset_number=1&category_name=${encodeURIComponent(
-        //         "laptop charger"
-        //       )}`
-        //     );
-        //     const chargerData = await chargerResponse.json();
-        //     chargerAssetNumberInput.value = chargerData.asset_number;
-
-        //     const assetTypeInput = document.getElementById("asset-type");
-        //     if (assetTypeInput) assetTypeInput.value = "laptop charger";
-        //   } else {
-        //     chargerSection.classList.add("hidden");
-        //   }
-        // }
       } catch (error) {
         console.error("Error fetching asset number:", error);
         // Fallback to default if API fails
@@ -513,7 +536,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  const formAssignBtn = document.getElementById("form-assign-asset");
   formAssignBtn.addEventListener("click", (e) => {
     let hasError = false;
     const inputModel = document.getElementById("input-model");
