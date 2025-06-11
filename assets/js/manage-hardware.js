@@ -156,14 +156,16 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // DELETE INVENTORY
-    if (e.target.classList.contains("delete-inventory-btn")) {
-      e.stopPropagation();
-      deleteInventory(e.target);
-    }
+    // if (e.target.classList.contains("delete-inventory-btn")) {
+    //   e.stopPropagation();
+    //   deleteInventory(e.target);
+    // }
 
     // DELETE ASSET
-    if (e.target.classList.contaienr("delete-asset-btn")) {
+    if (e.target.classList.contains("delete-asset-btn")) {
       e.stopPropagation();
+      deleteInventoryAsset(e.target);
+      console.log("click");
     }
   }
 
@@ -204,44 +206,11 @@ document.addEventListener("DOMContentLoaded", function () {
     form.action = "/manage-hardware";
   }
 
-  // DELETE INVENTORY FUNCTION
+  // DELETE ALL INVENTORY FUNCTION
   function deleteInventory(target) {
     const inventoryId = target.getAttribute("data-id");
     const inventoryName = target.getAttribute("data-name");
     if (!inventoryId || !inventoryName) {
-      console.error("Missing inventory data");
-      return;
-    }
-
-    // Check if SweetAlert is available
-    if (typeof Swal !== "undefined") {
-      Swal.fire({
-        icon: "warning",
-        title: "Delete Inventory?",
-        text: `Are you sure you want to delete "${inventoryName}"?`,
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Delete",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          performDelete(inventoryId, inventoryName, target);
-        }
-      });
-    } else {
-      // Fallback to native confirm
-      if (confirm(`Are you sure you want to delete "${inventoryName}"?`)) {
-        performDelete(inventoryId, inventoryName, target);
-      }
-    }
-  }
-
-  function deleteAsset(target) {
-    const inventoryId = target.getAttribute("data-id");
-    const assetId = target.getAttribute("data-asset-id");
-    console.log("inventory id:", inventoryId);
-    console.log("asset id: ", assetId);
-    if (!inventoryId || !assetId) {
       console.error("Missing inventory data");
       return;
     }
@@ -312,6 +281,301 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       });
   }
+
+  function deleteInventoryAsset(target) {
+    const inventoryId = target.getAttribute("data-id");
+    const inventoryName = target.getAttribute("data-inventory-name");
+    const assetId = target.getAttribute("data-asset-id");
+    const currentQuantity = parseInt(
+      target.getAttribute("data-current-quantity")
+    );
+    const itemNumber = target.getAttribute("data-item-number");
+
+    console.log("Delete request data:", {
+      inventoryId,
+      inventoryName,
+      assetId,
+      currentQuantity,
+      itemNumber,
+      target,
+    });
+
+    // Enhanced validation
+    if (!inventoryId || !inventoryName) {
+      console.error("Missing required inventory data", {
+        inventoryId,
+        inventoryName,
+        assetId,
+        hasId: !!inventoryId,
+        hasName: !!inventoryName,
+      });
+      alert("Missing inventory data. Please refresh the page and try again.");
+      return;
+    }
+
+    if (isNaN(currentQuantity) || currentQuantity <= 0) {
+      console.error("Invalid current quantity", { currentQuantity });
+      alert("Invalid quantity data. Please refresh the page and try again.");
+      return;
+    }
+
+    // Check if SweetAlert is available
+    if (typeof Swal !== "undefined") {
+      Swal.fire({
+        icon: "warning",
+        title: "Delete Asset?",
+        text: `Are you sure you want to delete this "${inventoryName}" asset? This will reduce the inventory quantity from ${currentQuantity} to ${
+          currentQuantity - 1
+        }.`,
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Delete Asset",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          performSingleAssetDelete(
+            inventoryId,
+            inventoryName,
+            assetId,
+            currentQuantity,
+            itemNumber,
+            target
+          );
+        }
+      });
+    } else {
+      // Fallback to native confirm
+      if (
+        confirm(
+          `Are you sure you want to delete this "${inventoryName}" asset? This will reduce the inventory quantity from ${currentQuantity} to ${
+            currentQuantity - 1
+          }.`
+        )
+      ) {
+        performSingleAssetDelete(
+          inventoryId,
+          inventoryName,
+          assetId,
+          currentQuantity,
+          itemNumber,
+          target
+        );
+      }
+    }
+  }
+
+  function performSingleAssetDelete(
+    inventoryId,
+    inventoryName,
+    assetId,
+    currentQuantity,
+    itemNumber,
+    target
+  ) {
+    console.log("Starting delete operation for:", {
+      inventoryId,
+      inventoryName,
+      assetId,
+      currentQuantity,
+    });
+
+    const formData = new FormData();
+    formData.append("delete_single_asset", inventoryId);
+    formData.append("asset_id", assetId);
+    formData.append("current_quantity", currentQuantity);
+    formData.append("item_number", itemNumber || 0);
+
+    // Log FormData contents for debugging
+    for (let [key, value] of formData.entries()) {
+      console.log(`FormData ${key}:`, value);
+    }
+
+    // Show loading state
+    if (typeof Swal !== "undefined") {
+      Swal.fire({
+        title: "Deleting Asset...",
+        text: "Please wait while we process your request.",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        },
+      });
+    }
+
+    fetch("/manage-hardware/inventory-list", {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => {
+        console.log("Response status:", res.status);
+        console.log("Response headers:", [...res.headers.entries()]);
+        console.log("Content-Type:", res.headers.get("content-type"));
+
+        if (!res.ok) {
+          // Try to get error details from response
+          return res.text().then((text) => {
+            console.error("Server error response:", text);
+            throw new Error(
+              `Server error (${res.status}): ${text || "Unknown error"}`
+            );
+          });
+        }
+
+        // Check if response is actually JSON
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          return res.text().then((text) => {
+            console.error("Non-JSON response received:", text);
+            throw new Error(
+              "Server returned non-JSON response: " + text.substring(0, 200)
+            );
+          });
+        }
+
+        return res.text(); // Get as text first to debug
+      })
+      .then((responseText) => {
+        console.log("Raw response text:", responseText);
+        console.log("Response length:", responseText.length);
+
+        // Try to find where JSON ends
+        let jsonEndIndex = responseText.indexOf("}{");
+        if (jsonEndIndex !== -1) {
+          console.warn("Multiple JSON objects detected. Taking first one.");
+          responseText = responseText.substring(0, jsonEndIndex + 1);
+        }
+
+        // Remove any trailing content after JSON
+        let trimmedResponse = responseText.trim();
+        if (trimmedResponse.endsWith("}")) {
+          // Find the last complete JSON object
+          let braceCount = 0;
+          let jsonEnd = -1;
+          for (let i = trimmedResponse.length - 1; i >= 0; i--) {
+            if (trimmedResponse[i] === "}") {
+              braceCount++;
+            } else if (trimmedResponse[i] === "{") {
+              braceCount--;
+              if (braceCount === 0) {
+                jsonEnd = i;
+                break;
+              }
+            }
+          }
+          if (jsonEnd !== -1) {
+            const jsonPart = trimmedResponse.substring(jsonEnd);
+            console.log("Extracted JSON part:", jsonPart);
+            return JSON.parse(jsonPart);
+          }
+        }
+
+        // Try to parse the full response
+        try {
+          return JSON.parse(trimmedResponse);
+        } catch (parseError) {
+          console.error("JSON parse error:", parseError);
+          console.error("Problematic response:", trimmedResponse);
+          throw new Error("Invalid JSON response from server");
+        }
+      })
+      .then((data) => {
+        console.log("Delete response data:", data);
+
+        if (data.success) {
+          if (typeof Swal !== "undefined") {
+            Swal.fire({
+              icon: "success",
+              text: `"${inventoryName}" asset was deleted successfully! New quantity: ${data.new_quantity}`,
+              showConfirmButton: false,
+              timer: 2000,
+              timerProgressBar: true,
+              position: "top-end",
+              toast: true,
+            });
+          }
+
+          // Remove the specific row
+          const row = target.closest("tr");
+          if (row) {
+            console.log("Removing row:", row);
+            row.remove();
+          } else {
+            console.warn("Could not find row to remove");
+          }
+
+          // Update quantity display for remaining rows of the same inventory
+          updateInventoryQuantityDisplay(inventoryId, data.new_quantity);
+
+          // If quantity reaches 0, show message
+          if (data.new_quantity <= 0) {
+            setTimeout(() => {
+              if (typeof Swal !== "undefined") {
+                Swal.fire({
+                  icon: "info",
+                  title: "Inventory Empty",
+                  text: `All "${inventoryName}" assets have been deleted.`,
+                  confirmButtonText: "OK",
+                }).then(() => {
+                  location.reload();
+                });
+              } else {
+                alert(`All "${inventoryName}" assets have been deleted.`);
+                location.reload();
+              }
+            }, 2500);
+          }
+        } else {
+          console.error("Server returned success=false:", data);
+          throw new Error(
+            data.error || data.message || "Unknown error occurred"
+          );
+        }
+      })
+      .catch((error) => {
+        console.error("Delete error details:", {
+          error: error,
+          message: error.message,
+          stack: error.stack,
+        });
+
+        if (typeof Swal !== "undefined") {
+          Swal.fire({
+            icon: "error",
+            title: "Delete Failed",
+            text: "Could not delete the asset: " + error.message,
+            confirmButtonText: "OK",
+          });
+        } else {
+          alert("Could not delete the asset: " + error.message);
+        }
+      });
+  }
+
+  // Helper function to update quantity displays
+  function updateInventoryQuantityDisplay(inventoryId, newQuantity) {
+    // Find all elements that display quantity for this inventory
+    const quantityElements = document.querySelectorAll(
+      `[data-inventory-id="${inventoryId}"] .quantity-display`
+    );
+    quantityElements.forEach((element) => {
+      element.textContent = newQuantity;
+    });
+
+    // Update data attributes for remaining delete buttons
+    const deleteButtons = document.querySelectorAll(
+      `[data-id="${inventoryId}"]`
+    );
+    deleteButtons.forEach((button) => {
+      button.setAttribute("data-current-quantity", newQuantity);
+    });
+
+    console.log(
+      `Updated quantity display for inventory ${inventoryId} to ${newQuantity}`
+    );
+  }
+
   function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
@@ -319,6 +583,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const chargerConditionSelect = document.querySelector(
     'select[name="charger-condition"]'
   );
+
   function clearChargerFields() {
     if (chargerSerialInput) chargerSerialInput.value = "";
     if (chargerConditionSelect) chargerConditionSelect.value = "New";

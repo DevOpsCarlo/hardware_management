@@ -321,6 +321,81 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['assigned-btn'])) {
   }
 }
 
+if (isset($_POST['delete_single_asset'])) {
+  // Clean any previous output buffer to prevent extra content
+  if (ob_get_level()) ob_clean();
+
+  $inventoryId = $_POST['delete_single_asset'];
+  $assetId = isset($_POST['asset_id']) ? (int)$_POST['asset_id'] : 0;
+  $currentQuantity = isset($_POST['current_quantity']) ? (int)$_POST['current_quantity'] : 0;
+  $itemNumber = isset($_POST['item_number']) ? (int)$_POST['item_number'] : 0;
+
+  error_log("Delete request received: " . json_encode([
+    'inventoryId' => $inventoryId,
+    'currentQuantity' => $currentQuantity,
+    'itemNumber' => $itemNumber
+  ]));
+
+  // Set headers first
+  header('Content-Type: application/json');
+
+  if (empty($inventoryId)) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'error' => 'Missing inventory ID']);
+    exit;
+  }
+
+  if ($currentQuantity <= 0) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'error' => 'Invalid current quantity']);
+    exit;
+  }
+
+  if ($assetId < 0) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'error' => 'Missing or invalid asset ID']);
+    exit;
+  }
+
+  try {
+    $pdo->beginTransaction();
+
+    // Delete the specific asset if assetId is provided
+    if ($assetId > 0) {
+      $deleteAssetStmt = $pdo->prepare("DELETE FROM assets WHERE id = ? AND inventory_id = ?");
+      $deleteAssetStmt->execute([$assetId, $inventoryId]);
+    }
+
+    // Update inventory quantity
+    $updateInventoryStmt = $pdo->prepare("UPDATE inventory SET quantity = GREATEST(quantity - 1, 0) WHERE id = ?");
+    $updateInventoryStmt->execute([$inventoryId]);
+
+    // Get the new quantity to return
+    $getQuantityStmt = $pdo->prepare("SELECT quantity FROM inventory WHERE id = ?");
+    $getQuantityStmt->execute([$inventoryId]);
+    $newQuantity = $getQuantityStmt->fetchColumn();
+
+    $pdo->commit();
+
+    // Return consistent response format
+    echo json_encode([
+      'success' => true,
+      'message' => 'Asset deleted and inventory quantity reduced',
+      'new_quantity' => (int)$newQuantity
+    ]);
+  } catch (Exception $e) {
+    $pdo->rollback();
+    http_response_code(500);
+    echo json_encode([
+      'success' => false,
+      'error' => 'Database error: ' . $e->getMessage()
+    ]);
+  }
+
+  // Important: Exit to prevent any additional output
+  exit;
+}
+
 // Add this function at the top of your file to map category names to codes
 function getCategoryCode($categoryName)
 {

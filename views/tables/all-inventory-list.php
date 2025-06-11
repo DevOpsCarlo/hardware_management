@@ -117,7 +117,9 @@
                              <button class="cursor-pointer w-full text-left delete-asset-btn"
                                data-id="<?= htmlspecialchars($inventory['inventory_id']) ?>"
                                data-asset-id="<?= htmlspecialchars($asset['id'] ?? 0) ?>"
-                               item-number="<?= $itemCounter - 1 ?>">
+                               data-inventory-name="<?= htmlspecialchars($inventory['manufacturer']) ?>"
+                               data-current-quantity="<?= htmlspecialchars($inventory['quantity']) ?>"
+                               data-item-number="<?= $itemCounter - 1 ?>">
                                Delete
                              </button>
                            </li>
