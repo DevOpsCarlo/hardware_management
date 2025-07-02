@@ -12,7 +12,7 @@ unset($_SESSION['category_error'], $_SESSION['category_form_data'], $_SESSION['c
 <main class="grid grid-cols-1 sm:grid-cols-12 min-h-screen">
   <?php require("views/sidebar.php"); ?>
   <section class="col-span-12 md:col-span-10 ">
-    <?php require("views/banner.php"); ?>
+    <!-- require("views/banner.php"); -->
     <article class="mt-6 px-6 text-2xl font-bold text-slate-800 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <div class="flex items-center justify-between col-span-1 md:col-span-2 lg:col-span-10 mb-8">
         <h2 class="">Add Categories</h2>

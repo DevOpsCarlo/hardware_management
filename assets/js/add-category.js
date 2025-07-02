@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
     categoryForm.action = "/add-category";
     addBtn.textContent = "Add Category";
     inputCategoryName.value = "";
+    inputCategoryName.focus();
     categoryIdInput.value = "";
   });
 

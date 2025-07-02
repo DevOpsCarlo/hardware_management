@@ -26,18 +26,86 @@ if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['delete_inventory_id']
   exit;
 }
 
-//  add inventory
-if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['add-inventory-btn'])) {
-  $inventoryId = isset($_POST['inventory_id']) ? intval($_POST['inventory_id']) : 0; // <- NEW
-  $manufacturer = isset($_POST['input-manufacturer']) ? htmlspecialchars(trim($_POST['input-manufacturer'])) : "";
-  $inputQty = isset($_POST['input-qty']) ? intval($_POST['input-qty']) : 0;
-  $categoryId = isset($_POST['category_id']) ? intval($_POST['category_id']) : 0;
+function generateBatchId($pdo)
+{
+  $date = date('Ymd'); // Format: 20250614
 
-  if ($manufacturer && $inputQty && $categoryId > 0) {
-    // ✅ UPDATE LOGIC if ID is set
+  // Get the count of batches created today
+  $stmt = $pdo->prepare("SELECT COUNT(*) FROM inventory WHERE DATE(created_at) = CURDATE()");
+  $stmt->execute();
+  $count = $stmt->fetchColumn();
+
+  // Increment count for new batch
+  $sequence = str_pad($count + 1, 3, '0', STR_PAD_LEFT);
+
+  $batch_id = "BATCH-{$date}-{$sequence}";
+
+  // Ensure uniqueness (in case of concurrent requests)
+  $stmt = $pdo->prepare("SELECT COUNT(*) FROM inventory WHERE batch_id = ?");
+  $stmt->execute([$batch_id]);
+
+  if ($stmt->fetchColumn() > 0) {
+    // If batch_id exists, add random suffix
+    $batch_id .= '-' . substr(uniqid(), -3);
+  }
+
+  return $batch_id;
+}
+
+// Main form processing - your existing code with batch ID integration
+if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['add-inventory-btn'])) {
+  $inventoryId = intval($_POST['inventory_id'] ?? 0);
+  $categoryId = intval($_POST['category_id'] ?? 0);
+  $manufacturer = htmlspecialchars(trim($_POST['input-manufacturer'] ?? ''));
+  $model = htmlspecialchars(trim($_POST['input-model'] ?? ''));
+  $purchaseDate = htmlspecialchars(trim($_POST['purchase-date'] ?? ''));
+  $quantity = intval($_POST['input-qty'] ?? 0);
+  $warranty = intval($_POST['input-warranty'] ?? 0);
+  $photoPath = null;
+
+  // Handle file upload (your existing logic)
+  if (isset($_FILES['photo']) && $_FILES['photo']['error'] == UPLOAD_ERR_OK) {
+    $uploadDir = 'uploads/assets/';
+
+    // Create directory if it doesn't exist
+    if (!is_dir($uploadDir)) {
+      mkdir($uploadDir, 0755, true);
+    }
+
+    // Validate file type
+    $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+    $fileExtension = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
+
+    if (in_array($fileExtension, $allowedExtensions)) {
+      // Generate unique filename to prevent conflicts
+      $uniqueFilename = uniqid('inventory_') . '.' . $fileExtension;
+      $photoPath = $uploadDir . $uniqueFilename;
+
+      if (!move_uploaded_file($_FILES['photo']['tmp_name'], $photoPath)) {
+        $photoPath = null; // Reset if upload failed
+        $_SESSION['inventory_error'] = "Failed to upload photo.";
+      }
+    } else {
+      $_SESSION['inventory_error'] = "Invalid file type. Please upload JPG, PNG, or GIF files only.";
+      header("Location: /manage-hardware");
+      exit;
+    }
+  }
+
+  // Validation (your existing logic)
+  if ($manufacturer && $quantity > 0 && $categoryId > 0) {
+
+    // UPDATE EXISTING INVENTORY (Edit mode)
     if ($inventoryId > 0) {
-      $stmt = $pdo->prepare("UPDATE inventory SET manufacturer = ?, quantity = ?, category_id = ?, updated_at = NOW() WHERE id = ?");
-      $stmt->execute([$manufacturer, $inputQty, $categoryId, $inventoryId]);
+      // If a new photo is uploaded, include it in the update
+      if ($photoPath) {
+        $stmt = $pdo->prepare("UPDATE inventory SET manufacturer = ?, model = ?, purchase_date = ?, quantity = ?, warranty_years = ?, photo = ?, category_id = ?, updated_at = NOW() WHERE id = ?");
+        $stmt->execute([$manufacturer, $model, $purchaseDate, $quantity, $warranty, $photoPath, $categoryId, $inventoryId]);
+      } else {
+        // If no new photo is uploaded, don't update the photo_path field (retain existing photo)
+        $stmt = $pdo->prepare("UPDATE inventory SET manufacturer = ?, model = ?, purchase_date = ?, quantity = ?, warranty_years = ?, category_id = ?, updated_at = NOW() WHERE id = ?");
+        $stmt->execute([$manufacturer, $model, $purchaseDate, $quantity, $warranty, $categoryId, $inventoryId]);
+      }
 
       if ($stmt->rowCount() > 0) {
         $_SESSION['inventory_updated'] = "Inventory updated successfully.";
@@ -49,83 +117,104 @@ if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['add-inventory-btn']))
       exit;
     }
 
-    // ✅ EXISTING MERGE-OR-INSERT LOGIC
-    $stmt = $pdo->prepare("SELECT id, quantity FROM inventory WHERE LOWER(manufacturer) = LOWER(:manufacturer) AND category_id = :categoryId LIMIT 1");
-    $stmt->execute(['manufacturer' => $manufacturer, 'categoryId' => $categoryId]);
-    $existingManufacturer = $stmt->fetch(PDO::FETCH_ASSOC);
+    // INSERT NEW INVENTORY (Always create new record - no merging) - MODIFIED WITH BATCH ID
+    // Generate batch ID for new inventory
+    $batchId = generateBatchId($pdo);
 
-    if ($existingManufacturer) {
-      $newQty = $existingManufacturer['quantity'] + $inputQty;
-      $updateStmt = $pdo->prepare("UPDATE inventory SET quantity = ? WHERE id = ?");
-      $updateStmt->execute([$newQty, $existingManufacturer['id']]);
-
-      $_SESSION['inventory_updated'] = "Successfuly added $inputQty qty for $manufacturer. Total: $newQty";
-      header("Location: /manage-hardware");
-      exit;
+    if ($photoPath) {
+      $insertStmt = $pdo->prepare("INSERT INTO inventory (batch_id, manufacturer, model, purchase_date, quantity, warranty_years, photo, category_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
+      $insertStmt->execute([$batchId, $manufacturer, $model, $purchaseDate, $quantity, $warranty, $photoPath, $categoryId]);
     } else {
-      $insertStmt = $pdo->prepare("INSERT INTO inventory (manufacturer, quantity, category_id) VALUES (?, ?, ?)");
-      $insertStmt->execute([$manufacturer, $inputQty, $categoryId]);
-
-      $_SESSION['inventory_added'] = "Sucessfully added [$inputQty qty] to [$manufacturer]";
-      header("Location: /manage-hardware");
-      exit;
+      $insertStmt = $pdo->prepare("INSERT INTO inventory (batch_id, manufacturer, model, purchase_date, quantity, warranty_years, category_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
+      $insertStmt->execute([$batchId, $manufacturer, $model, $purchaseDate, $quantity, $warranty, $categoryId]);
     }
+
+    $_SESSION['inventory_added'] = "Successfully added [$quantity qty] of [$manufacturer $model] - Batch ID: $batchId";
+    header("Location: /manage-hardware");
+    exit;
   } else {
-    $_SESSION['inventory_error'] = "Please enter brand name and quantity";
+    $_SESSION['inventory_error'] = "Please enter manufacturer name, quantity, and select a category.";
     header("Location: /manage-hardware");
     exit;
   }
 }
 
-// ** FETCH DATA FROM DATABASE
+// Helper functions for inventory management
 
-//FETCH CATEGORY
-$stmt = $pdo->prepare("SELECT * FROM categories ORDER BY name ASC");
-$stmt->execute();
-$categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Function to get all inventory items (for display)
+function getAllInventory($pdo)
+{
+  $sql = "SELECT i.*, c.name as category_name 
+            FROM inventory i 
+            LEFT JOIN categories c ON i.category_id = c.id 
+            ORDER BY i.created_at DESC";
 
-//FETCH INVENTORY
-$stmt = $pdo->prepare("
-    SELECT 
-        inventory.id AS inventory_id,
-        inventory.manufacturer,
-        inventory.quantity,
-        inventory.category_id,
-        inventory.created_at,
-        inventory.updated_at,
-        categories.name AS category_name
-    FROM inventory
-    INNER JOIN categories ON inventory.category_id = categories.id
-    ORDER BY inventory.manufacturer ASC
-");
-$stmt->execute();
-$inventories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+  $stmt = $pdo->prepare($sql);
+  $stmt->execute();
 
-
-$stmt = $pdo->prepare("
-    SELECT * FROM assets
-   
-");
-$stmt->execute();
-$assets = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-$assetsByInventory = [];
-
-foreach ($assets as $asset) {
-  $invId = $asset['inventory_id']; // must exist in each asset record
-  if (!isset($assetsByInventory[$invId])) {
-    $assetsByInventory[$invId] = [];
-  }
-  $assetsByInventory[$invId][] = $asset;
+  return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-// $stmt = $pdo->prepare(" SELECT inventory.id AS inventory_id, inventory.manufacturer, inventory.quantity, inventory.category_id,   inventory.created_at, inventory.updated_at, categories.name AS category_name FROM inventory INNER JOIN categories ON inventory.category_id = categories.id ORDER BY inventory.manufacturer ASC ");
-// $stmt->execute();
-// $inventories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Function to get inventory by ID (for editing)
+function getInventoryById($pdo, $id)
+{
+  $sql = "SELECT i.*, c.name as category_name 
+            FROM inventory i 
+            LEFT JOIN categories c ON i.category_id = c.id 
+            WHERE i.id = ?";
+
+  $stmt = $pdo->prepare($sql);
+  $stmt->execute([$id]);
+
+  return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+// Function to get inventory summary by manufacturer and model
+function getInventorySummary($pdo)
+{
+  $sql = "SELECT manufacturer, model, 
+            COUNT(*) as batch_count,
+            SUM(quantity) as total_quantity,
+            MIN(purchase_date) as earliest_purchase,
+            MAX(purchase_date) as latest_purchase
+            FROM inventory 
+            GROUP BY manufacturer, model 
+            ORDER BY manufacturer, model";
+
+  $stmt = $pdo->prepare($sql);
+  $stmt->execute();
+
+  return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function getAllCategories($pdo)
+{
+  $sql = "SELECT id, name FROM categories ORDER BY name ASC";
+  $stmt = $pdo->prepare($sql);
+  $stmt->execute();
+  return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
 
+// Function to check warranty status
+function getWarrantyStatus($purchase_date, $warranty_years)
+{
+  $purchase = new DateTime($purchase_date);
+  $warranty_end = clone $purchase;
+  $warranty_end->add(new DateInterval("P{$warranty_years}Y"));
+  $now = new DateTime();
 
+  if ($now > $warranty_end) {
+    return ['status' => 'expired', 'end_date' => $warranty_end->format('Y-m-d')];
+  } elseif ($now->diff($warranty_end)->days <= 90) {
+    return ['status' => 'expiring_soon', 'end_date' => $warranty_end->format('Y-m-d')];
+  } else {
+    return ['status' => 'active', 'end_date' => $warranty_end->format('Y-m-d')];
+  }
+}
 
-// **
-
+// Fetch database
+$inventories = getAllInventory($pdo);
+$categories = getAllCategories($pdo);
 
 require("views/manage-hardware.views.php");

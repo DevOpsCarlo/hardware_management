@@ -180,17 +180,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const inventoryIdInput = form.querySelector("#inventory-id");
     const submitButton = form.querySelector(".add-inventory-btn");
 
-    if (
-      !manufacturerInput ||
-      !quantityInput ||
-      !categorySelect ||
-      !inventoryIdInput ||
-      !submitButton
-    ) {
-      console.error("Required form elements not found");
-      return;
-    }
-
     // Populate values from data-attributes
     const id = target.dataset.id;
     const name = target.dataset.name;
@@ -612,8 +601,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const inputModel = document.getElementById("input-model");
     const inputSerialNumber = document.getElementById("input-serial-number");
     const inputIpAddress = document.getElementById("input-ip-address");
-    const inputDatePurchase = document.getElementById("date-purchase");
-    const inputWarrantyDate = document.getElementById("warranty-date");
     const selectStatus = document.getElementById("select-status");
     const selectConditions = document.getElementById("select-conditions");
     // const assetId = document.getElementById("asset-id");
@@ -629,8 +616,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const ipAddress = target.getAttribute("data-ip-address");
     const status = target.getAttribute("data-status");
     const conditions = target.getAttribute("data-conditions");
-    const dateOfPurchase = target.getAttribute("data-dateof-purchase");
-    const warrantyDate = target.getAttribute("data-warranty-date");
     const assetId = target.getAttribute("data-asset-id");
     // Get charger data from button attributes
     const chargerId = target.getAttribute("data-charger-id");
@@ -659,8 +644,6 @@ document.addEventListener("DOMContentLoaded", function () {
       inputSerialNumber.value = serialNumber.toUpperCase() || "";
     if (inputIpAddress) inputIpAddress.value = ipAddress || "";
     // if (assetNumberInput) assetNumberInput.value = assetNumber || "";
-    if (inputDatePurchase) inputDatePurchase.value = dateOfPurchase || "";
-    if (inputWarrantyDate) inputWarrantyDate.value = warrantyDate || "";
     if (selectStatus) selectStatus.value = status || "Available";
     if (selectConditions) selectConditions.value = conditions || "New";
 
@@ -671,10 +654,10 @@ document.addEventListener("DOMContentLoaded", function () {
       : "";
 
     // Setup asset photo preview (same as before)
-    const assetPhotoInput = document.getElementById("asset-photo");
+    const assetPhotoInput = document.getElementById("photo");
     const photoPreview = document.getElementById("photo-preview");
     // 📸 Load existing asset photo from button's data attribute
-    const existingPhotoUrl = target.getAttribute("data-asset-photo");
+    const existingPhotoUrl = target.getAttribute("data-photo");
     if (photoPreview) {
       if (existingPhotoUrl) {
         photoPreview.src = `/${existingPhotoUrl}`;

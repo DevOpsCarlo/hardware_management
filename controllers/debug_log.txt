@@ -1,0 +1,50 @@
+2025-06-16 09:11:59 - Page loaded
+POST REQUEST DETECTED
+POST DATA: Array
+(
+    [item_number] => 1
+    [category_id] => 44
+    [inventory_id] => 8
+    [asset-id] => 0
+    [manufacturer] => Dell
+    [category_display] => Laptop
+    [asset-number] => TRA-01-0001
+    [input-model] => Inspiron 3000
+    [input-serial-number] => 2
+    [input-ip-address] => 123
+    [status] => Available
+    [conditions] => New
+    [asset-type] => laptop charger
+    [charger-id] => 0
+    [charger-model] => 
+    [charger-asset-number] => TRA-01-0001C
+    [charger-serial-number] => 2
+    [charger-condition] => New
+)
+
+NO ADD-ASSET BUTTON FOUND
+2025-06-16 09:12:13 - Page loaded
+POST REQUEST DETECTED
+POST DATA: Array
+(
+    [item_number] => 1
+    [category_id] => 44
+    [inventory_id] => 8
+    [asset-id] => 0
+    [manufacturer] => Dell
+    [category_display] => Laptop
+    [asset-number] => TRA-01-0001
+    [input-model] => Inspiron 3000
+    [input-serial-number] => 23
+    [input-ip-address] => 192.169.22
+    [status] => Available
+    [conditions] => New
+    [asset-type] => laptop charger
+    [charger-id] => 0
+    [charger-model] => 
+    [charger-asset-number] => TRA-01-0001C
+    [charger-serial-number] => 1
+    [charger-condition] => New
+)
+
+NO ADD-ASSET BUTTON FOUND

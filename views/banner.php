@@ -1,4 +1,4 @@
-  <header class="flex justify-between items-center pr-4 shadow-sm">
+  <!-- <header class="flex justify-between items-center pr-4 shadow-sm">
     <div class="flex items-center ">
       <img src="/assets/images/toprank-logo.png" alt="" class="w-1/12">
       <div class="flex flex-col gap-0">
@@ -12,4 +12,13 @@
         <p class="whitespace-nowrap ml-2">Add Hardware</p>
       </button>
     </div>
-  </header>
+  </header> -->
+
+  <div class="flex text-sm ">
+    <a href="/manage-hardware" class="px-3 py-2 cursor-pointer <?= urlIs("/manage-hardware") ? 'text-white shadow border-b-2 border-white' : 'text-red-400' ?>">
+      Add Inventory
+    </a>
+    <a href="/manage-hardware/add-asset" class="px-3 py-2 cursor-pointer <?= urlIs('/manage-hardware/add-asset') ? 'text-white shadow border-b-2 border-white' : 'text-red-400' ?>">
+      Add Asset
+    </a>
+  </div>
