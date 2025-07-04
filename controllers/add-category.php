@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['delete_category_id'])
     $_SESSION['category_error'] = "Invalid category ID.";
   }
 
-  header("Location: /add-category");
+  header("Location: /manage-hardware/add-category");
   exit;
 }
 
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
       $_SESSION['category_error'] = "Category already exists!";
       $_SESSION['category_form_data'] = ['name' => $categoryName, 'id' => $categoryId];
       $_SESSION['category_edit_mode'] = $categoryId > 0;
-      header("Location: /add-category");
+      header("Location: /manage-hardware/add-category");
       exit;
     } else {
       if ($categoryId > 0) {
@@ -51,14 +51,14 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
         $stmt->execute([$categoryName, $categoryId]);
 
         $_SESSION['category_updated'] = $categoryName;
-        header("Location: /add-category");
+        header("Location: /manage-hardware/add-category");
         exit;
       } else {
         // Insert NEW CATEGORY
         $stmt = $pdo->prepare("INSERT INTO categories (name) VALUES (?)");
         $stmt->execute([$categoryName]);
         $_SESSION['category_added'] = $categoryName;
-        header("Location: /add-category");
+        header("Location: /manage-hardware/add-category");
         exit;
       }
     }

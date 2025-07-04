@@ -21,12 +21,14 @@ if (array_key_exists($uri, $apiRoutes)) {
 $routes = [
   '/' => 'controllers/index.php',
   '/dashboard' => 'controllers/dashboard.php',
-  '/add-category' => 'controllers/add-category.php',
-  '/manage-hardware' => 'controllers/manage-hardware.php',
+  '/manage-hardware/add-inventory' => 'controllers/add-inventory.php',
   '/hardwares' => 'controllers/hardwares.php',
   '/logout' => 'controllers/logout.php',
   '/assigned-asset' => 'controllers/assigned-asset.php',
+  '/manage-hardware/add-category' => 'controllers/add-category.php',
   '/manage-hardware/add-asset' => 'controllers/add-asset.php',
+  '/manage-hardware/add-asset/view-asset' => 'controllers/view-asset.php',
+  '/manage-hardware/assign-asset' => 'controllers/assign-asset.php',
   //  '/get-next-asset-number' => 'controllers/get-next-asset-number.php', 
 
 

@@ -102,14 +102,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // DETAILED TABLE EVENT HANDLING
-  const detailedTable = document.querySelector("#detailed-list-table");
-  if (detailedTable) {
-    detailedTable.addEventListener("click", function (e) {
-      handleDetailedTableActions(e);
-    });
-  }
-
   // HANDLE INVENTORY TABLE ACTIONS
   function handleTableActions(e) {
     // Handle ellipsis toggle
@@ -136,39 +128,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // HANDLE DETAILED TABLE ACTIONS
-  function handleDetailedTableActions(e) {
-    // Handle ellipsis toggle
-    if (e.target.classList.contains("select-menu")) {
-      e.stopPropagation();
-      closeAllMenus();
-
-      const menuElement = e.target.nextElementSibling;
-      if (menuElement && menuElement.classList.contains("menu")) {
-        menuElement.classList.toggle("hidden");
-      }
-    }
-
-    // ASSIGN ASSET
-    if (e.target.classList.contains("assign-asset-btn")) {
-      e.stopPropagation();
-      openAssignAssetModal(e.target);
-    }
-
-    // DELETE INVENTORY
-    // if (e.target.classList.contains("delete-inventory-btn")) {
-    //   e.stopPropagation();
-    //   deleteInventory(e.target);
-    // }
-
-    // DELETE ASSET
-    if (e.target.classList.contains("delete-asset-btn")) {
-      e.stopPropagation();
-      deleteInventoryAsset(e.target);
-      console.log("click");
-    }
-  }
-
   // EDIT INVENTORY FUNCTION
   function editInventory(target) {
     const form = document.querySelector("form");
@@ -179,17 +138,20 @@ document.addEventListener("DOMContentLoaded", function () {
     const categorySelect = form.querySelector("select[name='category_id']");
     const inventoryIdInput = form.querySelector("#inventory-id");
     const submitButton = form.querySelector(".add-inventory-btn");
+    const purchaseDateInput = form.querySelector(".purchase-date");
 
     // Populate values from data-attributes
     const id = target.dataset.id;
     const name = target.dataset.name;
     const qty = target.dataset.qty;
     const categoryId = target.dataset.categoryId;
+    const purchaseDate = target.dataset.purchaseDate;
 
     manufacturerInput.value = name || "";
     quantityInput.value = qty || "";
     categorySelect.value = categoryId || "";
     inventoryIdInput.value = id || "";
+    purchaseDateInput.value = purchaseDate || "";
 
     submitButton.textContent = "Update Inventory";
     form.action = "/manage-hardware";

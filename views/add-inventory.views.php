@@ -4,7 +4,7 @@
   <?php require("views/sidebar.php"); ?>
   <section class="col-span-12 md:col-span-10">
     <!-- require("views/banner.php");  -->
-    <article class="py-2 px-6 text-2xl font-bold text-slate-800 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 space-y-5  bg-red-800">
+    <article class="py-2 px-6 text-2xl font-bold text-slate-800 grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-2 gap-6 space-y-5  bg-red-800">
       <!-- <div class="col-span-10 "> -->
       <?php require("views/banner.php") ?>
     </article>
@@ -65,9 +65,8 @@
       <div class="w-full max-w-7xl bg-white col-span-4 mx-auto rounded-sm p-4 shadow-lg" id="inventory-form">
         <!-- Dynamic Title -->
         <h2 class="text-slate-800 font-bold px-6 pt-4 text-xl" id="form-title">Add Inventory</h2>
-
         <form class="space-y-4 bg-white p-6 text-slate-800 grid grid-cols-2 gap-2 form text-sm font-medium"
-          action="/manage-hardware" method="POST" enctype="multipart/form-data" id="inventory-form-element">
+          action="/manage-hardware/add-inventory" method="POST" enctype="multipart/form-data" id="inventory-form-element">
 
           <!-- Hidden field for inventory ID (for edit mode) -->
           <input type="hidden" name="inventory_id" id="inventory-id">
@@ -116,7 +115,7 @@
           <div>
             <label for="purchase-date" class="block">Purchase Date</label>
             <input type="date"
-              class="block w-full border border-gray-300 rounded p-2"
+              class="block w-full border border-gray-300 rounded p-2 purchase-date"
               name="purchase-date"
               id="purchase-date">
           </div>
@@ -185,7 +184,6 @@
                 <th>Image</th>
                 <th>Manufacturer</th>
                 <th>Model</th>
-                <!-- <th>Purchase Date</th> -->
                 <th>Category</th>
                 <th>Quantity</th>
                 <th>Action</th>
@@ -196,39 +194,45 @@
                 <?php foreach ($inventories as $index => $inventory): ?>
                   <tr>
                     <td><?= $index + 1 ?></td>
-                    <td class="w-1/12  h-1/12 object-contain"> <img src="<?= htmlspecialchars(ucfirst($inventory['photo'])) ?>" alt=""> </td>
+                    <td class="w-1/12  h-1/12 object-contain">
+                      <?php
+                      // Ensure photos field is not null or empty before calling explode
+                      $photos = !empty($inventory['photos']) ? explode(',', $inventory['photos']) : [];
+                      $photo = !empty($photos) ? $photos[0] : ''; // Use the first photo if available
+                      ?>
+                      <?php if ($photo): ?>
+                        <img src="/<?= htmlspecialchars(ucfirst($photo)) ?>" alt="">
+                      <?php else: ?>
+                        <img src="/uploads/default-photo/laptop-charger.jpg" alt="No image available">
+                      <?php endif; ?>
+                    </td>
                     <td><?= htmlspecialchars(ucfirst($inventory['manufacturer'])) ?> </td>
                     <td><?= htmlspecialchars(ucfirst($inventory['model'])) ?> </td>
-                    <!-- $purchaseDate = $inventory['purchase_date'] ?? null;
-                    $date = null;
-
-                    if ($purchaseDate && DateTime::createFromFormat('Y-m-d', $purchaseDate) !== false) {
-                      $date = DateTime::createFromFormat('Y-m-d', $purchaseDate);
-                    }
-                    <td><$date ? htmlspecialchars($date->format('F j, Y')) : 'N/A' </td>
-                     -->
                     <td><?= htmlspecialchars(ucfirst($inventory['category_name'])) ?></td>
-                    <td><?= htmlspecialchars($inventory['quantity']) ?></td>
+                    <td><?= htmlspecialchars($inventory['total_quantity']) ?></td>
                     <td class="relative">
                       <i class="fa-solid fa-ellipsis-vertical cursor-pointer select-menu"></i>
                       <div class="absolute top-3 left-5 mt-2 w-20 bg-white border rounded shadow group-hover:block z-10 hidden menu">
-                        <ul class="text-xs text-slate-700 font-light ">
+                        <ul class="text-xs text-slate-700 font-light">
                           <li class="px-4 py-2 hover:bg-slate-100 border-b-1">
                             <button class="cursor-pointer block w-full text-left edit-inventory-btn"
-                              data-id="<?= $inventory['id'] ?>"
-                              data-category-id="<?= $inventory['category_id'] ?>"
                               data-manufacturer="<?= htmlspecialchars($inventory['manufacturer']) ?>"
                               data-model="<?= htmlspecialchars($inventory['model']) ?>"
-                              data-quantity="<?= $inventory['quantity'] ?>"
-                              data-warranty-years="<?= $inventory['warranty_years'] ?>"
-                              data-photo="<?= htmlspecialchars($inventory['photo']) ?>">
+                              data-quantity="<?= htmlspecialchars($inventory['total_quantity']) ?>"
+                              data-category-name="<?= htmlspecialchars($inventory['category_name']) ?>">
                               Edit
                             </button>
-                            <!-- data-purchase-date=" $inventory['purchase_date'] " -->
-
                           </li>
-                          <li class="px-4 py-2 hover:bg-slate-100 border-b-1"><button class="cursor-pointer w-full text-left delete-inventory-btn" data-name="<?= htmlspecialchars($inventory['manufacturer']) ?>" data-id="<?= $inventory['id'] ?>">Delete</button></li>
-                          <li class="px-4 py-2 hover:bg-slate-100"><a href="/view" class="cursor-pointer w-full text-left">View</a></li>
+                          <li class="px-4 py-2 hover:bg-slate-100 border-b-1">
+                            <button class="cursor-pointer w-full text-left delete-inventory-btn"
+                              data-name="<?= htmlspecialchars($inventory['manufacturer']) ?>"
+                              data-id="<?= $inventory['inventory_ids'] ?>">
+                              Delete
+                            </button>
+                          </li>
+                          <li class="px-4 py-2 hover:bg-slate-100">
+                            <a href="/view" class="cursor-pointer w-full text-left">View</a>
+                          </li>
                         </ul>
                       </div>
                     </td>
@@ -239,7 +243,6 @@
           </table>
         </div>
       </div>
-
     </article>
 
 

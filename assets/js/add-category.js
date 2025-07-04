@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
   addCategory.addEventListener("click", () => {
     categoryModal.classList.toggle("hidden");
     modalTitle.textContent = "Add Category";
-    categoryForm.action = "/add-category";
+    categoryForm.action = "/manage-hardware/add-category";
     addBtn.textContent = "Add Category";
     inputCategoryName.value = "";
     inputCategoryName.focus();
@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", function () {
         categoryModal.classList.remove("hidden");
         modalTitle.textContent = "Edit Category";
         addBtn.textContent = "Update Category";
-        categoryForm.action = "/add-category";
+        categoryForm.action = "manage-hardware/add-category";
         inputCategoryName.value = categoryName;
         categoryIdInput.value = categoryId;
       }
@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const formData = new FormData();
             formData.append("delete_category_id", categoryId);
 
-            fetch("/add-category", {
+            fetch("/manage-hardware/add-category", {
               method: "POST",
               body: formData,
             })

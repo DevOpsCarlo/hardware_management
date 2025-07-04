@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("figure-title").textContent =
       (manufacturer || "") + " - " + (categoryName || "");
     document.getElementById("photo-preview").src = "/" + (photo || "");
-
+    console.log("Charger ID", chargerId);
     // Generate asset number preview if it's a new asset
     console.log("Asset ID", assetId);
     if (!assetId || assetId === "0") {

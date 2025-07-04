@@ -14,11 +14,17 @@
     </div>
   </header> -->
 
-  <div class="flex text-sm ">
-    <a href="/manage-hardware" class="px-3 py-2 cursor-pointer <?= urlIs("/manage-hardware") ? 'text-white shadow border-b-2 border-white' : 'text-red-400' ?>">
+  <div class="flex items-center text-sm ">
+    <a href="/manage-hardware/add-category" class="w-full px-3 py-2 cursor-pointer <?= urlIs("/manage-hardware/add-category") ? 'text-white shadow border-b-2 border-white' : 'text-red-400' ?>">
+      Add Category
+    </a>
+    <a href="/manage-hardware/add-inventory" class="w-full px-3 py-2 cursor-pointer <?= urlIs("/manage-hardware/add-inventory") ? 'text-white shadow border-b-2 border-white' : 'text-red-400' ?>">
       Add Inventory
     </a>
-    <a href="/manage-hardware/add-asset" class="px-3 py-2 cursor-pointer <?= urlIs('/manage-hardware/add-asset') ? 'text-white shadow border-b-2 border-white' : 'text-red-400' ?>">
+    <a href="/manage-hardware/add-asset" class="w-full px-3 py-2 cursor-pointer <?= urlIs('/manage-hardware/add-asset') ? 'text-white shadow border-b-2 border-white' : 'text-red-400' ?>">
       Add Asset
+    </a>
+    <a href="/manage-hardware/assign-asset" class="w-full px-3 py-2 cursor-pointer <?= urlIs('/manage-hardware/assign-asset') ? 'text-white shadow border-b-2 border-white' : 'text-red-400' ?>">
+      Assign Asset
     </a>
   </div>

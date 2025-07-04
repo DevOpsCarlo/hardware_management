@@ -8,6 +8,7 @@
   let inventoryTable = new DataTable('#inventoryTable');
   let detailedTable = new DataTable('#detailedTable');
   let categoryTable = new DataTable('#categoryTable');
+  let assignAssetTable = new DataTable('assignAssetTable');
 </script>
 
 

@@ -3,7 +3,7 @@
 <main class="grid grid-cols-1 sm:grid-cols-12 min-h-screen">
   <?php require("views/sidebar.php"); ?>
   <section class="col-span-12 md:col-span-10">
-    <article class="py-2 px-6 text-2xl font-bold text-slate-800 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 space-y-5 bg-red-800">
+    <article class="py-2 px-6 text-2xl font-bold text-slate-800 grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-2 gap-6 space-y-5 bg-red-800">
       <?php
       if (!empty($_SESSION['forms_errors'])):
         $inventoryErrorMessage = htmlspecialchars($_SESSION['forms_errors'], ENT_QUOTES, 'UTF-8');
@@ -103,7 +103,6 @@
                 }
                 $laptopAssetsByInventory[$invId][] = $asset;
               }
-
               foreach ($inventories as $inventory):
                 if (strtolower($inventory['category_name']) === 'laptop charger') {
                   continue;
@@ -111,7 +110,6 @@
                 $invId = $inventory['inventory_id'];
                 $assetsForInventory = $laptopAssetsByInventory[$invId] ?? [];
                 $quantity = $inventory['quantity'];
-
                 // Loop through the quantity (expected number of assets)
                 for ($i = 0; $i < $quantity; $i++):
                   $asset = $assetsForInventory[$i] ?? null;
@@ -165,7 +163,7 @@
                               data-photo="<?= htmlspecialchars($inventory['photo'] ?? '') ?>"
                               data-asset-id="<?= htmlspecialchars($asset['asset_id'] ?? 0) ?>"
                               <?php if ($relatedCharger): ?>
-                              data-charger-id="<?= htmlspecialchars($relatedCharger['id'] ?? 0) ?>"
+                              data-charger-id="<?= htmlspecialchars($relatedCharger['asset_id'] ?? 0) ?>"
                               data-charger-asset-number="<?= htmlspecialchars($relatedCharger['asset_number']) ?>"
                               data-charger-model="<?= htmlspecialchars($relatedCharger['model']) ?>"
                               data-charger-serial-number="<?= htmlspecialchars($relatedCharger['serial_number'] ?? '') ?>"
@@ -205,7 +203,7 @@
                             </button>
                           </li>
                           <li class="px-4 py-2 hover:bg-slate-100">
-                            <a href="/view" class="cursor-pointer w-full text-left">View</a>
+                            <a href="/manage-hardware/add-asset/view-asset" class="cursor-pointer w-full text-left">View</a>
                           </li>
                         </ul>
                       </div>

@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['delete_inventory_id']
     $_SESSION['inventory_error'] = "Invalid category ID.";
   }
 
-  header("Location: /manage-hardware");
+  header("Location: /manage-hardware/add-inventory");
   exit;
 }
 
@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['add-inventory-btn']))
       }
     } else {
       $_SESSION['inventory_error'] = "Invalid file type. Please upload JPG, PNG, or GIF files only.";
-      header("Location: /manage-hardware");
+      header("Location: /manage-hardware/add-inventory");
       exit;
     }
   }
@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['add-inventory-btn']))
         $_SESSION['inventory_error'] = "No changes were made.";
       }
 
-      header("Location: /manage-hardware");
+      header("Location: /manage-hardware/add-inventory");
       exit;
     }
 
@@ -130,11 +130,11 @@ if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['add-inventory-btn']))
     }
 
     $_SESSION['inventory_added'] = "Successfully added [$quantity qty] of [$manufacturer $model] - Batch ID: $batchId";
-    header("Location: /manage-hardware");
+    header("Location: /manage-hardware/add-inventory");
     exit;
   } else {
     $_SESSION['inventory_error'] = "Please enter manufacturer name, quantity, and select a category.";
-    header("Location: /manage-hardware");
+    header("Location: /manage-hardware/add-inventory");
     exit;
   }
 }
@@ -142,12 +142,20 @@ if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['add-inventory-btn']))
 // Helper functions for inventory management
 
 // Function to get all inventory items (for display)
+// Function to get all inventory items (for display), grouping by manufacturer/model
 function getAllInventory($pdo)
 {
-  $sql = "SELECT i.*, c.name as category_name 
-            FROM inventory i 
-            LEFT JOIN categories c ON i.category_id = c.id 
-            ORDER BY i.created_at DESC";
+  $sql = "SELECT 
+            manufacturer, 
+            model, 
+            SUM(quantity) as total_quantity,
+            c.name as category_name,
+            GROUP_CONCAT(DISTINCT photo) as photos,
+            GROUP_CONCAT(DISTINCT i.id) as inventory_ids
+          FROM inventory i 
+          LEFT JOIN categories c ON i.category_id = c.id 
+          GROUP BY manufacturer, model, category_name
+          ORDER BY manufacturer, model";
 
   $stmt = $pdo->prepare($sql);
   $stmt->execute();
@@ -173,10 +181,10 @@ function getInventoryById($pdo, $id)
 function getInventorySummary($pdo)
 {
   $sql = "SELECT manufacturer, model, 
-            COUNT(*) as batch_count,
-            SUM(quantity) as total_quantity,
-            MIN(purchase_date) as earliest_purchase,
-            MAX(purchase_date) as latest_purchase
+                    COUNT(*) as batch_count,
+                    SUM(quantity) as total_quantity,
+                    MIN(purchase_date) as earliest_purchase,
+                    MAX(purchase_date) as latest_purchase
             FROM inventory 
             GROUP BY manufacturer, model 
             ORDER BY manufacturer, model";
@@ -186,7 +194,6 @@ function getInventorySummary($pdo)
 
   return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-
 function getAllCategories($pdo)
 {
   $sql = "SELECT id, name FROM categories ORDER BY name ASC";
@@ -217,4 +224,4 @@ function getWarrantyStatus($purchase_date, $warranty_years)
 $inventories = getAllInventory($pdo);
 $categories = getAllCategories($pdo);
 
-require("views/manage-hardware.views.php");
+require("views/add-inventory.views.php");

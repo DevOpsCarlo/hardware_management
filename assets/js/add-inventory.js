@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const formData = new FormData();
     formData.append("delete_inventory_id", inventoryId);
 
-    fetch("/manage-hardware", {
+    fetch("/manage-hardware/add-inventory", {
       method: "POST",
       body: formData,
     })

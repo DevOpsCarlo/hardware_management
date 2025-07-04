@@ -15,8 +15,8 @@
         </div>
         <!-- Submenu -->
         <div class="flex flex-col px-3 gap-2 mt-4 <?= urlContains("/add-category") || urlContains("/manage-hardware") || urlContains("/manage-hardware.inventory-list") || urlContains("/hardwares") ? "" : "hidden" ?> submenu">
-          <a href="/add-category" class="sidebar-link <?= urlIs('/add-category') ? "active" : "" ?>">Add Category</a>
-          <a href="/manage-hardware" class="sidebar-link <?= urlIs("/manage-hardware") || urlIs("/manage-hardware/inventory-list") ? "active" : "" ?>">Manage Hardware</a>
+          <!-- <a href="/add-category" class="sidebar-link <?= urlIs('/add-category') ? "active" : "" ?>">Add Category</a> -->
+          <a href="/manage-hardware/add-category" class="sidebar-link <?= urlIs("/manage-hardware/add-inventory") || urlIs("/manage-hardware/add-category") || urlIs("/manage-hardware/add-asset") || urlIs("/manage-hardware/assign-asset") ? "active" : "" ?>">Manage Hardware</a>
           <a href="" class="sidebar-link <?= urlIs("/hardwares") ? "active" : "" ?>">Hardwares</a>
         </div>
       </div>

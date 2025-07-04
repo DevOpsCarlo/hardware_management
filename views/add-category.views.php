@@ -12,15 +12,17 @@ unset($_SESSION['category_error'], $_SESSION['category_form_data'], $_SESSION['c
 <main class="grid grid-cols-1 sm:grid-cols-12 min-h-screen">
   <?php require("views/sidebar.php"); ?>
   <section class="col-span-12 md:col-span-10 ">
-    <!-- require("views/banner.php"); -->
+    <article class="py-2 px-6 text-2xl font-bold text-slate-800 grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-2 gap-6 space-y-5 bg-red-800">
+      <?php require("views/banner.php") ?>
+
+    </article>
+    <div class="flex items-center justify-end col-span-1 md:col-span-2 lg:col-span-10 my-4">
+      <button class="flex items-center text-red-700 border px-2 py-1 text-sm hover:bg-red-700 hover:text-white rounded-sm mr-2 cursor-pointer" id="add-category-btn">
+        + Add Category
+      </button>
+    </div>
     <article class="mt-6 px-6 text-2xl font-bold text-slate-800 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div class="flex items-center justify-between col-span-1 md:col-span-2 lg:col-span-10 mb-8">
-        <h2 class="">Add Categories</h2>
-        <button class="flex items-center text-sm bg-red-500 py-1 px-3 text-white gap-2 hover:bg-red-600 cursor-pointer font-light" id="add-category-btn">
-          <i class="fa-thin fa-plus"></i>
-          <span class="font-light">Add Category</span>
-        </button>
-      </div>
+
 
       <?php
       $successTypes = ['category_added' => 'added', 'category_updated' => 'updated'];
@@ -76,7 +78,7 @@ unset($_SESSION['category_error'], $_SESSION['category_form_data'], $_SESSION['c
       <!-- CATEGORY TABLE  -->
       <article class="col-span-10 text-sm mt-0">
         <div>
-          <h4 class="text-slate-700 font-semibold text-base">Category Lists:</h4>
+          <!-- <h4 class="text-slate-700 font-semibold text-base">Category Lists:</h4> -->
           <div>
             <table id="categoryTable" class="display font-light">
               <thead>
@@ -123,6 +125,6 @@ unset($_SESSION['category_error'], $_SESSION['category_form_data'], $_SESSION['c
 
 
 
-<script src="assets/js/add-category.js"></script>
+<script src="/assets/js/add-category.js"></script>
 
 <?php require("views/partials/footer.php") ?>
