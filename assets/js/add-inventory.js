@@ -17,7 +17,8 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("input-qty").value = inventoryData.quantity;
     document.getElementById("input-warranty").value =
       inventoryData.warranty_years;
-
+    document.getElementById("input-warranty").value =
+      inventoryData.warranty_years;
     // Show current photo if exists
     if (inventoryData.photo) {
       document.getElementById("current-photo").classList.remove("hidden");
@@ -122,10 +123,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (e.target.classList.contains("edit-inventory-btn")) {
       e.stopPropagation();
       closeAllMenus();
-
       // Get inventory data from data attributes
       const inventoryData = {
-        id: e.target.dataset.id || e.target.getAttribute("data-id"),
+        id: e.target.dataset.id || e.target.getAttribute("inventory-id"),
         category_id:
           e.target.dataset.categoryId ||
           e.target.getAttribute("data-category-id"),
@@ -154,6 +154,11 @@ document.addEventListener("DOMContentLoaded", function () {
       deleteInventory(e.target);
     }
   }
+  const closeModal = document.getElementById("inventory-cancel-btn");
+
+  closeModal.addEventListener("click", () => {
+    modal.classList.add("hidden");
+  });
 
   // CLOSE ALL MENUS
   function closeAllMenus() {

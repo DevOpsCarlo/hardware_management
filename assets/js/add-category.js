@@ -10,10 +10,15 @@ document.addEventListener("DOMContentLoaded", function () {
   const inputCategoryName = document.getElementById("input-category-name");
   const categoryIdInput = document.getElementById("category-id");
   const deleteCategory = document.querySelectorAll(".delete-category-btn");
+  const closeModal = document.getElementById("toggle-close");
+
+  closeModal.addEventListener("click", () => {
+    categoryModal.classList.add("hidden");
+  });
 
   // add category button to show modal
   addCategory.addEventListener("click", () => {
-    categoryModal.classList.toggle("hidden");
+    categoryModal.classList.remove("hidden");
     modalTitle.textContent = "Add Category";
     categoryForm.action = "/manage-hardware/add-category";
     addBtn.textContent = "Add Category";
@@ -39,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (isEmptyCategoryName) {
       hasError = true;
-      errorMessage.textContent = "⚠️ Please enter a category name. ";
+      errorMessage.textContent = "Please enter a category name. ";
       errorMessage.classList.remove("hidden");
     }
     if (hasError) {

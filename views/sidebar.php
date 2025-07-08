@@ -23,13 +23,15 @@
 
       <!-- Management -->
       <div class="">
+        <!-- Menu toggle -->
         <div class="flex justify-between items-center toggle-submenu cursor-pointer sidebar-link">
           <a class="">Management</a>
           <i class="fa-solid fa-chevron-down mr-5 icon"></i>
         </div>
-        <div class="flex flex-col px-3 gap-2 mt-4 hidden submenu">
-          <a href="" class="sidebar-link">Users</a>
-          <a href="" class="sidebar-link">Branch</a>
+        <!-- Submenu -->
+        <div class="flex flex-col px-3 gap-2 mt-4 <?= urlContains("/user") || urlContains("/branch") ? "" : "hidden" ?> submenu">
+          <a href="/user" class="sidebar-link <?= urlIs("/user") ? "active" : "" ?> ">Users</a>
+          <a href="/branch" class="sidebar-link <?= urlIs("/branch") ? "active" : "" ?>">Branch</a>
           <a href="" class="sidebar-link">Assignments</a>
           <a href="" class="sidebar-link">Maintenance Request</a>
           <a href="" class="sidebar-link">Reports Logs</a>

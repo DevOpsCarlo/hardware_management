@@ -7,11 +7,12 @@
       <!-- <div class="col-span-10 "> -->
       <?php require("views/banner.php") ?>
     </article>
-
+    <div class="flex justify-end my-4">
+      <button class="text-red-700 border px-2 py-1 text-sm hover:bg-red-700 hover:text-white rounded-sm mr-2 cursor-pointer" id="toggle-add-inventory-form"> Assign Asset</button>
+      <button class="text-red-700 border px-2 py-1 text-sm hover:bg-red-700 hover:text-white rounded-sm mr-2 cursor-pointer" id="toggle-add-inventory-form"> Remove Assign</button>
+    </div>
     <article class="col-span-10 text-sm font-light" id="detailed-list-table">
-
       <div>
-        <h4 class="text-slate-700 font-semibold text-base">All inventory list</h4>
         <div>
           <table id="detailedTable" class="display text-left">
             <thead>
@@ -39,7 +40,7 @@
                   // if (strtolower($asset['category_name']) === 'laptop charger') continue;
                   ?>
                   <tr class="text-xs font-light text-left">
-                    <td><?= $itemCounter++ ?></td>
+                    <td><?= $itemCounter++ ?> </td>
                     <td class="w-1/12 h-1/12 object-contain">
                       <img src="/<?= htmlspecialchars($asset['photo'] ?? 'Empty') ?>" alt="">
                     </td>

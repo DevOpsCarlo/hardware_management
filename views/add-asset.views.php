@@ -221,8 +221,13 @@
 
 
     <div class="fixed inset-0 top-0 left-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 <?= (!empty($_SESSION['form_errors'])) ? '' : 'hidden' ?>" id="add-asset-modal">
-      <div class="w-full max-w-5xl bg-slate-100 col-span-4 mx-auto rounded-sm p-7 shadow-lg" id="category-modal-box">
-        <h2 class="text-slate-800 font-bold text-2xl mb-2 modal-title">Hardware details</h2>
+      <div class="w-full max-w-5xl bg-white col-span-4 mx-auto rounded-sm p-7 shadow-lg" id="category-modal-box">
+        <div class="flex items-center gap-4 border-b-2 border-slate-100 pb-5">
+          <div class="">
+            <i class="fa-solid fa-computer text-red-500 rounded-full bg-red-50 p-4"></i>
+          </div>
+          <h2 class="text-slate-800 font-bold text-2xl modal-title">Hardware details</h2>
+        </div>
         <form class="text-sm font-light col-span-10 grid gap-2" id="add-asset-form" method="POST" action="">
           <div class="hidden">
             <input type="text" name="item_number" id="modal-item-number">
@@ -358,7 +363,15 @@
             </div>
           </figure>
 
-          <button type="submit" class="mt-4 bg-red-500 hover:bg-red-600 cursor-pointer font-bold text-sm text-white px-4 py-2 rounded" name="add-asset" id="form-add-asset">Add Asset</button>
+          <div class="flex items-center gap-4">
+            <button
+              class="border border-slate-300 text-sm w-1/2 px-4 py-2 text-slate-700 rounded-sm hover:bg-slate-50 cursor-pointer"
+              id="asset-cancel-btn"
+              type="button">
+              Cancel
+            </button>
+            <button type="submit" class="bg-red-500 hover:bg-red-600 cursor-pointer w-1/2 font-bold text-sm text-white px-4 py-2 rounded" name="add-asset" id="form-add-asset">Add Asset</button>
+          </div>
         </form>
       </div>
     </div>

@@ -50,26 +50,50 @@ unset($_SESSION['category_error'], $_SESSION['category_form_data'], $_SESSION['c
       <!-- Category Modal -->
       <?php $errorModalVisible = !empty($errorMessage); ?>
       <div class="fixed inset-0 top-0 left-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 <?= $errorModalVisible ? '' : 'hidden'  ?> " id="category-modal">
-        <div class="w-full max-w-lg bg-slate-100 col-span-4 mx-auto rounded-sm p-7 shadow-lg" id="category-modal-box">
-          <h2 class="text-slate-800 font-bold text-2xl mb-4 modal-title"> <?= $editMode ? 'Edit Category' : 'Add Category' ?></h2>
+        <div class="max-w-xl w-full mx-auto rounded-sm shadow-lg p-4 bg-white" id="category-modal-box">
+          <div class="flex items-center gap-4 border-b-2 border-slate-100 pb-5">
+            <div class="">
+              <i class="fa-solid fa-tag text-red-500 rounded-full bg-red-50 p-4"></i>
+            </div>
+            <h2 class="ext-slate-800 font-bold text-2xl modal-title"> <?= $editMode ? 'Edit Category' : 'Add Category' ?></h2>
+          </div>
 
-          <?php if ($errorModalVisible): ?>
-            <p class="text-sm text-pink-600 mb-4 error-message"><?= htmlspecialchars($errorMessage) ?></p>
-          <?php else: ?>
-            <p class="text-sm text-pink-600 mb-4 hidden error-message"></p>
-          <?php endif; ?>
-          <form method="POST" class="flex flex-col gap-4" id="category-form">
-            <input
-              type="text"
-              placeholder="Category Name"
-              class="w-full border-2 rounded-sm text-sm bg-slate-100 border-slate-300 p-3 focus:outline-none focus:ring-2 focus:ring-skyblue-500 focus:border-transparent transition-all " id="input-category-name" name="inputCategoryName" value="<?= htmlspecialchars($category['name'] ?? '') ?>">
+          <form method="POST" class="space-y-4 bg-white p-6 text-slate-800 grid grid-cols-1 gap-2 form text-sm font-medium" id="category-form">
+
+            <div>
+              <label for="inputCategoryName" class="block text-sm font-light text-slate-800">Category Name <span class="text-red-600">*</span></label>
+              <div class="relative">
+                <input
+                  type="text"
+                  placeholder="Category Name"
+                  class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 " id="input-category-name" name="inputCategoryName" value="<?= htmlspecialchars($category['name'] ?? '') ?>">
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <i class="fa-regular fa-clipboard"></i>
+                </div>
+              </div>
+
+              <?php if ($errorModalVisible): ?>
+                <p class="text-sm text-pink-600 error-message"><?= htmlspecialchars($errorMessage) ?></p>
+              <?php else: ?>
+                <p class="text-sm text-pink-600 hidden error-message"></p>
+              <?php endif; ?>
+            </div>
+
             <input type="hidden" name="categoryId" id="category-id" value="<?= htmlspecialchars($category['id'] ?? 0) ?>">
-            <button
-              type="submit"
-              id="add-btn"
-              class="w-full bg-red-500 text-white rounded-sm text-base font-bold py-3 hover:bg-red-600 active:bg-red-700 transition-all focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 cursor-pointer">
-              <?= $editMode ? 'Update Category' : 'Add Category' ?>
-            </button>
+            <div class="flex items-center gap-4 pt-4">
+              <button
+                class="border border-slate-300 block text-sm w-full px-4 py-2 text-slate-700 rounded-sm hover:bg-slate-50 cursor-pointer"
+                id="toggle-close">
+                Cancel
+              </button>
+              <button
+                type="submit"
+                id="add-btn"
+                class="bg-red-600 block text-sm font-bold w-full px-4 py-2 text-white rounded-sm hover:bg-red-700 cursor-pointer">
+                <?= $editMode ? 'Update Category' : 'Add Category' ?>
+              </button>
+            </div>
+
           </form>
         </div>
       </div>

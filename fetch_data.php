@@ -94,6 +94,15 @@ function fetchLatestAssetForInventory($pdo, $inventoryId)
 }
 
 
+function fetchBranches($pdo)
+{
+  $stmt = $pdo->prepare("SELECT id, branch_name, branch_manager, created_at, updated_at FROM branch");
+  $stmt->execute();
+
+  // Fetch the results as an associative array
+  return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 
 // Mapping 
 function generateAssetNumber($categoryId, $categoryName)

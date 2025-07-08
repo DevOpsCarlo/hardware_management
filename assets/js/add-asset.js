@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const assignAssetButtons = document.querySelectorAll(".add-asset-btn");
   const modal = document.getElementById("add-asset-modal");
   const form = document.getElementById("add-asset-form");
-
+  const closeModal = document.getElementById("asset-cancel-btn");
   function closeAllMenus() {
     document
       .querySelectorAll(".menu")
@@ -231,7 +231,11 @@ document.addEventListener("DOMContentLoaded", function () {
       return "0001"; // fallback
     }
   }
-
+  closeModal.addEventListener("click", (e) => {
+    if (e.target === closeModal) {
+      modal.classList.add("hidden");
+    }
+  });
   // Close modal when clicking outside
   modal.addEventListener("click", function (e) {
     if (e.target === modal) {

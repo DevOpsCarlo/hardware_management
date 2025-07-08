@@ -29,10 +29,24 @@ $routes = [
   '/manage-hardware/add-asset' => 'controllers/add-asset.php',
   '/manage-hardware/add-asset/view-asset' => 'controllers/view-asset.php',
   '/manage-hardware/assign-asset' => 'controllers/assign-asset.php',
-  //  '/get-next-asset-number' => 'controllers/get-next-asset-number.php', 
+  '/user' => 'controllers/user.php',
+  '/branch' => 'controllers/branch.php',
 
 
 ];
+
+// Handle dynamic branch routes (e.g., /branch/1, /branch/2, etc.)
+// if (preg_match('/^\/branch\/(\d+)$/', $uri, $matches)) {
+//   $_GET['id'] = $matches[1]; // Set the branch ID in $_GET
+//   require('controllers/branch-detail.php');
+//   exit();
+// }
+
+if (preg_match('/^\/branch\/([a-zA-Z0-9\-_\.%\+\s]+)$/', $uri, $matches)) {
+  $_GET['branch_name'] = urldecode($matches[1]);
+  require('controllers/branch-detail.php');
+  exit();
+}
 
 if (array_key_exists($uri, $routes)) {
   require($routes[$uri]);

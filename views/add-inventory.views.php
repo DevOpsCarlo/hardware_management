@@ -58,98 +58,141 @@
 
     <!-- ADD INVENTORY FORM -->
 
-
-    <!-- <div class="tab-content block md:col-span-2 lg:col-span-10 text-sm rounded shadow" id="count"> -->
-    <!-- Updated Inventory Form Modal -->
     <div class="fixed inset-0 top-0 left-0 bg-black/30 backdrop-blur-xs flex items-center justify-center z-50 hidden" id="inventory-form-modal">
-      <div class="w-full max-w-7xl bg-white col-span-4 mx-auto rounded-sm p-4 shadow-lg" id="inventory-form">
+      <div class="w-full max-w-4xl bg-white col-span-4 mx-auto rounded-sm p-4 shadow-lg" id="inventory-form">
         <!-- Dynamic Title -->
-        <h2 class="text-slate-800 font-bold px-6 pt-4 text-xl" id="form-title">Add Inventory</h2>
+        <div class="flex items-center gap-4 border-b-2 border-slate-100 pb-5">
+          <div class="">
+            <i class="fa-solid fa-cubes text-red-500 rounded-full bg-red-50 p-4"></i>
+          </div>
+          <h2 class="text-slate-800 font-bold text-2xl" id="form-title">Add Inventory</h2>
+        </div>
+
         <form class="space-y-4 bg-white p-6 text-slate-800 grid grid-cols-2 gap-2 form text-sm font-medium"
           action="/manage-hardware/add-inventory" method="POST" enctype="multipart/form-data" id="inventory-form-element">
 
           <!-- Hidden field for inventory ID (for edit mode) -->
-          <input type="hidden" name="inventory_id" id="inventory-id">
+          <input type="hidden" name="inventory_id" id="inventory-id" value="<?= htmlspecialchars($inventory['id']) ?>">
 
-          <!-- Category -->
-          <div>
-            <label for="category-id" class="block">Category</label>
-            <?php if (!empty($categories)): ?>
-              <select class="mt-1 block w-full border border-gray-300 rounded p-2"
-                name="category_id" id="category-id">
-                <option value="" disabled selected>Select Category</option>
-                <?php foreach ($categories as $category): ?>
-                  <option value="<?= $category['id'] ?>"><?= htmlspecialchars(ucfirst($category['name'])) ?></option>
-                <?php endforeach; ?>
-              </select>
-              <span class="category-error text-pink-600 text-sm hidden font-light"></span>
-            <?php else: ?>
-              <select class="mt-1 block w-full border border-slate-300 rounded p-2 bg-slate-200" disabled>
-                <option class="">No categories found</option>
-              </select>
-            <?php endif; ?>
+          <div class="col-span-10 flex gap-4">
+            <!-- Category -->
+            <div class="w-full">
+              <label for="category-id" class="block">Category</label>
+              <?php if (!empty($categories)): ?>
+                <select class="mt-1 block w-full border border-gray-300 rounded p-2"
+                  name="category_id" id="category-id">
+                  <option value="" disabled selected>Select Category</option>
+                  <?php foreach ($categories as $category): ?>
+                    <option value="<?= $category['id'] ?>"><?= htmlspecialchars(ucfirst($category['name'])) ?></option>
+                  <?php endforeach; ?>
+                </select>
+                <span class="category-error text-pink-600 text-sm hidden font-light"></span>
+              <?php else: ?>
+                <select class="mt-1 block w-full border border-slate-300 rounded p-2 bg-slate-200" disabled>
+                  <option class="">No categories found</option>
+                </select>
+              <?php endif; ?>
+            </div>
+
+            <!-- Manufacturer -->
+            <div class="w-full">
+
+              <label for="input-manufacturer" class="block">Manufacturer</label>
+              <div class="relative">
+
+                <input type="text"
+                  class="mt-1 block w-full border border-gray-300 rounded p-2 input-manufacturer"
+                  placeholder="e.g., Lenovo"
+                  name="input-manufacturer"
+                  id="input-manufacturer" />
+                <span class="brand-error text-pink-600 text-sm hidden font-light"></span>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <i class="fa-solid fa-building"></i>
+                </div>
+              </div>
+
+            </div>
+
           </div>
 
-          <!-- Manufacturer -->
-          <div>
-            <label for="input-manufacturer" class="block">Manufacturer</label>
-            <input type="text"
-              class="mt-1 block w-full border border-gray-300 rounded p-2 input-manufacturer"
-              placeholder="e.g Lenovo"
-              name="input-manufacturer"
-              id="input-manufacturer" />
-            <span class="brand-error text-pink-600 text-sm hidden font-light"></span>
+
+          <div class="col-span-10 flex gap-4">
+            <!-- Model -->
+            <div class="w-full">
+              <label for="input-model" class="block">Model</label>
+              <div class="relative">
+                <input type="text"
+                  class="mt-1 block w-full border border-gray-300 rounded p-2"
+                  placeholder="e.g., ideapad slim3i"
+                  name="input-model"
+                  id="input-model">
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <i class="fa-solid fa-tag"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Purchase Date -->
+            <div class="w-full">
+              <label for="purchase-date" class="block">Purchase Date</label>
+              <input type="date"
+                class="block w-full border border-gray-300 rounded p-2 purchase-date"
+                name="purchase-date"
+                id="purchase-date">
+            </div>
+
           </div>
 
-          <!-- Model -->
-          <div>
-            <label for="input-model" class="block">Model</label>
-            <input type="text"
-              class="mt-1 block w-full border border-gray-300 rounded p-2"
-              placeholder="e.g ideapad slim3i"
-              name="input-model"
-              id="input-model">
-          </div>
 
-          <!-- Purchase Date -->
-          <div>
-            <label for="purchase-date" class="block">Purchase Date</label>
-            <input type="date"
-              class="block w-full border border-gray-300 rounded p-2 purchase-date"
-              name="purchase-date"
-              id="purchase-date">
-          </div>
+          <div class="col-span-10 flex gap-4">
+            <!-- Quantity -->
+            <div class="w-full">
+              <label for="input-qty" class="block">Quantity</label>
+              <div class="relative">
 
-          <!-- Quantity -->
-          <div>
-            <label for="input-qty" class="block">Quantity</label>
-            <input type="number"
-              class="mt-1 block w-full border border-gray-300 rounded p-2 input-qty"
-              placeholder="e.g 5"
-              name="input-qty"
-              id="input-qty" />
-            <span class="qty-error text-pink-600 text-sm hidden font-light"></span>
-          </div>
+                <input type="number"
+                  class="mt-1 block w-full border border-gray-300 rounded p-2 input-qty"
+                  placeholder="e.g., 5"
+                  name="input-qty"
+                  id="input-qty" />
+                <span class="qty-error text-pink-600 text-sm hidden font-light"></span>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
 
-          <!-- Warranty Years -->
-          <div>
-            <label for="input-warranty" class="block">Warranty (Years)</label>
-            <input type="number"
-              class="mt-1 block w-full border border-gray-300 rounded p-2"
-              placeholder="e.g 2"
-              name="input-warranty"
-              id="input-warranty">
-          </div>
+                  <i class="fa-solid fa-hashtag"></i>
+                </div>
+              </div>
 
+            </div>
+
+            <!-- Warranty Years -->
+            <div class="w-full">
+              <label for="input-warranty" class="block">Warranty (Years)</label>
+              <div class="relative">
+
+                <input type="number"
+                  class="mt-1 block w-full border border-gray-300 rounded p-2"
+                  placeholder="e.g., 2"
+                  name="input-warranty"
+                  id="input-warranty">
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <i class="fa-solid fa-calendar"></i>
+                </div>
+              </div>
+
+            </div>
+          </div>
           <!-- Inventory Photo -->
           <div>
             <label for="photo" class="block">Photo</label>
-            <input type="file"
-              class="block w-full border border-gray-300 rounded p-2 cursor-pointer"
-              name="photo"
-              id="photo">
-            <!-- Display current photo when editing -->
-
+            <div class="relative">
+              <input type="file"
+                class="block w-full border border-gray-300 rounded p-2 cursor-pointer"
+                name="photo"
+                id="photo">
+              <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <i class="fa-solid fa-image"></i>
+              </div>
+            </div>
           </div>
 
           <div id="current-photo" class=" hidden">
@@ -159,7 +202,12 @@
 
 
           <!-- Submit Button -->
-          <div class="grid col-span-2 justify-end">
+          <div class="col-span-10 flex gap-4 pt-4">
+            <button
+              class="border border-slate-300 block text-sm w-full px-4 py-2 text-slate-700 rounded-sm hover:bg-slate-50 cursor-pointer"
+              id="inventory-cancel-btn">
+              Cancel
+            </button>
             <button type="submit"
               class="bg-red-600 block w-full px-2 py-1 text-white rounded-sm hover:bg-red-700 add-inventory-btn cursor-pointer"
               name="add-inventory-btn"
@@ -167,6 +215,7 @@
               Add Inventory
             </button>
           </div>
+
 
         </form>
       </div>
@@ -217,16 +266,21 @@
                           <li class="px-4 py-2 hover:bg-slate-100 border-b-1">
                             <button class="cursor-pointer block w-full text-left edit-inventory-btn"
                               data-manufacturer="<?= htmlspecialchars($inventory['manufacturer']) ?>"
+                              data-category-id=<?= htmlspecialchars($inventory['category_id'])  ?>
                               data-model="<?= htmlspecialchars($inventory['model']) ?>"
                               data-quantity="<?= htmlspecialchars($inventory['total_quantity']) ?>"
-                              data-category-name="<?= htmlspecialchars($inventory['category_name']) ?>">
+                              data-category-name="<?= htmlspecialchars($inventory['category_name']) ?>"
+                              data-id="<?= htmlspecialchars($inventory['inventory_id'] ?? 0) ?>"
+                              data-purchase-date="<?= htmlspecialchars($inventory['purchase_date']) ?>"
+                              data-warranty-years="<?= htmlspecialchars($inventory['warranty_years']) ?>"
+                              data-photo="/<?= htmlspecialchars($inventory['photos']) ?>">
                               Edit
                             </button>
                           </li>
                           <li class="px-4 py-2 hover:bg-slate-100 border-b-1">
                             <button class="cursor-pointer w-full text-left delete-inventory-btn"
                               data-name="<?= htmlspecialchars($inventory['manufacturer']) ?>"
-                              data-id="<?= $inventory['inventory_ids'] ?>">
+                              data-id="<?= $inventory['inventory_id'] ?>">
                               Delete
                             </button>
                           </li>

@@ -146,16 +146,19 @@ if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['add-inventory-btn']))
 function getAllInventory($pdo)
 {
   $sql = "SELECT 
-            manufacturer, 
-            model, 
-            SUM(quantity) as total_quantity,
-            c.name as category_name,
-            GROUP_CONCAT(DISTINCT photo) as photos,
-            GROUP_CONCAT(DISTINCT i.id) as inventory_ids
+            i.id AS inventory_id,
+            i.manufacturer, 
+            i.model, 
+            i.purchase_date,
+            i.warranty_years, 
+            SUM(i.quantity) AS total_quantity,
+            i.category_id,
+            c.name AS category_name,
+            GROUP_CONCAT(DISTINCT i.photo) AS photos
           FROM inventory i 
           LEFT JOIN categories c ON i.category_id = c.id 
-          GROUP BY manufacturer, model, category_name
-          ORDER BY manufacturer, model";
+          GROUP BY i.id, i.manufacturer, i.model, i.purchase_date, i.category_id, c.name
+          ORDER BY i.manufacturer, i.model";
 
   $stmt = $pdo->prepare($sql);
   $stmt->execute();
