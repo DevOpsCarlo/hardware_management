@@ -10,6 +10,7 @@
   let categoryTable = new DataTable('#categoryTable');
   let assignAssetTable = new DataTable('#assignAssetTable');
   let branchTable = new DataTable("#branchTable")
+  let employeeTable = new DataTable("#employeeTable");
 </script>
 
 

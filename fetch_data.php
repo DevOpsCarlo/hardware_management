@@ -103,6 +103,49 @@ function fetchBranches($pdo)
   return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+function fetchEmployee($pdo)
+{
+  $stmt = $pdo->prepare("SELECT * FROM employee");
+  $stmt->execute();
+  return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+// Fetch branch details by name
+function fetchBranchByName($pdo, $branchName)
+{
+  $stmt = $pdo->prepare("SELECT * FROM branch WHERE branch_name = ?");
+  $stmt->execute([$branchName]);
+  return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+// Fetch departments for this branch
+function fetchDepartmentsByBranch($pdo, $branchId)
+{
+  $stmt = $pdo->prepare("SELECT * FROM departments WHERE branch_id = ? ORDER BY department_name");
+  $stmt->execute([$branchId]);
+  return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function getBranchByName($pdo, $branchName)
+{
+  $stmt = $pdo->prepare("SELECT * FROM branch WHERE branch_name = ?");
+  $stmt->execute([$branchName]);
+  return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function getDepartmentByName($pdo, $branchId, $departmentName)
+{
+  $stmt = $pdo->prepare("SELECT * FROM departments WHERE branch_id = ? AND department_name = ?");
+  $stmt->execute([$branchId, $departmentName]);
+  return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function getEmployeesByDepartment($pdo, $departmentId)
+{
+  $stmt = $pdo->prepare("SELECT * FROM employee WHERE department_id = ?");
+  $stmt->execute([$departmentId]);
+  return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 
 // Mapping 
 function generateAssetNumber($categoryId, $categoryName)

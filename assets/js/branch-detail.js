@@ -92,17 +92,8 @@ document.addEventListener("DOMContentLoaded", function () {
   editDepartmentBtns.forEach((btn) => {
     btn.addEventListener("click", function () {
       const departmentId = this.dataset.departmentId;
-
-      // Find the department card to get current values
-      const departmentCard = this.closest(".bg-white");
-      const departmentName = departmentCard
-        .querySelector("h3")
-        .textContent.trim();
-      const departmentHeadElement =
-        departmentCard.querySelector("span:has(strong)");
-      const departmentHead = departmentHeadElement
-        ? departmentHeadElement.textContent.replace("Head:", "").trim()
-        : "";
+      const departmentName = this.dataset.departmentName;
+      const departmentHead = this.dataset.departmentHead;
 
       // Populate modal with current values
       departmentModalTitle.textContent = "Edit Department";
@@ -130,10 +121,8 @@ document.addEventListener("DOMContentLoaded", function () {
   deleteDepartmentBtns.forEach((btn) => {
     btn.addEventListener("click", function () {
       const departmentId = this.dataset.departmentId;
-      const departmentCard = this.closest(".bg-white");
-      const departmentName = departmentCard
-        .querySelector("h3")
-        .textContent.trim();
+      const departmentName = this.dataset.departmentName;
+      // const departmentHead = this.dataset.departmentHead;
 
       // Close the menu
       document
@@ -148,7 +137,7 @@ document.addEventListener("DOMContentLoaded", function () {
         showCancelButton: true,
         confirmButtonColor: "#dc2626",
         cancelButtonColor: "#6b7280",
-        confirmButtonText: "Yes, delete it!",
+        confirmButtonText: "Delete",
       }).then((result) => {
         if (result.isConfirmed) {
           // Create a form to submit the deletion

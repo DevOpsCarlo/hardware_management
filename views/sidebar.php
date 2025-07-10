@@ -29,8 +29,8 @@
           <i class="fa-solid fa-chevron-down mr-5 icon"></i>
         </div>
         <!-- Submenu -->
-        <div class="flex flex-col px-3 gap-2 mt-4 <?= urlContains("/user") || urlContains("/branch") ? "" : "hidden" ?> submenu">
-          <a href="/user" class="sidebar-link <?= urlIs("/user") ? "active" : "" ?> ">Users</a>
+        <div class="flex flex-col px-3 gap-2 mt-4 <?= urlContains("/employee") || urlContains("/branch") ? "" : "hidden" ?> submenu">
+          <a href="/employee" class="sidebar-link <?= urlIs("/employee") ? "active" : "" ?> ">Employee</a>
           <a href="/branch" class="sidebar-link <?= urlIs("/branch") ? "active" : "" ?>">Branch</a>
           <a href="" class="sidebar-link">Assignments</a>
           <a href="" class="sidebar-link">Maintenance Request</a>

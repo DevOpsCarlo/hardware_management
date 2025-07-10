@@ -1,5 +1,5 @@
 <?php
-$pageTitle = 'Branch';
+$pageTitle = 'Toprank Branches';
 
 if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['delete_branch_id'])) {
   $branchIdToDelete = $_POST['delete_branch_id'];

@@ -21,19 +21,17 @@
     <!-- Header with Back Button -->
     <div class="flex items-center justify-between my-4">
       <div class="flex items-center gap-4">
-        <a href="/branch" class="text-slate-700 hover:text-red-800 text-sm flex items-center gap-1">
-          <i class="fa-solid fa-arrow-left ml-2"></i>
-          Back to Branches
+        <a href="/branch/<?= urlencode($branch['branch_name']) ?>" class="text-sm text-red-600 hover:underline">
+          ← Back to <?= htmlspecialchars($branch['branch_name']) ?> Branch
         </a>
-
       </div>
       <button class="text-red-700 border px-2 py-1 text-sm hover:bg-red-700 hover:text-white rounded-sm mr-2 cursor-pointer" id="toggle-department-modal">
-        Add Department
+        + Add Employee
       </button>
     </div>
     <div class="my-4 shadow-md py-2 px-2">
       <h2 class="text-2xl font-extrabold text-red-700">
-        <?= htmlspecialchars($branch['branch_name'] ?? 'Unknown Branch') ?> Branch
+        <?= htmlspecialchars($department['department_name']) ?> Department
       </h2>
       <!-- Branch Info Card -->
       <div class="flex items-center justify-between">

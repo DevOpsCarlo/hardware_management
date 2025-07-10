@@ -29,19 +29,21 @@ $routes = [
   '/manage-hardware/add-asset' => 'controllers/add-asset.php',
   '/manage-hardware/add-asset/view-asset' => 'controllers/view-asset.php',
   '/manage-hardware/assign-asset' => 'controllers/assign-asset.php',
-  '/user' => 'controllers/user.php',
+  '/employee' => 'controllers/employee.php',
   '/branch' => 'controllers/branch.php',
 
 
 ];
 
-// Handle dynamic branch routes (e.g., /branch/1, /branch/2, etc.)
-// if (preg_match('/^\/branch\/(\d+)$/', $uri, $matches)) {
-//   $_GET['id'] = $matches[1]; // Set the branch ID in $_GET
-//   require('controllers/branch-detail.php');
-//   exit();
-// }
+// 1. Match: /branch/{branch_name}/{department_name}
+if (preg_match('/^\/branch\/([a-zA-Z0-9\-_\.%\+\s]+)\/([a-zA-Z0-9\-_\.%\+\s]+)$/', $uri, $matches)) {
+  $_GET['branch_name'] = urldecode($matches[1]);
+  $_GET['department_name'] = urldecode($matches[2]);
+  require('controllers/department-detail.php');
+  exit();
+}
 
+// 2. Match: /branch/{branch_name}
 if (preg_match('/^\/branch\/([a-zA-Z0-9\-_\.%\+\s]+)$/', $uri, $matches)) {
   $_GET['branch_name'] = urldecode($matches[1]);
   require('controllers/branch-detail.php');

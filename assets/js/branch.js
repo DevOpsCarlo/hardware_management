@@ -93,7 +93,6 @@ document.querySelector("#branchTable").addEventListener("click", function (e) {
   // Edit button
   if (e.target.classList.contains("edit-btn")) {
     e.stopPropagation();
-    console.log(branchManager);
 
     modal.classList.remove("hidden");
     modalTitle.textContent = "Edit Branch";
