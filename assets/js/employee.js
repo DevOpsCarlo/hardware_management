@@ -5,6 +5,27 @@ document.addEventListener("DOMContentLoaded", function () {
   const modalAddBtn = document.getElementById("modal-add-btn");
 
   toggleModal.addEventListener("click", () => {
+    const modalTitle = document.getElementById("modal-title");
+    const modalAddBtn = document.getElementById("modal-add-btn");
+    const modalForm = document.getElementById("modal-form");
+    const inputId = document.getElementById("id");
+    const inputEmployeeName = document.getElementById("input-employee-name");
+    const inputEmployeeId = document.getElementById("input-employee-id");
+    const optionStatus = document.getElementById("option-status");
+
+    // Clear all fields
+    modalTitle.textContent = "Add New Employee";
+    modalAddBtn.textContent = "Add Employee";
+    modalForm.action = "/employee";
+    inputId.value = "0"; // or "" - this is the key fix!
+    inputEmployeeName.value = "";
+    inputEmployeeId.value = "";
+    optionStatus.value = "";
+
+    // Hide validation messages
+    document.getElementById("input-validation").classList.add("hidden");
+    document.getElementById("input-validation-status").classList.add("hidden");
+
     modal.classList.remove("hidden");
   });
 
@@ -15,7 +36,11 @@ document.addEventListener("DOMContentLoaded", function () {
   modalAddBtn.addEventListener("click", (e) => {
     const inputEmployeeName = document.getElementById("input-employee-name");
     const inputValidation = document.getElementById("input-validation");
+    const inputValidationStatus = document.getElementById(
+      "input-validation-status"
+    );
     inputValidation.classList.add("hidden");
+    const optionStatus = document.getElementById("option-status");
     let hasError = false;
 
     if (inputEmployeeName.value.trim() === "") {
@@ -23,6 +48,14 @@ document.addEventListener("DOMContentLoaded", function () {
       inputValidation.textContent = "Please enter employee name";
       inputValidation.classList.remove("hidden");
     }
+
+    // Validate employee status
+    if (optionStatus.value === "") {
+      hasError = true;
+      inputValidationStatus.textContent = "Please select employee status";
+      inputValidationStatus.classList.remove("hidden");
+    }
+
     if (hasError) {
       e.preventDefault();
     }
@@ -81,6 +114,7 @@ document
   .addEventListener("click", function (e) {
     // fetch data when click
     const id = e.target.getAttribute("data-id");
+    console.log(id);
     const employeeName = e.target.getAttribute("data-employee-name");
     const employeeId = e.target.getAttribute("data-employee-id");
     const selectedStatus = e.target.getAttribute("data-option-status");
@@ -93,7 +127,6 @@ document
     const inputEmployeeName = document.getElementById("input-employee-name");
     const inputEmployeeId = document.getElementById("input-employee-id");
     const optionStatus = document.getElementById("option-status");
-
     // Edit button
     if (e.target.classList.contains("edit-btn")) {
       e.stopPropagation();
@@ -111,7 +144,7 @@ document
     // Delete button
     if (e.target.classList.contains("delete-btn")) {
       e.stopPropagation();
-
+      console.log("id", id);
       Swal.fire({
         icon: "warning",
         title: "Delete Category?",

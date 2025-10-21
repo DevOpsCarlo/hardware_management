@@ -52,8 +52,11 @@
     ?>
 
     <!-- ADD INVENTORY BUTTON -->
-    <div class="flex justify-end my-4">
-      <button class="text-red-700 border px-2 py-1 text-sm hover:bg-red-700 hover:text-white rounded-sm mr-2 cursor-pointer" id="toggle-add-inventory-form"> + Add inventory</button>
+    <div class="flex justify-between my-4">
+      <div>
+        <h2 class="text-2xl font-extrabold text-red-700 ml-6">Inventory List</h2>
+      </div>
+      <button class="text-red-700 border px-2 py-1 text-sm hover:bg-red-700 hover:text-white rounded-sm mr-6 cursor-pointer" id="toggle-add-inventory-form"> + Add inventory</button>
     </div>
 
     <!-- ADD INVENTORY FORM -->
@@ -136,7 +139,7 @@
             <div class="w-full">
               <label for="purchase-date" class="block">Purchase Date</label>
               <input type="date"
-                class="block w-full border border-gray-300 rounded p-2 purchase-date"
+                class="mt-1 block w-full border border-gray-300 rounded p-2 purchase-date"
                 name="purchase-date"
                 id="purchase-date">
             </div>
@@ -226,38 +229,48 @@
     <article class="col-span-10 text-sm mt-4 font-light" id="inventory-list-table">
       <div>
         <div>
-          <table id="inventoryTable" class="display">
-            <thead>
-              <tr>
-                <th>No.</th>
-                <th>Image</th>
-                <th>Manufacturer</th>
-                <th>Model</th>
-                <th>Category</th>
-                <th>Quantity</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php if (!empty($inventories)): ?>
+          <?php if (empty($inventories)): ?>
+            <div class="col-span-full text-center py-12">
+              <div class="text-slate-400 mb-4">
+                <i class="fa-solid fa-box text-6xl"></i>
+              </div>
+              <h3 class="text-lg font-medium text-slate-600 mb-2">No Inventory Yet</h3>
+              <p class="text-slate-500 mb-4">Start by adding your first inventory.</p>
+
+            </div>
+          <?php else: ?>
+            <table id="inventoryTable" class="display">
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>Image</th>
+                  <th>Manufacturer</th>
+                  <th>Model</th>
+                  <th>Category</th>
+                  <th>Quantity</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+
                 <?php foreach ($inventories as $index => $inventory): ?>
                   <tr>
                     <td><?= $index + 1 ?></td>
-                    <td class="w-1/12  h-1/12 object-contain">
+                    <td class="w-1/12 object-contain">
                       <?php
                       // Ensure photos field is not null or empty before calling explode
                       $photos = !empty($inventory['photos']) ? explode(',', $inventory['photos']) : [];
                       $photo = !empty($photos) ? $photos[0] : ''; // Use the first photo if available
                       ?>
                       <?php if ($photo): ?>
-                        <img src="/<?= htmlspecialchars(ucfirst($photo)) ?>" alt="">
+                        <img src="/<?= htmlspecialchars(ucfirst($photo)) ?>" alt="" class="w-8/12">
                       <?php else: ?>
                         <img src="/uploads/default-photo/laptop-charger.jpg" alt="No image available">
                       <?php endif; ?>
                     </td>
                     <td><?= htmlspecialchars(ucfirst($inventory['manufacturer'])) ?> </td>
                     <td><?= htmlspecialchars(ucfirst($inventory['model'])) ?> </td>
-                    <td><?= htmlspecialchars(ucfirst($inventory['category_name'])) ?></td>
+                    <td><?= htmlspecialchars(ucfirst($inventory['category_name'] ?? "Laptop charger")) ?></td>
                     <td><?= htmlspecialchars($inventory['total_quantity']) ?></td>
                     <td class="relative">
                       <i class="fa-solid fa-ellipsis-vertical cursor-pointer select-menu"></i>
@@ -292,9 +305,10 @@
                     </td>
                   </tr>
                 <?php endforeach; ?>
-              <?php endif; ?>
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          <?php endif; ?>
+
         </div>
       </div>
     </article>

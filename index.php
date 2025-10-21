@@ -29,6 +29,7 @@ $routes = [
   '/manage-hardware/add-asset' => 'controllers/add-asset.php',
   '/manage-hardware/add-asset/view-asset' => 'controllers/view-asset.php',
   '/manage-hardware/assign-asset' => 'controllers/assign-asset.php',
+  '/manage-hardware/assign-asset/asset-details' => 'controllers/asset-details.php',
   '/employee' => 'controllers/employee.php',
   '/branch' => 'controllers/branch.php',
 
@@ -37,6 +38,7 @@ $routes = [
 
 // 1. Match: /branch/{branch_name}/{department_name}
 if (preg_match('/^\/branch\/([a-zA-Z0-9\-_\.%\+\s]+)\/([a-zA-Z0-9\-_\.%\+\s]+)$/', $uri, $matches)) {
+  // dd($matches);
   $_GET['branch_name'] = urldecode($matches[1]);
   $_GET['department_name'] = urldecode($matches[2]);
   require('controllers/department-detail.php');
@@ -47,6 +49,15 @@ if (preg_match('/^\/branch\/([a-zA-Z0-9\-_\.%\+\s]+)\/([a-zA-Z0-9\-_\.%\+\s]+)$/
 if (preg_match('/^\/branch\/([a-zA-Z0-9\-_\.%\+\s]+)$/', $uri, $matches)) {
   $_GET['branch_name'] = urldecode($matches[1]);
   require('controllers/branch-detail.php');
+  exit();
+}
+
+
+if (preg_match('/^\/manage-hardware\/assign-asset\/asset-details\/([0-9]+)$/', $uri, $matches)) {
+  error_log("MATCHED asset-details route! Asset ID: " . $matches[1]);
+  $_GET['id'] = $matches[1];
+  error_log("Set _GET['id'] to: " . $_GET['id']);
+  require('controllers/asset-details.php');
   exit();
 }
 

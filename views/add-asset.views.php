@@ -77,7 +77,6 @@
                 <th>Serial No.</th>
                 <th>Status</th>
                 <th>Conditions</th>
-                <!-- <th>Assigned To</th> -->
                 <th>Action</th>
               </tr>
             </thead>
@@ -118,21 +117,22 @@
                   <tr class="text-xs font-light text-left">
                     <td><?= $itemCounter++ ?></td>
                     <td class="w-1/12 h-1/12 object-contain">
-                      <img src="/<?= htmlspecialchars($inventory['photo'] ?? 'Empty') ?>" alt="">
+                      <img src="/<?= htmlspecialchars($inventory['photo'] ?? '-') ?>" alt="" class="w-8/12">
                     </td>
-                    <td><?= htmlspecialchars(ucfirst($inventory['manufacturer'] ?? 'Empty')) ?></td>
-                    <td><?= htmlspecialchars(ucfirst($inventory['model'] ?? 'Empty')) ?></td>
-                    <td><?= htmlspecialchars(ucfirst($inventory['category_name'] ?? 'Empty')) ?></td>
-                    <td><?= htmlspecialchars($asset['asset_number'] ?? 'Empty') ?></td>
-                    <td><?= htmlspecialchars($asset['serial_number'] ?? 'Empty') ?></td>
+                    <td><?= htmlspecialchars(ucfirst($inventory['manufacturer'] ?? '-')) ?></td>
+                    <td><?= htmlspecialchars(ucfirst($inventory['model'] ?? '-')) ?></td>
+                    <td><?= htmlspecialchars(ucfirst($inventory['category_name'] ?? '-')) ?></td>
+                    <td><?= htmlspecialchars($asset['asset_number'] ?? '-') ?></td>
+                    <td><?= htmlspecialchars($asset['serial_number'] ?? '-') ?></td>
                     <?php
                     $statusClassMap = [
                       'Available' => 'text-emerald-500 bg-emerald-100',
                       'Assigned' => 'text-blue-500 bg-blue-100',
-                      'Under Maintenance' => 'text-orange-500 bg-orange-100',
+                      'Surrender' => 'text-orange-500 bg-orange-100',
+                      'Under Maintenance' => 'text-gray-500 bg-gray-100',
                       'Defective' => 'text-red-500 bg-red-100'
                     ];
-                    $currentStatus = $asset['status'] ?? 'Empty';
+                    $currentStatus = $asset['status'] ?? '-';
                     $statusClass = $statusClassMap[$currentStatus] ?? 'text-gray-500 bg-gray-100';
                     ?>
                     <td>
@@ -140,7 +140,7 @@
                         <?= htmlspecialchars($currentStatus) ?>
                       </span>
                     </td>
-                    <td><?= htmlspecialchars($asset['conditions'] ?? 'Empty') ?></td>
+                    <td><?= htmlspecialchars($asset['conditions'] ?? '-') ?></td>
                     <!-- <td> htmlspecialchars($asset['assigned_to'] ?? 'Empty') </td> -->
                     <td class="relative">
                       <i class="fa-solid fa-ellipsis-vertical cursor-pointer select-menu"></i>
@@ -294,7 +294,7 @@
               <div class="flex flex-col gap-1 w-full">
                 <label class="text-xs font-bold" for="">Status</label>
                 <?php
-                $statusOptions = ['Available', 'Assigned', 'Under Maintenance', 'Defective'];
+                $statusOptions = ['Available', 'Assigned', 'Surrender', 'Under Maintenance', 'Defective'];
                 $currentStatus = $asset['status'] ?? '';
                 ?>
                 <select class="w-full border rounded px-3 py-1" name="status" id="select-status">

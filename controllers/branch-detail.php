@@ -92,5 +92,4 @@ if (!$branch) {
 }
 
 $departments = fetchDepartmentsByBranch($pdo, $branch['id']);
-
 require("views/branch-details.views.php");

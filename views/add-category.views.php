@@ -16,8 +16,11 @@ unset($_SESSION['category_error'], $_SESSION['category_form_data'], $_SESSION['c
       <?php require("views/banner.php") ?>
 
     </article>
-    <div class="flex items-center justify-end col-span-1 md:col-span-2 lg:col-span-10 my-4">
-      <button class="flex items-center text-red-700 border px-2 py-1 text-sm hover:bg-red-700 hover:text-white rounded-sm mr-2 cursor-pointer" id="add-category-btn">
+    <div class="flex items-center justify-between col-span-1 md:col-span-2 lg:col-span-10 my-4">
+      <div>
+        <h2 class="text-2xl font-extrabold text-red-700 ml-6">Category List</h2>
+      </div>
+      <button class="flex items-center text-red-700 border px-2 py-1 text-sm hover:bg-red-700 hover:text-white rounded-sm mr-6 cursor-pointer" id="add-category-btn">
         + Add Category
       </button>
     </div>
@@ -83,7 +86,8 @@ unset($_SESSION['category_error'], $_SESSION['category_form_data'], $_SESSION['c
             <div class="flex items-center gap-4 pt-4">
               <button
                 class="border border-slate-300 block text-sm w-full px-4 py-2 text-slate-700 rounded-sm hover:bg-slate-50 cursor-pointer"
-                id="toggle-close">
+                id="toggle-close"
+                type="button">
                 Cancel
               </button>
               <button
@@ -102,19 +106,27 @@ unset($_SESSION['category_error'], $_SESSION['category_form_data'], $_SESSION['c
       <!-- CATEGORY TABLE  -->
       <article class="col-span-10 text-sm mt-0">
         <div>
-          <!-- <h4 class="text-slate-700 font-semibold text-base">Category Lists:</h4> -->
           <div>
-            <table id="categoryTable" class="display font-light">
-              <thead>
-                <tr>
-                  <th>No.</th>
-                  <th>Category</th>
-                  <th>Quantity</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <?php if (!empty($categories)): ?>
+            <?php if (empty($categories)): ?>
+              <div class="col-span-full text-center py-12">
+                <div class="text-slate-400 mb-4">
+                  <i class="fa-solid fa-list text-6xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-slate-600 mb-2">No Category Yet</h3>
+                <p class="text-slate-500 mb-4">Start by adding your first category.</p>
+
+              </div>
+            <?php else: ?>
+              <table id="categoryTable" class="display font-light">
+                <thead>
+                  <tr>
+                    <th>No.</th>
+                    <th>Category</th>
+                    <th>Quantity</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
                   <?php foreach ($categories as $index => $category): ?>
                     <tr>
                       <td><?= $index + 1 ?></td>
@@ -132,11 +144,11 @@ unset($_SESSION['category_error'], $_SESSION['category_form_data'], $_SESSION['c
                       </td>
                     </tr>
                   <?php endforeach; ?>
-
-                <?php endif; ?>
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            <?php endif; ?>
           </div>
+
         </div>
       </article>
   </section>

@@ -139,25 +139,44 @@ if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['add-inventory-btn']))
   }
 }
 
-// Helper functions for inventory management
 
-// Function to get all inventory items (for display)
-// Function to get all inventory items (for display), grouping by manufacturer/model
+// function getAllInventory($pdo)
+// {
+//   $sql = "SELECT 
+//             i.id AS inventory_id,
+//             i.manufacturer, 
+//             i.model, 
+//             i.purchase_date,
+//             i.warranty_years, 
+//             SUM(i.quantity) AS total_quantity,
+//             i.category_id,
+//             c.name AS category_name,
+//             GROUP_CONCAT(DISTINCT i.photo) AS photos
+//           FROM inventory i 
+//           LEFT JOIN categories c ON i.category_id = c.id 
+//           GROUP BY i.id, i.manufacturer, i.model, i.purchase_date, i.category_id, c.name
+//           ORDER BY i.manufacturer, i.model";
+
+//   $stmt = $pdo->prepare($sql);
+//   $stmt->execute();
+
+//   return $stmt->fetchAll(PDO::FETCH_ASSOC);
+// }
 function getAllInventory($pdo)
 {
   $sql = "SELECT 
-            i.id AS inventory_id,
+            MIN(i.id) AS inventory_id,  -- Use MIN to get a representative ID
             i.manufacturer, 
             i.model, 
-            i.purchase_date,
-            i.warranty_years, 
+            MIN(i.purchase_date) AS purchase_date,  -- Show earliest purchase date
+            MIN(i.warranty_years) AS warranty_years,  -- Show minimum warranty
             SUM(i.quantity) AS total_quantity,
             i.category_id,
             c.name AS category_name,
             GROUP_CONCAT(DISTINCT i.photo) AS photos
           FROM inventory i 
           LEFT JOIN categories c ON i.category_id = c.id 
-          GROUP BY i.id, i.manufacturer, i.model, i.purchase_date, i.category_id, c.name
+          GROUP BY i.manufacturer, i.model, i.category_id, c.name
           ORDER BY i.manufacturer, i.model";
 
   $stmt = $pdo->prepare($sql);

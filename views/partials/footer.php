@@ -11,6 +11,10 @@
   let assignAssetTable = new DataTable('#assignAssetTable');
   let branchTable = new DataTable("#branchTable")
   let employeeTable = new DataTable("#employeeTable");
+  let addEmployeeTable = new DataTable("#addEmployeeTable");
+  let departmentEmployeeTable = new DataTable("#departmentEmployeeTable")
+  let assetTable = new DataTable("#assetTable");
+  let assetDetailsTable = new DataTable("#assetDetailsTable");
 </script>
 
 

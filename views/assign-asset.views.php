@@ -7,16 +7,110 @@
       <!-- <div class="col-span-10 "> -->
       <?php require("views/banner.php") ?>
     </article>
-    <div class="flex justify-end my-4">
-      <button class="text-red-700 border px-2 py-1 text-sm hover:bg-red-700 hover:text-white rounded-sm mr-2 cursor-pointer" id="toggle-add-inventory-form"> Assign Asset</button>
-      <button class="text-red-700 border px-2 py-1 text-sm hover:bg-red-700 hover:text-white rounded-sm mr-2 cursor-pointer" id="toggle-add-inventory-form"> Remove Assign</button>
+    <?php
+    // Handle success messages
+    if (!empty($_SESSION['success_message'])):
+      $inventorySuccessMessage = htmlspecialchars($_SESSION['success_message'], ENT_QUOTES, 'UTF-8');
+    ?>
+      <script>
+        Swal.fire({
+          icon: 'success',
+          text: '<?= $inventorySuccessMessage ?>',
+          showConfirmButton: true,
+          position: 'center',
+          timer: 3000,
+          timerProgressBar: true
+        });
+      </script>
+    <?php
+      unset($_SESSION['success_message']);
+    endif;
+    ?>
+
+    <div class="col-span-10 text-sm font-light flex justify-end gap-2 px-4 sticky top-0 bg-white shadow-lg py-2 z-10">
+      <button class="text-red-700 border px-2 py-1 text-sm rounded-sm mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-modal">
+        Assign Asset
+      </button>
+
+      <button class="text-red-700 border px-2 py-1 text-sm hover:bg-red-700 hover:text-white rounded-sm mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-unassign-modal" type="button">Unassigned Asset</button>
     </div>
-    <article class="col-span-10 text-sm font-light" id="detailed-list-table">
+
+    <!-- Asset Assignment Form -->
+    <div class="fixed inset-0 top-0 left-0 bg-black/30 backdrop-blur-xs flex items-center justify-center z-50 hidden" id="modal">
+      <div class="w-full max-w-2xl bg-white col-span-4 mx-auto rounded-sm p-4 shadow-lg" id="inventory-form">
+        <!-- Dynamic Title -->
+        <div class="flex items-center gap-4 border-b-2 border-slate-100 pb-5">
+          <div class="">
+            <i class="fa-solid fa-cubes text-red-500 rounded-full bg-red-50 p-4"></i>
+          </div>
+          <h2 class="text-slate-800 font-bold text-2xl" id="form-title">Assign Asset</h2>
+        </div>
+        <form id="assignAssetForm" method="POST" action="/manage-hardware/assign-asset" class="space-y-4 bg-white p-6 text-slate-800 grid grid-cols-2 gap-2 form text-sm font-medium">
+          <!-- In your modal form -->
+          <div id="selectedAssetsContainer"></div>
+
+          <div class="col-span-10 gap-4">
+            <select name="employee_id" id="employeeSelect" class="border rounded px-3 py-2 text-sm ">
+              <option value="">Select Employee</option>
+              <?php
+              $employees = fetchEmployeeActive($pdo, 'Active');
+              foreach ($employees as $employee): ?>
+                <option value="<?= htmlspecialchars($employee['id']) ?>">
+                  <?= htmlspecialchars($employee['employee_name']) ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+
+          <div class="col-span-10 flex gap-4 pt-4">
+            <button type="button" class="border border-slate-300 block text-sm w-full px-4 py-2 text-slate-700 rounded-sm hover:bg-slate-50 cursor-pointer" id="cancel-btn">
+              Cancel
+            </button>
+            <button type="submit" name="assign_assets" class="bg-red-600 block w-full px-2 py-1 text-white rounded-sm hover:bg-red-700 add-inventory-btn cursor-pointer" id="assign-btn">
+              Assign
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Asset Unassignment Modal -->
+    <div class="fixed inset-0 top-0 left-0 bg-black/30 backdrop-blur-xs flex items-center justify-center z-50 hidden" id="unassign-modal">
+      <div class="w-full max-w-2xl bg-white col-span-4 mx-auto rounded-sm p-4 shadow-lg">
+        <div class="flex items-center gap-4 border-b-2 border-slate-100 pb-5">
+          <div class="">
+            <i class="fa-solid fa-user-minus text-red-500 rounded-full bg-red-50 p-4"></i>
+          </div>
+          <h2 class="text-slate-800 font-bold text-2xl">Unassign Asset</h2>
+        </div>
+        <form id="unassignAssetForm" method="POST" action="/manage-hardware/assign-asset" class="space-y-4 bg-white p-6 text-slate-800 grid grid-cols-2 gap-2 form text-sm font-medium">
+          <div id="selectedUnassignAssetsContainer"></div>
+
+          <div class="col-span-10">
+            <p class="text-gray-600 mb-4">Are you sure you want to unassign the selected asset(s)? This will remove the current employee assignment and set the status to 'Available'.</p>
+          </div>
+
+          <div class="col-span-10 flex gap-4 pt-4">
+            <button type="button" class="border border-slate-300 block text-sm w-full px-4 py-2 text-slate-700 rounded-sm hover:bg-slate-50 cursor-pointer" id="cancel-unassign-btn">
+              Cancel
+            </button>
+            <button type="submit" name="unassign_assets" class="bg-red-600 block w-full px-2 py-1 text-white rounded-sm hover:bg-red-700 cursor-pointer" id="unassign-btn">
+              Unassign
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <article class="col-span-10 text-sm font-light px-2 pt-3" id="asset-table">
       <div>
         <div>
-          <table id="detailedTable" class="display text-left">
+          <table id="assetTable" class="display text-left">
             <thead>
               <tr>
+                <th>
+                  <input type="checkbox" id="headerCheckbox" class="select-all-checkbox">
+                </th>
                 <th>No.</th>
                 <th>Image</th>
                 <th>Manufacturer</th>
@@ -26,7 +120,7 @@
                 <th>Serial No.</th>
                 <th>Status</th>
                 <th>Conditions</th>
-                <!-- <th>Assigned To</th> -->
+                <th>Assigned To</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -35,14 +129,14 @@
               $itemCounter = 1;
               foreach ($assetsByInventory as $inventoryAssets): ?>
                 <?php foreach ($inventoryAssets as $asset): ?>
-                  <?php
-                  // Skip if category is Laptop Charger
-                  // if (strtolower($asset['category_name']) === 'laptop charger') continue;
-                  ?>
+
                   <tr class="text-xs font-light text-left">
+                    <td>
+                      <input type="checkbox" name="selected_assets[]" value="<?= htmlspecialchars($asset['asset_id']) ?>" class="asset-checkbox" data-status="<?= htmlspecialchars($asset['status']) ?>">
+                    </td>
                     <td><?= $itemCounter++ ?> </td>
                     <td class="w-1/12 h-1/12 object-contain">
-                      <img src="/<?= htmlspecialchars($asset['photo'] ?? 'Empty') ?>" alt="">
+                      <img src="/<?= htmlspecialchars($asset['photo'] ?? 'uploads/default-photo/laptop-charger.jpg') ?>" alt="" class="w-8/12">
                     </td>
                     <td><?= htmlspecialchars(ucfirst($asset['manufacturer'] ?? 'Empty')) ?></td>
                     <td><?= htmlspecialchars(ucfirst($asset['model'] ?? 'Empty')) ?></td>
@@ -53,7 +147,8 @@
                     $statusClassMap = [
                       'Available' => 'text-emerald-500 bg-emerald-100',
                       'Assigned' => 'text-blue-500 bg-blue-100',
-                      'Under Maintenance' => 'text-orange-500 bg-orange-100',
+                      'Surrender' => 'text-orange-500 bg-orange-100',
+                      'Under Maintenance' => 'text-gray-500 bg-gray-100',
                       'Defective' => 'text-red-500 bg-red-100'
                     ];
                     $currentStatus = $asset['status'] ?? 'Empty';
@@ -65,72 +160,11 @@
                       </span>
                     </td>
                     <td><?= htmlspecialchars($asset['conditions'] ?? 'Empty') ?></td>
-                    <!-- <td> htmlspecialchars($asset['assigned_to'] ?? 'Empty') </td> -->
-                    <td class="relative">
-                      <i class="fa-solid fa-ellipsis-vertical cursor-pointer select-menu"></i>
-                      <div class="absolute top-10 right-5 mt-2 w-20 bg-white border rounded shadow group-hover:block z-10 hidden menu">
-                        <ul class="text-xs text-slate-700 font-light">
-                          <!-- Add Asset -->
-                          <li class="px-4 py-2 hover:bg-slate-100 border-b-1">
-                            <button class="cursor-pointer block w-full text-left add-asset-btn"
-                              data-id="<?= htmlspecialchars($inventory['inventory_id']) ?>"
-                              data-item-number="<?= $itemCounter - 1 ?>"
-                              data-manufacturer="<?= htmlspecialchars($inventory['manufacturer']) ?>"
-                              data-category-id="<?= htmlspecialchars($inventory['category_id']) ?>"
-                              data-category-option="<?= htmlspecialchars($inventory['category_name']) ?>"
-                              data-asset-number="<?= htmlspecialchars($asset['asset_number'] ?? '') ?>"
-                              data-model="<?= htmlspecialchars($inventory['model'] ?? '') ?>"
-                              data-serial-number="<?= htmlspecialchars($asset['serial_number'] ?? '') ?>"
-                              data-ip-address="<?= htmlspecialchars($asset['ip_address'] ?? '') ?>"
-                              data-status="<?= htmlspecialchars($asset['status'] ?? '') ?>"
-                              data-conditions="<?= htmlspecialchars($asset['conditions'] ?? '') ?>"
-                              data-photo="<?= htmlspecialchars($inventory['photo'] ?? '') ?>"
-                              data-asset-id="<?= htmlspecialchars($asset['asset_id'] ?? 0) ?>"
-                              <?php if ($relatedCharger): ?>
-                              data-charger-id="<?= htmlspecialchars($relatedCharger['id'] ?? 0) ?>"
-                              data-charger-asset-number="<?= htmlspecialchars($relatedCharger['asset_number']) ?>"
-                              data-charger-model="<?= htmlspecialchars($relatedCharger['model']) ?>"
-                              data-charger-serial-number="<?= htmlspecialchars($relatedCharger['serial_number'] ?? '') ?>"
-                              data-charger-conditions="<?= htmlspecialchars($relatedCharger['conditions']) ?>"
-                              data-charger-status="<?= htmlspecialchars($relatedCharger['status']) ?>"
-                              <?php endif; ?>>
-                              Add
-                            </button>
-                          </li>
-                          <!-- Delete -->
-                          <li class="px-4 py-2 hover:bg-slate-100 border-b-1">
-                            <button class="cursor-pointer w-full text-left delete-asset-btn"
-                              data-id="<?= htmlspecialchars($inventory['inventory_id']) ?>"
-                              data-item-number="<?= $itemCounter - 1 ?>"
-                              data-manufacturer="<?= htmlspecialchars($inventory['manufacturer']) ?>"
-                              data-category-id="<?= htmlspecialchars($inventory['category_id']) ?>"
-                              data-category-option="<?= htmlspecialchars($inventory['category_name']) ?>"
-                              data-asset-number="<?= htmlspecialchars($asset['asset_number'] ?? '') ?>"
-                              data-model="<?= htmlspecialchars($inventory['model'] ?? '') ?>"
-                              data-serial-number="<?= htmlspecialchars($asset['serial_number'] ?? '') ?>"
-                              data-ip-address="<?= htmlspecialchars($asset['ip_address'] ?? '') ?>"
-                              data-status="<?= htmlspecialchars($asset['status'] ?? '') ?>"
-                              data-conditions="<?= htmlspecialchars($asset['conditions'] ?? '') ?>"
-                              data-photo="<?= htmlspecialchars($inventory['photo'] ?? '') ?>"
-                              data-asset-id="<?= htmlspecialchars($asset['asset_id'] ?? 0) ?>"
-                              data-item-number="<?= $itemCounter - 1 ?>"
-                              <?php if ($relatedCharger): ?>
-                              data-charger-id="<?= htmlspecialchars($relatedCharger['id'] ?? 0) ?>"
-                              data-charger-asset-number="<?= htmlspecialchars($relatedCharger['asset_number']) ?>"
-                              data-charger-model="<?= htmlspecialchars($relatedCharger['model']) ?>"
-                              data-charger-serial-number="<?= htmlspecialchars($relatedCharger['serial_number'] ?? '') ?>"
-                              data-charger-conditions="<?= htmlspecialchars($relatedCharger['conditions']) ?>"
-                              data-charger-status="<?= htmlspecialchars($relatedCharger['status']) ?>"
-                              <?php endif; ?>>
-
-                              Delete
-                            </button>
-                          </li>
-                          <li class="px-4 py-2 hover:bg-slate-100">
-                            <a href="/manage-hardware/add-asset/view-asset" class="cursor-pointer w-full text-left">View</a>
-                          </li>
-                        </ul>
-                      </div>
+                    <td> <?= htmlspecialchars($asset['assigned_employee_name'] ?? '-') ?> </td>
+                    <td class="">
+                      <a href="/manage-hardware/assign-asset/asset-details?id=<?= htmlspecialchars($asset['asset_id']) ?>">
+                        <i class="fa-solid fa-eye"></i>
+                      </a>
                     </td>
                   </tr>
                 <?php endforeach; ?>
@@ -146,5 +180,5 @@
 
 
 
-
+<script src="/assets/js/assign-asset.js"> </script>
 <?php require("views/partials/footer.php") ?>
