@@ -122,7 +122,7 @@ unset($_SESSION['category_error'], $_SESSION['category_form_data'], $_SESSION['c
                   <tr>
                     <th>No.</th>
                     <th>Category</th>
-                    <th>Quantity</th>
+                    <th>Total Asset</th>
                     <th>Action</th>
                   </tr>
                 </thead>

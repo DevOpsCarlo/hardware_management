@@ -7,26 +7,55 @@ if ($chargerCategory) {
     $chargerCategoryId = $chargerCategory['id'];
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'Delete Asset') {
-    $assetId = $_POST['asset_id'] ?? 0;
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'Delete Asset') {
+    header('Content-Type: application/json');
+
+    $assetId = $_POST['asset_id'] ?? null;
+
+    error_log("Delete request received for asset ID: " . $assetId);
 
     if (!$assetId || !is_numeric($assetId)) {
-        $_SESSION['form_errors'] = ['general' => 'Invalid asset ID for deletion.'];
-        header('Location: /manage-hardware/add-asset');
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Invalid asset ID for deletion.']);
         exit;
     }
 
     try {
-        $stmt = $pdo->prepare("DELETE FROM asset WHERE id = ?");
-        $stmt->execute([$assetId]);
+        $pdo->beginTransaction();
 
-        $_SESSION['success_message'] = 'Asset deleted successfully.';
-        header('Location: /manage-hardware/add-asset');
-        exit;
+        // First, delete from asset_branch_assignment_history (child table)
+        $stmt = $pdo->prepare("DELETE FROM asset_branch_assignment_history WHERE asset_id = ?");
+        $stmt->execute([$assetId]);
+        error_log("Deleted from asset_branch_assignment_history. Rows affected: " . $stmt->rowCount());
+
+        // Then delete from asset_employee_assignment_history (if it exists and has foreign key)
+        $stmt = $pdo->prepare("DELETE FROM assignment_history WHERE asset_id = ?");
+        $stmt->execute([$assetId]);
+        error_log("Deleted from asset_employee_assignment_history. Rows affected: " . $stmt->rowCount());
+
+        // Finally, delete the asset itself
+        $stmt = $pdo->prepare("DELETE FROM asset WHERE id = ?");
+        $result = $stmt->execute([$assetId]);
+
+        error_log("Delete asset executed. Rows affected: " . $stmt->rowCount());
+
+        if ($stmt->rowCount() > 0) {
+            $pdo->commit();
+            echo json_encode(['success' => true, 'message' => 'Asset deleted successfully.']);
+            exit;
+        } else {
+            $pdo->rollback();
+            http_response_code(404);
+            echo json_encode(['success' => false, 'message' => 'Asset not found.']);
+            exit;
+        }
     } catch (Exception $e) {
+        $pdo->rollback();
         error_log("Delete error: " . $e->getMessage());
-        $_SESSION['form_errors'] = ['general' => 'Failed to delete asset.'];
-        header('Location: /manage-hardware/add-asset');
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Failed to delete asset: ' . $e->getMessage()]);
         exit;
     }
 }
@@ -65,6 +94,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors['ip'] = 'Invalid IP address format';
         }
 
+        if (!empty($errors)) {
+            $_SESSION['form_errors'] = $errors;
+            header('Location: /manage-hardware/add-asset');
+            exit;
+        }
 
         // Generate asset number if new asset
         $assetNumber = null;
@@ -72,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $assetNumber = generateAssetNumber($categoryId, $categoryName);
         }
 
-        // Insert or update main laptop asset
+        // Insert or update main asset
         if ($action === 'Add Asset' && (empty($assetId) || $assetId == 0)) {
             $stmt = $pdo->prepare("
                 INSERT INTO asset (inventory_id, asset_number, serial_number, ip_address, conditions, status, created_at, updated_at) 
@@ -101,76 +135,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mainAssetId = $assetId;
         } else {
             throw new Exception("Invalid asset action.");
-        }
-
-        // Handle charger if laptop
-        if (strtolower($categoryName) === 'laptop') {
-            $chargerAssetNumber = trim($_POST['charger-asset-number'] ?? '');
-            $chargerSerialNumber = trim($_POST['charger-serial-number'] ?? '');
-            $chargerCondition = $_POST['charger-condition'] ?? 'Good';
-            $chargerManufacturer = trim($_POST['manufacturer'] ?? '');
-            $chargerModel = trim($_POST['input-model'] ?? '');
-            $chargerId = $_POST['charger-id'] ?? 0;
-
-
-
-            if (!empty($chargerSerialNumber)) {
-                // Check if charger inventory exists
-                $stmt = $pdo->prepare("SELECT id, quantity FROM inventory WHERE manufacturer = ? AND model = ? AND category_id = ?");
-                $stmt->execute([$chargerManufacturer, $chargerModel, $chargerCategoryId]);
-                $chargerInventory = $stmt->fetch(PDO::FETCH_ASSOC);
-
-                if ($chargerInventory) {
-                    // Increment charger inventory quantity by 1
-                    $stmt = $pdo->prepare("UPDATE inventory SET quantity = quantity + 1, updated_at = NOW() WHERE id = ?");
-                    $stmt->execute([$chargerInventory['id']]);
-                    $chargerInventoryId = $chargerInventory['id'];
-                } else {
-                    // Insert new charger inventory record
-                    $stmt = $pdo->prepare("
-                        INSERT INTO inventory (manufacturer, model, category_id, quantity, created_at, updated_at) 
-                        VALUES (?, ?, ?, 1, NOW(), NOW())
-                    ");
-                    $stmt->execute([$chargerManufacturer, $chargerModel, $chargerCategoryId]);
-                    $chargerInventoryId = $pdo->lastInsertId();
-                }
-
-                // Generate charger asset number if not provided
-                if (empty($chargerAssetNumber)) {
-                    $chargerAssetNumber = generateAssetNumber($chargerCategoryId, 'charger');
-                }
-
-                if (empty($chargerId) || $chargerId == 0) {
-                    // Insert charger asset linked to charger inventory and laptop asset
-                    $stmt = $pdo->prepare("
-                        INSERT INTO asset (inventory_id, asset_number, serial_number, conditions, status, related_laptop_id, created_at, updated_at)
-                        VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())
-                    ");
-                    $stmt->execute([
-                        $chargerInventoryId,
-                        $chargerAssetNumber,
-                        $chargerSerialNumber,
-                        $chargerCondition,
-                        $status,
-                        $mainAssetId
-                    ]);
-                } else {
-                    // Update existing charger asset
-                    $stmt = $pdo->prepare("
-                        UPDATE asset
-                        SET asset_number = ?, serial_number = ?, conditions = ?, status = ?, related_laptop_id = ?, updated_at = NOW()
-                        WHERE id = ?
-                    ");
-                    $stmt->execute([
-                        $chargerAssetNumber,
-                        $chargerSerialNumber,
-                        $chargerCondition,
-                        $status,
-                        $mainAssetId,
-                        $chargerId
-                    ]);
-                }
-            }
         }
 
         $pdo->commit();

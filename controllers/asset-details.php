@@ -19,11 +19,8 @@ try {
     exit;
   }
 
-  // Fetch assignment history for this asset using the enhanced function
-  $assignmentHistory = getAssetAssignmentHistory($pdo, $assetId);
-
-  // Fetch assignment statistics for this asset
-  // $assignmentStats = getAssetAssignmentStats($pdo, $assetId);
+  // Fetch UNIFIED assignment history (both branch and employee)
+  $assignmentHistory = getUnifiedAssignmentHistorySimple($pdo, $assetId);
 } catch (PDOException $e) {
   $_SESSION['error_message'] = "Error fetching asset details: " . $e->getMessage();
   header("Location: /manage-hardware/assign-asset");
@@ -31,4 +28,6 @@ try {
 }
 
 // dd($assignmentHistory);
+
+
 require("views/asset-details.views.php");

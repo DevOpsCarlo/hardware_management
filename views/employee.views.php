@@ -51,11 +51,11 @@
               <thead>
                 <tr>
                   <th>No.</th>
-                  <th>Employee ID</th>
+                  <!-- <th>Employee ID</th> -->
                   <th>Employee Name</th>
                   <th>Status</th>
-                  <th>Branch</th>
-                  <th>Department</th>
+                  <!-- <th>Branch</th>
+                  <th>Department</th> -->
                   <th>Employee Asset</th>
                   <th>Action</th>
                 </tr>
@@ -64,7 +64,7 @@
                 <?php foreach ($employees as $index => $employee): ?>
                   <tr class="text-xs font-light text-left">
                     <td><?= $index + 1 ?></td>
-                    <td><?= htmlspecialchars($employee['employee_code'] ?? "Empty") ?></td>
+                    <!-- <td>htmlspecialchars($employee['employee_code'] ?? "Empty")</td> -->
                     <td><?= htmlspecialchars($employee['employee_name'] ?? "Empty") ?></td>
 
                     <?php
@@ -83,8 +83,8 @@
                         <?= htmlspecialchars($currentStatus) ?>
                       </span>
                     </td>
-                    <td><?= htmlspecialchars($employee['branch_name'] ?? "-") ?></td>
-                    <td><?= htmlspecialchars($employee['department_name'] ?? "-") ?></td>
+                    <!-- <td> htmlspecialchars($employee['branch_name'] ?? "-") ?></td>
+                    <td>htmlspecialchars($employee['department_name'] ?? "-") ?></td> -->
                     <td><?= htmlspecialchars($employee['total_assets'] ?? "0") ?></td>
                     <td class="relative">
                       <i class="fa-solid fa-ellipsis-vertical cursor-pointer select-menu"></i>

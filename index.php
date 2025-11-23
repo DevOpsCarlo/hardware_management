@@ -32,16 +32,25 @@ $routes = [
   '/manage-hardware/assign-asset/asset-details' => 'controllers/asset-details.php',
   '/employee' => 'controllers/employee.php',
   '/branch' => 'controllers/branch.php',
+  '/branch/branch-asset' => 'controllers/branch.php',
 
 
 ];
 
 // 1. Match: /branch/{branch_name}/{department_name}
+// if (preg_match('/^\/branch\/([a-zA-Z0-9\-_\.%\+\s]+)\/([a-zA-Z0-9\-_\.%\+\s]+)$/', $uri, $matches)) {
+//   // dd($matches);
+//   $_GET['branch_name'] = urldecode($matches[1]);
+//   $_GET['department_name'] = urldecode($matches[2]);
+//   require('controllers/department-detail.php');
+//   exit();
+// }
+
+// 1. Match: /branch/{branch_name}/{department_name}
 if (preg_match('/^\/branch\/([a-zA-Z0-9\-_\.%\+\s]+)\/([a-zA-Z0-9\-_\.%\+\s]+)$/', $uri, $matches)) {
   // dd($matches);
   $_GET['branch_name'] = urldecode($matches[1]);
-  $_GET['department_name'] = urldecode($matches[2]);
-  require('controllers/department-detail.php');
+  require('controllers/department.php');
   exit();
 }
 
@@ -51,7 +60,21 @@ if (preg_match('/^\/branch\/([a-zA-Z0-9\-_\.%\+\s]+)$/', $uri, $matches)) {
   require('controllers/branch-detail.php');
   exit();
 }
+// 3.  Match: /branch/{branch_name}/assets?filter={filter_type}
+// if (preg_match('/^\/branch\/([a-zA-Z0-9\-_\.%\+\s]+)\/assets$/', $uri, $matches)) {
+//   $_GET['branch_name'] = urldecode($matches[1]);
+//   // filter parameter is already in $_GET from the query string
+//   require('controllers/branch-filtered-assets.php');
+//   exit();
+// }
 
+
+
+if (preg_match('/^\/branch\/([a-zA-Z0-9\-_\.%\+\s]+)$/', $uri, $matches)) {
+  $_GET['branch_asset'] = urldecode($matches[1]);
+  require('controllers/branch-asset.php');
+  exit();
+}
 
 if (preg_match('/^\/manage-hardware\/assign-asset\/asset-details\/([0-9]+)$/', $uri, $matches)) {
   error_log("MATCHED asset-details route! Asset ID: " . $matches[1]);

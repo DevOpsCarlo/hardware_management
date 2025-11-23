@@ -1,8 +1,10 @@
+
 document.addEventListener("DOMContentLoaded", function () {
   const assignAssetButtons = document.querySelectorAll(".add-asset-btn");
   const modal = document.getElementById("add-asset-modal");
   const form = document.getElementById("add-asset-form");
   const closeModal = document.getElementById("asset-cancel-btn");
+
   function closeAllMenus() {
     document
       .querySelectorAll(".menu")
@@ -73,21 +75,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const serialNumber = target.getAttribute("data-serial-number");
     const ipAddress = target.getAttribute("data-ip-address");
     const status = target.getAttribute("data-status");
+    console.log(status);
     const conditions = target.getAttribute("data-conditions");
     const photo = target.getAttribute("data-photo");
     const assetId = target.getAttribute("data-asset-id");
 
-    console.log("asset number:", assetNumber);
-    // Charger info
-    const chargerId = target.getAttribute("data-charger-id");
-    const chargerAssetNumber = target.getAttribute("data-charger-asset-number");
-    const chargerModel = target.getAttribute("data-charger-model");
-    const chargerSerialNumber = target.getAttribute(
-      "data-charger-serial-number"
-    );
-    const chargerCondition = target.getAttribute("data-charger-conditions");
-    const chargerStatus = target.getAttribute("data-charger-status");
-    console.log("Charger Asset No. ", chargerAssetNumber);
     // Populate modal fields
     document.getElementById("modal-item-number").value = itemNumber || "";
     document.getElementById("modal-inventory-id").value = inventoryId || "";
@@ -102,9 +94,8 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("figure-title").textContent =
       (manufacturer || "") + " - " + (categoryName || "");
     document.getElementById("photo-preview").src = "/" + (photo || "");
-    console.log("Charger ID", chargerId);
+
     // Generate asset number preview if it's a new asset
-    console.log("Asset ID", assetId);
     if (!assetId || assetId === "0") {
       const categoryKey = categoryName ? categoryName.toLowerCase() : "";
       document.getElementById("form-add-asset").textContent = "Assign Asset";
@@ -131,36 +122,6 @@ document.addEventListener("DOMContentLoaded", function () {
       document.getElementById("modal-asset-number").value = assetNumber;
       document.getElementById("form-add-asset").textContent = "Update Asset";
       document.getElementById("asset-action").value = "Update Asset";
-    }
-
-    // Handle laptop charger section
-    const laptopChargerSection = document.getElementById(
-      "laptop-charger-section"
-    );
-    if (categoryName && categoryName.toLowerCase() === "laptop") {
-      laptopChargerSection.classList.remove("hidden");
-
-      // Populate charger fields if they exist
-      if (chargerId) {
-        document.getElementById("charger-id").value = chargerId;
-        document.getElementById("charger-asset-number").value =
-          chargerAssetNumber || "";
-        document.getElementById("model-charger").value = chargerModel || "";
-        document.getElementById("charger-serial-number").value =
-          chargerSerialNumber || "";
-        document.querySelector('select[name="charger-condition"]').value =
-          chargerCondition || "Good";
-      } else {
-        // Clear charger fields for new assignment - NO AUTO-GENERATION
-        document.getElementById("charger-id").value = 0;
-        document.getElementById("charger-asset-number").value = ""; // Empty for manual input
-        document.getElementById("model-charger").value = manufacturer || "";
-        document.getElementById("charger-serial-number").value = "";
-        document.querySelector('select[name="charger-condition"]').value =
-          "Good";
-      }
-    } else {
-      laptopChargerSection.classList.add("hidden");
     }
 
     // Add category_id to form
@@ -231,11 +192,13 @@ document.addEventListener("DOMContentLoaded", function () {
       return "0001"; // fallback
     }
   }
+
   closeModal.addEventListener("click", (e) => {
     if (e.target === closeModal) {
       modal.classList.add("hidden");
     }
   });
+
   // Close modal when clicking outside
   modal.addEventListener("click", function (e) {
     if (e.target === modal) {
@@ -243,7 +206,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // Handle form submission with charger validation
+  // Handle form submission
   form.addEventListener("submit", function (e) {
     console.log("Form submission started");
 
@@ -251,7 +214,6 @@ document.addEventListener("DOMContentLoaded", function () {
       .getElementById("input-serial-number")
       .value.trim();
     const inventoryId = document.getElementById("modal-inventory-id").value;
-    const categoryName = document.getElementById("modal-category-select").value;
 
     // Validate main asset
     if (!serialNumber) {
@@ -264,25 +226,6 @@ document.addEventListener("DOMContentLoaded", function () {
       e.preventDefault();
       alert("Inventory ID is missing");
       return false;
-    }
-
-    // Validate charger fields if it's a laptop
-    if (categoryName && categoryName.toLowerCase() === "laptop") {
-      const chargerSerialNumber = document
-        .getElementById("charger-serial-number")
-        .value.trim();
-      const chargerAssetNumber = document
-        .getElementById("charger-asset-number")
-        .value.trim();
-
-      // If charger serial is provided, asset number must also be provided
-      if (chargerSerialNumber && !chargerAssetNumber) {
-        e.preventDefault();
-        alert(
-          "Charger asset number is required when charger serial number is provided"
-        );
-        return false;
-      }
     }
 
     // Debug: Log all form data before submission
@@ -333,7 +276,11 @@ document.addEventListener("click", async function (e) {
 
     const assetId = e.target.getAttribute("data-asset-id");
     const assetNumber = e.target.getAttribute("data-asset-number");
-    const manufacturer = e.target.getAttribute("data-category-option");
+    const manufacturer = e.target.getAttribute("data-manufacturer");
+    
+    console.log("Delete initiated for asset ID:", assetId);
+    console.log("Asset Number:", assetNumber);
+    console.log("Manufacturer:", manufacturer);
 
     if (!assetId || assetId === "0") {
       Swal.fire({
@@ -355,6 +302,8 @@ document.addEventListener("click", async function (e) {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
+          console.log("Sending delete request for asset ID:", assetId);
+          
           const response = await fetch(window.location.href, {
             method: "POST",
             headers: {
@@ -363,25 +312,55 @@ document.addEventListener("click", async function (e) {
             body: new URLSearchParams({
               action: "Delete Asset",
               asset_id: assetId,
-            }),
+            }).toString(),
           });
 
-          if (response.redirected) {
-            window.location.href = response.url;
+          console.log("Response status:", response.status);
+          console.log("Response OK:", response.ok);
+
+          const data = await response.json();
+          console.log("Response data:", data);
+
+          if (data.success) {
+            // Find and remove the row from the table
+            const row = e.target.closest("tr");
+            if (row && $.fn.DataTable.isDataTable("#detailedTable")) {
+              const table = $("#detailedTable").DataTable();
+              table.row(row).remove().draw(false);
+            } else if (row) {
+              row.remove();
+            }
+
+            Swal.fire({
+              icon: "success",
+              text: data.message || "Asset deleted successfully!",
+              showConfirmButton: false,
+              position: "top-end",
+              timer: 1500,
+              timerProgressBar: true,
+              toast: true
+            });
           } else {
-            const text = await response.text();
-            console.error("Unexpected response:", text);
-            Swal.fire("Error", "Failed to delete asset. Check logs.", "error");
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: data.message || "Failed to delete asset.",
+              showConfirmButton: true,
+              position: "center"
+            });
           }
         } catch (err) {
           console.error("Deletion error:", err);
-          Swal.fire(
-            "Error",
-            "Something went wrong deleting the asset.",
-            "error"
-          );
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Something went wrong deleting the asset: " + err.message,
+            showConfirmButton: true,
+            position: "center"
+          });
         }
       }
     });
   }
 });
+    

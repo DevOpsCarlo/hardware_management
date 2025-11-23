@@ -5,7 +5,9 @@ body {
   padding: 0;
   box-sizing: border-box;
   font-family: "Poppins", sans-serif;
+  
 }
+
 
 @layer components {
   .sidebar-link {
@@ -15,3 +17,5 @@ body {
     @apply bg-slate-50 text-slate-900 rounded-sm p-2;
   }
 }
+
+

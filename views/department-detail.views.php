@@ -65,21 +65,23 @@
 
     </div>
 
+    <!-- Modal with Fixed Height and Scrollable Content -->
     <div class="fixed inset-0 top-0 left-0 bg-black/30 backdrop-blur-xs flex items-center justify-center z-50 hidden" id="modal">
-      <div class="max-w-xl w-full mx-auto rounded-sm shadow-lg p-4 bg-white" id="employee-modal-form-box">
-        <div class="flex items-center gap-4 border-b-2 border-slate-100 pb-5">
+      <div class="max-w-xl w-full mx-auto rounded-sm shadow-lg p-4 bg-white flex flex-col max-h-[90vh]" id="employee-modal-form-box">
+        <div class="flex items-center gap-4 border-b-2 border-slate-100 pb-5 flex-shrink-0">
           <div class="">
             <i class="fa-solid fa-users text-red-500 rounded-full bg-red-50 p-4"></i>
           </div>
           <h2 class="text-slate-800 font-bold text-2xl" id="employee-modal-title">Add Employees</h2>
         </div>
 
-        <form class="space-y-4 bg-white p-6 text-slate-800 grid grid-cols-1 gap-2 form text-sm font-medium" method="POST" id="employee-modal-form">
+        <!-- Scrollable Form Content -->
+        <form class="space-y-4 bg-white text-slate-800 grid grid-cols-1 gap-2 form text-sm font-medium overflow-y-auto flex-grow" method="POST" id="employee-modal-form">
           <!-- Table of Employees with Checkboxes -->
-          <div class="col-span-10">
+          <div class="col-span-10 p-4">
             <label for="input-department" class="block text-sm font-light text-slate-800">Select Employees<span class="text-red-600">*</span></label>
             <?php if (!empty($fetchEmployees)): ?>
-              <table class="display" id="addEmployeeTable">
+              <table class="display w-full" id="addEmployeeTable">
                 <thead>
                   <tr>
                     <th class="border p-2">Select</th>
@@ -116,22 +118,23 @@
               </div>
             <?php endif; ?>
           </div>
-
-          <!-- Submit Button -->
-          <div class="col-span-10 flex gap-4 pt-4">
-            <button type="button"
-              class="border border-slate-300 block text-sm w-full px-4 py-2 text-slate-700 rounded-sm hover:bg-slate-50 cursor-pointer"
-              id="modal-cancel-btn">
-              Cancel
-            </button>
-            <button type="submit"
-              class="bg-red-600 block text-sm font-bold w-full px-4 py-2 text-white rounded-sm hover:bg-red-700 cursor-pointer"
-              name="modalAddEmployee"
-              id="modal-add-btn">
-              Add Employee
-            </button>
-          </div>
         </form>
+
+        <!-- Fixed Bottom Buttons -->
+        <div class="col-span-10 flex gap-4 pt-4 px-4 pb-4 border-t border-slate-100 flex-shrink-0">
+          <button type="button"
+            class="border border-slate-300 block text-sm w-full px-4 py-2 text-slate-700 rounded-sm hover:bg-slate-50 cursor-pointer"
+            id="modal-cancel-btn">
+            Cancel
+          </button>
+          <button type="submit"
+            class="bg-red-600 block text-sm font-bold w-full px-4 py-2 text-white rounded-sm hover:bg-red-700 cursor-pointer"
+            name="modalAddEmployee"
+            id="modal-add-btn"
+            form="employee-modal-form">
+            Add Employee
+          </button>
+        </div>
       </div>
     </div>
 

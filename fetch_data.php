@@ -47,8 +47,8 @@ function fetchAssetsWithInventoryAndCategory($pdo)
             inventory.updated_at AS inventory_updated_at,
 
             categories.id AS category_id,
-            categories.name AS category_name,
-            categories.category_code
+            categories.name AS category_name
+            
         FROM asset
         INNER JOIN inventory ON asset.inventory_id = inventory.id
         INNER JOIN categories ON inventory.category_id = categories.id
@@ -69,7 +69,9 @@ function fetchAssetsWithInventoryAndCategoryAndEmployee($pdo)
             a.ip_address,
             a.status,
             a.conditions,
+            a.assigned_to_branch,
             a.assigned_to,
+            b.branch_name,
             i.id as inventory_id,
             i.manufacturer,
             i.model,
@@ -80,6 +82,7 @@ function fetchAssetsWithInventoryAndCategoryAndEmployee($pdo)
             e.id as assigned_employee_id
         FROM asset a
         LEFT JOIN inventory i ON a.inventory_id = i.id
+        LEFT JOIN branch b ON a.assigned_to_branch = b.id
         LEFT JOIN categories c ON i.category_id = c.id
         LEFT JOIN employee e ON a.assigned_to = e.id
         ORDER BY i.manufacturer, i.model, a.asset_number
@@ -127,7 +130,7 @@ function fetchLatestAssetForInventory($pdo, $inventoryId)
 
 function fetchBranches($pdo)
 {
-  $stmt = $pdo->prepare("SELECT id, branch_name, branch_manager, created_at, updated_at FROM branch");
+  $stmt = $pdo->prepare("SELECT id, branch_name, created_at, updated_at FROM branch");
   $stmt->execute();
 
   // Fetch the results as an associative array
@@ -186,40 +189,7 @@ function getEmployeesByDepartment($pdo, $departmentId)
   return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// // Function to get asset assignment history
-// function getAssetAssignmentHistory($pdo, $assetId)
-// {
-//   $query = "
-//         SELECT 
-//             aah.id,
-//             aah.asset_id,
-//             aah.action_type,
-//             aah.assigned_date,
-//             aah.unassigned_date,
-//             aah.notes,
-//             e.employee_name as assigned_employee_name,
-//             e.employee_id as assigned_employee_id,
-//             pe.employee_name as previous_employee_name,
-//             pe.employee_id as previous_employee_id,
-//             ab.name as assigned_by_name,
-//             a.asset_number,
-//             DATEDIFF(
-//                 COALESCE(aah.unassigned_date, NOW()), 
-//                 aah.assigned_date
-//             ) as days_assigned
-//         FROM asset_assignment_history aah
-//         LEFT JOIN employee e ON aah.employee_id = e.id
-//         LEFT JOIN employee pe ON aah.previous_employee_id = pe.id
-//         LEFT JOIN users ab ON aah.assigned_by = ab.id
-//         LEFT JOIN assets a ON aah.asset_id = a.id
-//         WHERE aah.asset_id = ?
-//         ORDER BY aah.assigned_date DESC
-//     ";
 
-//   $stmt = $pdo->prepare($query);
-//   $stmt->execute([$assetId]);
-//   return $stmt->fetchAll(PDO::FETCH_ASSOC);
-// }
 
 // Function to get all assets currently assigned to an employee
 function getEmployeeCurrentAssets($pdo, $employeeId)
@@ -282,27 +252,7 @@ function getEmployeeAssetHistory($pdo, $employeeId)
   return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// Function to get asset assignment statistics
-// function getAssetAssignmentStats($pdo, $assetId)
-// {
-//   $query = "
-//         SELECT 
-//             COUNT(DISTINCT employee_id) as total_employees_assigned,
-//             COUNT(*) as total_assignments,
-//             AVG(DATEDIFF(
-//                 COALESCE(unassigned_date, NOW()), 
-//                 assigned_date
-//             )) as avg_assignment_days,
-//             MIN(assigned_date) as first_assignment,
-//             MAX(assigned_date) as latest_assignment
-//         FROM asset_assignment_history 
-//         WHERE asset_id = ? AND action_type = 'assigned'
-//     ";
 
-//   $stmt = $pdo->prepare($query);
-//   $stmt->execute([$assetId]);
-//   return $stmt->fetch(PDO::FETCH_ASSOC);
-// }
 
 // Function to get assets that have been assigned to multiple employees
 function getFrequentlyTransferredAssets($pdo, $minTransfers = 3)
@@ -414,6 +364,57 @@ function generateAssetNumber($categoryId, $categoryName)
 
 // Assign asset deitals 
 
+// function fetchAssetDetailsById($pdo, $assetId)
+// {
+//   $query = "
+//         SELECT 
+//             a.id as asset_id,
+//             a.asset_number,
+//             a.serial_number,
+//             a.ip_address,
+//             a.status,
+//             a.conditions,
+//             a.assigned_to,
+//             a.related_laptop_id,
+//             a.created_at as asset_created_at,
+//             a.updated_at as asset_updated_at,
+
+//             i.id as inventory_id,
+//             i.manufacturer,
+//             i.model,
+//             i.photo,
+//             i.quantity,
+//             i.purchase_date,
+//             i.warranty_years,
+//             i.created_at as inventory_created_at,
+//             i.updated_at as inventory_updated_at,
+
+//             c.id as category_id,
+//             c.name AS category_name,
+
+//             e.employee_name as assigned_employee_name,
+//             e.id as assigned_employee_id,
+//             e.employee_id as assigned_employee_code,
+
+//             d.department_name as assigned_employee_department,
+//             d.id as department_id,
+//             b.branch_name as assigned_employee_branch,
+//             b.id as branch_id
+
+//         FROM asset a
+//         LEFT JOIN inventory i ON a.inventory_id = i.id
+//         LEFT JOIN categories c ON i.category_id = c.id
+//         LEFT JOIN employee e ON a.assigned_to = e.id
+//         LEFT JOIN department_employee de ON e.id = de.employee_id
+//         LEFT JOIN departments d ON de.department_id = d.id
+//         LEFT JOIN branch b ON d.branch_id = b.id
+//         WHERE a.id = ?
+//     ";
+
+//   $stmt = $pdo->prepare($query);
+//   $stmt->execute([$assetId]);
+//   return $stmt->fetch(PDO::FETCH_ASSOC);
+// }
 function fetchAssetDetailsById($pdo, $assetId)
 {
   $query = "
@@ -425,10 +426,11 @@ function fetchAssetDetailsById($pdo, $assetId)
             a.status,
             a.conditions,
             a.assigned_to,
+            a.assigned_to_branch,
             a.related_laptop_id,
             a.created_at as asset_created_at,
             a.updated_at as asset_updated_at,
-            
+
             i.id as inventory_id,
             i.manufacturer,
             i.model,
@@ -438,20 +440,23 @@ function fetchAssetDetailsById($pdo, $assetId)
             i.warranty_years,
             i.created_at as inventory_created_at,
             i.updated_at as inventory_updated_at,
-            
+
             c.id as category_id,
             c.name AS category_name,
-            c.category_code,
-            
+
             e.employee_name as assigned_employee_name,
             e.id as assigned_employee_id,
             e.employee_id as assigned_employee_code,
-            
+
             d.department_name as assigned_employee_department,
             d.id as department_id,
             b.branch_name as assigned_employee_branch,
-            b.id as branch_id
-            
+            b.id as branch_id,
+
+            -- NEW: branch where the asset is currently assigned
+            bb.branch_name AS asset_branch_name,
+            bb.id AS asset_branch_id
+
         FROM asset a
         LEFT JOIN inventory i ON a.inventory_id = i.id
         LEFT JOIN categories c ON i.category_id = c.id
@@ -459,6 +464,8 @@ function fetchAssetDetailsById($pdo, $assetId)
         LEFT JOIN department_employee de ON e.id = de.employee_id
         LEFT JOIN departments d ON de.department_id = d.id
         LEFT JOIN branch b ON d.branch_id = b.id
+        LEFT JOIN branch bb ON a.assigned_to_branch = bb.id  -- ★ ADDED
+
         WHERE a.id = ?
     ";
 
@@ -794,5 +801,703 @@ function fetchEmployeeAssetSummary($pdo)
   } catch (PDOException $e) {
     error_log("Error fetching employee asset summary: " . $e->getMessage());
     return [];
+  }
+}
+
+
+
+
+// Branch fetch 
+// Add these functions to your database functions file (e.g., database.php or functions.php)
+
+/**
+ * Get asset statistics for a specific branch
+ * Returns: total_assets, assigned_count, unassigned_count, in_repair_count
+ */
+// function getBranchAssetStats($pdo, $branchId)
+// {
+//   $query = "
+//     SELECT 
+//       COUNT(*) as total_assets,
+//       SUM(CASE WHEN a.status = 'Employee Assigned' THEN 1 ELSE 0 END) as assigned_count,
+//       SUM(CASE WHEN a.status = 'Branch Assigned' OR a.status = 'Available' THEN 1 ELSE 0 END) as unassigned_count,
+//       SUM(CASE WHEN a.status = 'Under Maintenance' THEN 1 ELSE 0 END) as in_repair_count
+//     FROM asset a
+//     WHERE a.assigned_to_branch = ?
+//   ";
+
+//   try {
+//     $stmt = $pdo->prepare($query);
+//     $stmt->execute([$branchId]);
+//     $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+//     return [
+//       'total_assets' => $result['total_assets'] ?? 0,
+//       'assigned_count' => $result['assigned_count'] ?? 0,
+//       'unassigned_count' => $result['unassigned_count'] ?? 0,
+//       'in_repair_count' => $result['in_repair_count'] ?? 0
+//     ];
+//   } catch (PDOException $e) {
+//     error_log("Error fetching branch asset stats: " . $e->getMessage());
+//     return [
+//       'total_assets' => 0,
+//       'assigned_count' => 0,
+//       'unassigned_count' => 0,
+//       'in_repair_count' => 0
+//     ];
+//   }
+// }
+function getBranchAssetStats($pdo, $branchId)
+{
+  $query = "
+    SELECT 
+      COUNT(*) as total_assets,
+      SUM(CASE WHEN a.status = 'Employee Assigned' THEN 1 ELSE 0 END) as assigned_count,
+      SUM(CASE WHEN a.status = 'Branch Assigned' OR a.status = 'Available' THEN 1 ELSE 0 END) as unassigned_count,
+      SUM(CASE WHEN a.status = 'Under Maintenance' THEN 1 ELSE 0 END) as in_repair_count,
+      SUM(CASE WHEN a.status = 'Uncommitted' THEN 1 ELSE 0 END) as uncommitted_count
+    FROM asset a
+    WHERE a.assigned_to_branch = ?
+  ";
+
+  try {
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$branchId]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return [
+      'total_assets'      => $result['total_assets'] ?? 0,
+      'assigned_count'    => $result['assigned_count'] ?? 0,
+      'unassigned_count'  => $result['unassigned_count'] ?? 0,
+      'in_repair_count'   => $result['in_repair_count'] ?? 0,
+      'uncommitted_count' => $result['uncommitted_count'] ?? 0
+    ];
+  } catch (PDOException $e) {
+    error_log("Error fetching branch asset stats: " . $e->getMessage());
+    return [
+      'total_assets'      => 0,
+      'assigned_count'    => 0,
+      'unassigned_count'  => 0,
+      'in_repair_count'   => 0,
+      'uncommitted_count' => 0
+    ];
+  }
+}
+/**
+ * Get all branches with asset statistics
+ * Returns: branches array with asset counts included
+ */
+function fetchBranchesWithAssetStats($pdo)
+{
+  try {
+    // First, fetch all branches
+    $stmt = $pdo->prepare("SELECT id, branch_name, created_at, updated_at FROM branch ORDER BY branch_name ASC");
+    $stmt->execute();
+    $branches = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Enhance each branch with asset statistics
+    foreach ($branches as &$branch) {
+      $stats = getBranchAssetStats($pdo, $branch['id']);
+      $branch['total_assets'] = $stats['total_assets'];
+      $branch['assigned_count'] = $stats['assigned_count'];
+      $branch['unassigned_count'] = $stats['unassigned_count'];
+      $branch['in_repair_count'] = $stats['in_repair_count'];
+      $branch['uncommitted_count'] = $stats['uncommitted_count'];
+    }
+
+    return $branches;
+  } catch (PDOException $e) {
+    error_log("Error fetching branches with asset stats: " . $e->getMessage());
+    return [];
+  }
+}
+
+/**
+ * Get detailed asset list for a specific branch
+ * Returns: all assets assigned to that branch with employee info
+ */
+function getBranchAssets($pdo, $branchId)
+{
+  $query = "
+    SELECT 
+      a.id as asset_id,
+      a.asset_number,
+      a.serial_number,
+      a.status,
+      a.conditions,
+      a.assigned_to,
+      i.manufacturer,
+      i.model,
+      c.name as category_name,
+      e.employee_name,
+      e.employee_id as employee_code,
+      b.branch_name,
+      a.created_at,
+      a.updated_at
+    FROM asset a
+    LEFT JOIN inventory i ON a.inventory_id = i.id
+    LEFT JOIN categories c ON i.category_id = c.id
+    LEFT JOIN employee e ON a.assigned_to = e.id
+    LEFT JOIN branch b ON a.assigned_to_branch = b.id
+    WHERE a.assigned_to_branch = ?
+    ORDER BY a.status DESC, a.asset_number ASC
+  ";
+
+  try {
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$branchId]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  } catch (PDOException $e) {
+    error_log("Error fetching branch assets: " . $e->getMessage());
+    return [];
+  }
+}
+
+
+
+
+/**
+ * Get assigned assets for a specific branch (grouped by employee)
+ */
+function getBranchAssignedAssets($pdo, $branchId)
+{
+  $query = "
+    SELECT 
+      e.id as employee_id,
+      e.employee_name,
+      e.employee_id as employee_code,
+      COUNT(*) as assigned_count,
+      GROUP_CONCAT(
+        CONCAT(a.asset_number, ' (', c.name, ')')
+        ORDER BY a.asset_number ASC
+        SEPARATOR ', '
+      ) as asset_list
+    FROM asset a
+    LEFT JOIN employee e ON a.assigned_to = e.id
+    LEFT JOIN categories c ON a.inventory_id IN (SELECT inventory_id FROM asset WHERE id = a.id)
+    WHERE a.assigned_to_branch = ? AND a.status = 'Employee Assigned'
+    GROUP BY e.id, e.employee_name, e.employee_code
+    ORDER BY e.employee_name ASC
+  ";
+
+  try {
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$branchId]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  } catch (PDOException $e) {
+    error_log("Error fetching branch assigned assets: " . $e->getMessage());
+    return [];
+  }
+}
+
+/**
+ * Get unassigned assets for a specific branch
+ */
+function getBranchUnassignedAssets($pdo, $branchId)
+{
+  $query = "
+    SELECT 
+      a.id as asset_id,
+      a.asset_number,
+      a.serial_number,
+      a.status,
+      i.manufacturer,
+      i.model,
+      c.name as category_name,
+      a.created_at
+    FROM asset a
+    LEFT JOIN inventory i ON a.inventory_id = i.id
+    LEFT JOIN categories c ON i.category_id = c.id
+    WHERE a.assigned_to_branch = ? AND a.assigned_to IS NULL
+    ORDER BY a.asset_number ASC
+  ";
+
+  try {
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$branchId]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  } catch (PDOException $e) {
+    error_log("Error fetching branch unassigned assets: " . $e->getMessage());
+    return [];
+  }
+}
+
+
+// Add these functions to your database functions file
+
+/**
+ * Assign asset to branch
+ * Creates an entry in asset_branch_assignment_history
+ */
+function assignAssetToBranch($pdo, $assetId, $branchId, $assignedBy = null, $status = 'Branch Assigned')
+{
+  try {
+    // Update asset status
+    $stmt = $pdo->prepare("
+      UPDATE asset 
+      SET assigned_to_branch = ?, status = ?, updated_at = CURRENT_TIMESTAMP 
+      WHERE id = ?
+    ");
+    $stmt->execute([$branchId, $status, $assetId]);
+
+    // Log in asset_branch_assignment_history
+    $stmt = $pdo->prepare("
+      INSERT INTO asset_branch_assignment_history 
+      (asset_id, branch_id, assigned_at, assigned_by, status) 
+      VALUES (?, ?, CURRENT_TIMESTAMP, ?, ?)
+    ");
+    $stmt->execute([$assetId, $branchId, $assignedBy, $status]);
+
+    return true;
+  } catch (PDOException $e) {
+    error_log("Error assigning asset to branch: " . $e->getMessage());
+    return false;
+  }
+}
+
+/**
+ * Unassign asset from branch
+ * Closes the assignment record in asset_branch_assignment_history
+ */
+function unassignAssetFromBranch($pdo, $assetId, $branchId)
+{
+  try {
+    // Update asset status
+    $stmt = $pdo->prepare("
+      UPDATE asset 
+      SET assigned_to_branch = NULL, status = 'Available', updated_at = CURRENT_TIMESTAMP 
+      WHERE id = ?
+    ");
+    $stmt->execute([$assetId]);
+
+    // Close assignment record
+    $stmt = $pdo->prepare("
+      UPDATE asset_branch_assignment_history 
+      SET unassigned_at = CURRENT_TIMESTAMP 
+      WHERE asset_id = ? AND branch_id = ? AND unassigned_at IS NULL
+    ");
+    $stmt->execute([$assetId, $branchId]);
+
+    return true;
+  } catch (PDOException $e) {
+    error_log("Error unassigning asset from branch: " . $e->getMessage());
+    return false;
+  }
+}
+
+/**
+ * Get all assets currently assigned to a branch
+ */
+function getBranchCurrentAssets($pdo, $branchId)
+{
+  $query = "
+    SELECT 
+      a.id as asset_id,
+      a.asset_number,
+      a.serial_number,
+      a.ip_address,
+      a.status,
+      a.conditions,
+      i.id as inventory_id,
+      i.manufacturer,
+      i.model,
+      i.photo,
+      i.purchase_date,
+      i.warranty_years,
+      c.id as category_id,
+      c.name as category_name,
+      b.id as branch_id,
+      b.branch_name,
+      abah.assigned_at,
+      abah.assigned_by,
+      e.employee_name as assigned_by_name
+    FROM asset_branch_assignment_history abah
+    JOIN asset a ON abah.asset_id = a.id
+    JOIN inventory i ON a.inventory_id = i.id
+    JOIN categories c ON i.category_id = c.id
+    JOIN branch b ON abah.branch_id = b.id
+    LEFT JOIN employee e ON abah.assigned_by = e.id
+    WHERE abah.branch_id = ? AND abah.unassigned_at IS NULL
+    ORDER BY i.manufacturer ASC, a.asset_number ASC
+  ";
+
+  try {
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$branchId]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  } catch (PDOException $e) {
+    error_log("Error fetching branch current assets: " . $e->getMessage());
+    return [];
+  }
+}
+
+/**
+ * Assign asset from branch to department
+ * Updates the asset assignment chain
+ */
+function assignAssetToDepartment($pdo, $assetId, $departmentId, $assignedBy = null)
+{
+  try {
+    // Get department info to get branch_id
+    $stmt = $pdo->prepare("SELECT branch_id FROM departments WHERE id = ?");
+    $stmt->execute([$departmentId]);
+    $branchId = $stmt->fetchColumn();
+
+    if (!$branchId) {
+      throw new Exception("Department not found");
+    }
+
+    // Update asset - move from branch level to department level
+    $stmt = $pdo->prepare("
+      UPDATE asset 
+      SET status = 'Department Assigned', updated_at = CURRENT_TIMESTAMP 
+      WHERE id = ?
+    ");
+    $stmt->execute([$assetId]);
+
+    // Log in assignment history (you may want to create a new table for department assignments too)
+    $stmt = $pdo->prepare("
+      INSERT INTO assignment_history 
+      (asset_id, action_type, assigned_by, notes) 
+      VALUES (?, 'DEPARTMENT_ASSIGNED', ?, CONCAT('Assigned to department ID: ', ?))
+    ");
+    $stmt->execute([$assetId, $assignedBy, $departmentId]);
+
+    return true;
+  } catch (Exception $e) {
+    error_log("Error assigning asset to department: " . $e->getMessage());
+    return false;
+  }
+}
+
+/**
+ * Assign asset from department to employee
+ */
+function assignAssetToEmployee($pdo, $assetId, $employeeId, $assignedBy = null)
+{
+  try {
+    // Update asset - move to employee level
+    $stmt = $pdo->prepare("
+      UPDATE asset 
+      SET assigned_to = ?, status = 'Employee Assigned', updated_at = CURRENT_TIMESTAMP 
+      WHERE id = ?
+    ");
+    $stmt->execute([$employeeId, $assetId]);
+
+    // Log in assignment_history
+    $stmt = $pdo->prepare("
+      INSERT INTO assignment_history 
+      (asset_id, employee_id, action_type, assigned_by, assigned_date) 
+      VALUES (?, ?, 'ASSIGNED', ?, CURRENT_TIMESTAMP)
+    ");
+    $stmt->execute([$assetId, $employeeId, $assignedBy]);
+
+    return true;
+  } catch (PDOException $e) {
+    error_log("Error assigning asset to employee: " . $e->getMessage());
+    return false;
+  }
+}
+
+/**
+ * Unassign asset from employee (returns to department level)
+ */
+function unassignAssetFromEmployee($pdo, $assetId)
+{
+  try {
+    // Get employee_id before clearing
+    $stmt = $pdo->prepare("SELECT assigned_to FROM asset WHERE id = ?");
+    $stmt->execute([$assetId]);
+    $employeeId = $stmt->fetchColumn();
+
+    // Close employee assignment in assignment_history
+    $stmt = $pdo->prepare("
+      UPDATE assignment_history 
+      SET unassigned_date = CURRENT_TIMESTAMP 
+      WHERE asset_id = ? AND employee_id = ? AND unassigned_date IS NULL AND action_type = 'ASSIGNED'
+    ");
+    $stmt->execute([$assetId, $employeeId]);
+
+    // Update asset - return to department level
+    $stmt = $pdo->prepare("
+      UPDATE asset 
+      SET assigned_to = NULL, status = 'Department Assigned', updated_at = CURRENT_TIMESTAMP 
+      WHERE id = ?
+    ");
+    $stmt->execute([$assetId]);
+
+    return true;
+  } catch (PDOException $e) {
+    error_log("Error unassigning asset from employee: " . $e->getMessage());
+    return false;
+  }
+}
+
+
+function getAssetAssignmentPath($pdo, $assetId)
+{
+  $query = "
+    SELECT 
+      a.id as asset_id,
+      a.asset_number,
+      a.status,
+      a.assigned_department_id,
+      b.id as branch_id,
+      b.branch_name,
+      abah.assigned_at as assigned_to_branch_date,
+      d.id as department_id,
+      d.department_name,
+      e.id as employee_id,
+      e.employee_name,
+      ah.assigned_date as assigned_to_employee_date
+    FROM asset a
+    LEFT JOIN asset_branch_assignment_history abah ON a.id = abah.asset_id AND abah.unassigned_at IS NULL
+    LEFT JOIN branch b ON abah.branch_id = b.id 
+    LEFT JOIN departments d ON a.assigned_department_id = d.id
+    LEFT JOIN assignment_history ah ON a.id = ah.asset_id AND ah.unassigned_date IS NULL AND ah.action_type = 'ASSIGNED'
+    LEFT JOIN employee e ON ah.employee_id = e.id
+    WHERE a.id = ?
+  ";
+
+  try {
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$assetId]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+  } catch (PDOException $e) {
+    error_log("Error fetching asset assignment path: " . $e->getMessage());
+    return null;
+  }
+}
+/**
+ * Get branch summary with asset counts by status
+ */
+function getBranchAssetSummary($pdo, $branchId)
+{
+  $query = "
+    SELECT 
+      b.id as branch_id,
+      b.branch_name,
+      COUNT(a.id) as total_assets,
+      SUM(CASE WHEN a.status = 'Branch Assigned' THEN 1 ELSE 0 END) as branch_level_assets,
+      SUM(CASE WHEN a.status = 'Department Assigned' THEN 1 ELSE 0 END) as department_level_assets,
+      SUM(CASE WHEN a.status = 'Employee Assigned' THEN 1 ELSE 0 END) as employee_level_assets,
+      SUM(CASE WHEN a.status = 'Under Maintenance' THEN 1 ELSE 0 END) as under_maintenance,
+      SUM(CASE WHEN a.status = 'Uncommitted' THEN 1 ELSE 0 END) as defective
+    FROM branch b
+    LEFT JOIN asset_branch_assignment_history abah ON b.id = abah.branch_id AND abah.unassigned_at IS NULL
+    LEFT JOIN asset a ON abah.asset_id = a.id
+    WHERE b.id = ?
+    GROUP BY b.id, b.branch_name
+  ";
+
+  try {
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$branchId]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+  } catch (PDOException $e) {
+    error_log("Error fetching branch asset summary: " . $e->getMessage());
+    return null;
+  }
+}
+
+function  fetchDepartmentsWithAssetStats($pdo, $branchId)
+{
+  try {
+    // First, fetch departments
+    $stmt = $pdo->prepare("
+      SELECT id, department_name, department_head, created_at, updated_at 
+      FROM departments 
+      WHERE branch_id = ?
+      ORDER BY department_name ASC
+    ");
+    $stmt->execute([$branchId]);
+    $departments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Enhance each branch with asset statistics
+    foreach ($departments as &$department) {
+      $stats = getDepartmentAssetSummary($pdo, $department['id']);
+      $department['total_assets'] = $stats['total_assets'];
+      $department['assigned_count'] = $stats['assigned_count'];
+      $department['unassigned_count'] = $stats['unassigned_count'];
+      $department['in_repair_count'] = $stats['in_repair_count'];
+      $department['uncommitted_count'] = $stats['uncommitted_count'];
+    }
+
+    return $departments;
+  } catch (PDOException $e) {
+    error_log("Error fetching branches with asset stats: " . $e->getMessage());
+    return [];
+  }
+}
+
+function getDepartmentAssetSummary($pdo, $departmentId)
+{
+  $query = "
+    SELECT 
+      COUNT(*) as total_assets,
+      SUM(CASE WHEN a.status = 'Employee Assigned' THEN 1 ELSE 0 END) as assigned_count,
+      SUM(CASE WHEN a.status = 'Department Assigned' OR a.status = 'Available' THEN 1 ELSE 0 END) as unassigned_count,
+      SUM(CASE WHEN a.status = 'Under Maintenance' THEN 1 ELSE 0 END) as in_repair_count,
+      SUM(CASE WHEN a.status = 'Uncommitted' THEN 1 ELSE 0 END) as uncommitted_count
+    FROM asset a
+    WHERE a.assigned_department_id = ?
+  ";
+
+  try {
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$departmentId]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return [
+      'total_assets'      => $result['total_assets'] ?? 0,
+      'assigned_count'    => $result['assigned_count'] ?? 0,
+      'unassigned_count'  => $result['unassigned_count'] ?? 0,
+      'in_repair_count'   => $result['in_repair_count'] ?? 0,
+      'uncommitted_count' => $result['uncommitted_count'] ?? 0
+    ];
+  } catch (PDOException $e) {
+    error_log("Error fetching branch asset stats: " . $e->getMessage());
+    return [
+      'total_assets'      => 0,
+      'assigned_count'    => 0,
+      'unassigned_count'  => 0,
+      'in_repair_count'   => 0,
+      'uncommitted_count' => 0
+    ];
+  }
+}
+
+
+function getUnifiedAssignmentHistorySimple($pdo, $assetId)
+{
+  try {
+
+    $query = "
+            SELECT * FROM (
+                
+                /* ============================
+                   BRANCH ASSIGNMENTS
+                ============================= */
+                SELECT 
+                    abah.id,
+                    'BRANCH' AS type,
+                    b.branch_name AS assigned_to,
+                    NULL AS employee_code,
+                    abah.assigned_at AS assigned_date,
+                    abah.unassigned_at AS unassigned_date,
+                    abah.status AS status,
+                    NULL AS action_type,
+                    abah.assigned_by,
+                    NULL AS file_path,
+                    CASE 
+                        WHEN abah.unassigned_at IS NOT NULL THEN
+                            TIMESTAMPDIFF(DAY, abah.assigned_at, abah.unassigned_at)
+                        ELSE
+                            TIMESTAMPDIFF(DAY, abah.assigned_at, NOW())
+                    END AS days_assigned
+                FROM asset_branch_assignment_history abah
+                LEFT JOIN branch b ON abah.branch_id = b.id
+                WHERE abah.asset_id = ?
+
+                UNION ALL
+
+                /* ============================
+                   EMPLOYEE ASSIGNMENTS
+                ============================= */
+                SELECT
+                    ah.id,
+                    'EMPLOYEE' AS type,
+                    CASE 
+                        WHEN e.employee_id IS NOT NULL AND e.employee_id != '' 
+                        THEN CONCAT(e.employee_name, ' (', e.employee_id, ')')
+                        ELSE e.employee_name
+                    END AS assigned_to,
+                    e.employee_id AS employee_code,
+                    ah.assigned_date,
+                    ah.unassigned_date,
+                    NULL AS status,
+                    ah.action_type,
+                    ah.assigned_by,
+                    ah.file_path,
+                    CASE 
+                        WHEN ah.unassigned_date IS NOT NULL THEN
+                            TIMESTAMPDIFF(DAY, ah.assigned_date, ah.unassigned_date)
+                        ELSE
+                            TIMESTAMPDIFF(DAY, ah.assigned_date, NOW())
+                    END AS days_assigned
+                FROM assignment_history ah
+                LEFT JOIN employee e ON ah.employee_id = e.id
+                WHERE ah.asset_id = ?
+
+            ) AS unified
+
+            ORDER BY assigned_date DESC
+        ";
+
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$assetId, $assetId]);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  } catch (PDOException $e) {
+    error_log("Unified assignment history error: " . $e->getMessage());
+    return [];
+  }
+}
+/**
+ * Get department asset summary
+ */
+// function getDepartmentAssetSummary($pdo, $departmentId)
+// {
+//   $stmt = $pdo->prepare("
+//     SELECT 
+//       id,
+//       department_id,
+//       total_assets,
+//       assigned_to_employees,
+//       available_at_department,
+//       updated_at
+//     FROM department_asset_summary
+//     WHERE department_id = ?
+//   ");
+//   $stmt->execute([$departmentId]);
+//   return $stmt->fetch(PDO::FETCH_ASSOC);
+// }
+
+
+
+// ============================================
+// HELPER FUNCTION: Update Department Asset Summary
+// ============================================
+function updateDepartmentAssetSummary($pdo, $departmentId)
+{
+  try {
+    $stmt = $pdo->prepare("
+      SELECT COUNT(*) FROM asset_department_assignments 
+      WHERE department_id = ? AND is_active = TRUE
+    ");
+    $stmt->execute([$departmentId]);
+    $totalAssets = $stmt->fetchColumn();
+
+    $stmt = $pdo->prepare("
+      SELECT COUNT(*) FROM asset_employee_assignments 
+      WHERE department_id = ? AND is_active = TRUE
+    ");
+    $stmt->execute([$departmentId]);
+    $assignedToEmployees = $stmt->fetchColumn();
+
+    $availableAtDepartment = $totalAssets - $assignedToEmployees;
+
+    $stmt = $pdo->prepare("
+      INSERT INTO department_asset_summary (department_id, total_assets, assigned_to_employees, available_at_department)
+      VALUES (?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE 
+        total_assets = ?, 
+        assigned_to_employees = ?, 
+        available_at_department = ?,
+        updated_at = CURRENT_TIMESTAMP
+    ");
+    $stmt->execute([$departmentId, $totalAssets, $assignedToEmployees, $availableAtDepartment, $totalAssets, $assignedToEmployees, $availableAtDepartment]);
+  } catch (Exception $e) {
+    error_log("Error updating department asset summary: " . $e->getMessage());
   }
 }

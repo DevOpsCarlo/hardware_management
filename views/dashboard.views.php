@@ -71,7 +71,7 @@
         </div>
       </a>
     </article>
-
+    <!-- 
     <article class="my-6 px-6">
       <div>
         <h4 class="text-slate-700 font-semibold">Recent Assignments</h4>
@@ -89,7 +89,7 @@
           </table>
         </div>
       </div>
-    </article>
+    </article> -->
   </section>
 </main>
 

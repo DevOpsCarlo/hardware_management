@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
         categoryModal.classList.remove("hidden");
         modalTitle.textContent = "Edit Category";
         addBtn.textContent = "Update Category";
-        categoryForm.action = "manage-hardware/add-category";
+        categoryForm.action = "/manage-hardware/add-category";
         inputCategoryName.value = categoryName;
         categoryIdInput.value = categoryId;
       }

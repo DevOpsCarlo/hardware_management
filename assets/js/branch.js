@@ -80,7 +80,6 @@ document.querySelector("#branchTable").addEventListener("click", function (e) {
   // fetch data when click
   const branchId = e.target.getAttribute("data-branch-id");
   const branchName = e.target.getAttribute("data-branch-name");
-  const branchManager = e.target.getAttribute("data-branch-manager");
 
   const modalTitle = document.getElementById("modal-title");
   const modal = document.getElementById("modal");
@@ -88,7 +87,6 @@ document.querySelector("#branchTable").addEventListener("click", function (e) {
   const modalForm = document.getElementById("modal-form");
   const inputBranchId = document.getElementById("branch-id");
   const inputBranch = document.getElementById("input-branch");
-  const inputBranchManager = document.getElementById("input-branch-manager");
 
   // Edit button
   if (e.target.classList.contains("edit-btn")) {
@@ -146,3 +144,29 @@ document.querySelector("#branchTable").addEventListener("click", function (e) {
     });
   }
 });
+
+document.querySelector("#branchTable").addEventListener("click", function (e) {
+  // fetch data when click
+  const branchId = e.target.getAttribute("data-branch-id");
+  const branchName = e.target.getAttribute("data-branch-name");
+  const clickedRow = e.target.closest("tr");
+  if (
+    clickedRow &&
+    !e.target.classList.contains("edit-btn") &&
+    !e.target.classList.contains("delete-btn") &&
+    !e.target.classList.contains("select-menu") &&
+    !e.target.closest(".menu")
+  ) {
+    const branchNameCell = clickedRow.querySelector("td:nth-child(2)");
+    if (branchNameCell) {
+      const branchNameText = branchNameCell.textContent.trim();
+      if (branchNameText && branchNameText !== "Empty") {
+        window.location.href = `/branch/${encodeURIComponent(branchNameText)}`;
+      }
+    }
+    return; // stop here so it won't trigger other actions
+  }
+
+    });
+
+  

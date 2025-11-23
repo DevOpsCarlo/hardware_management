@@ -54,7 +54,7 @@
     <!-- ADD INVENTORY BUTTON -->
     <div class="flex justify-between my-4">
       <div>
-        <h2 class="text-2xl font-extrabold text-red-700 ml-6">Inventory List</h2>
+        <h2 class="text-2xl font-extrabold text-red-700 ml-2">Inventory List</h2>
       </div>
       <button class="text-red-700 border px-2 py-1 text-sm hover:bg-red-700 hover:text-white rounded-sm mr-6 cursor-pointer" id="toggle-add-inventory-form"> + Add inventory</button>
     </div>
@@ -226,7 +226,7 @@
 
 
     <!-- Inventory table -->
-    <article class="col-span-10 text-sm mt-4 font-light" id="inventory-list-table">
+    <article class="col-span-10 text-sm mt-4 font-light px-2" id="inventory-list-table">
       <div>
         <div>
           <?php if (empty($inventories)): ?>
@@ -244,7 +244,8 @@
                 <tr>
                   <th>No.</th>
                   <th>Image</th>
-                  <th>Manufacturer</th>
+                  <!-- <th>Manufacturer</th>
+                  <th>Model</th> -->
                   <th>Model</th>
                   <th>Category</th>
                   <th>Quantity</th>
@@ -256,7 +257,7 @@
                 <?php foreach ($inventories as $index => $inventory): ?>
                   <tr>
                     <td><?= $index + 1 ?></td>
-                    <td class="w-1/12 object-contain">
+                    <td class="w-1/12 h-1/12 object-contain">
                       <?php
                       // Ensure photos field is not null or empty before calling explode
                       $photos = !empty($inventory['photos']) ? explode(',', $inventory['photos']) : [];
@@ -265,11 +266,10 @@
                       <?php if ($photo): ?>
                         <img src="/<?= htmlspecialchars(ucfirst($photo)) ?>" alt="" class="w-8/12">
                       <?php else: ?>
-                        <img src="/uploads/default-photo/laptop-charger.jpg" alt="No image available">
+                        <img src="/uploads/default-photo/laptop-charger.jpg" alt="No image available" class="w-8/12">
                       <?php endif; ?>
                     </td>
-                    <td><?= htmlspecialchars(ucfirst($inventory['manufacturer'])) ?> </td>
-                    <td><?= htmlspecialchars(ucfirst($inventory['model'])) ?> </td>
+                    <td><?= htmlspecialchars(ucfirst($inventory['manufacturer'])) ?> / <?= htmlspecialchars(ucfirst($inventory['model'])) ?> </td>
                     <td><?= htmlspecialchars(ucfirst($inventory['category_name'] ?? "Laptop charger")) ?></td>
                     <td><?= htmlspecialchars($inventory['total_quantity']) ?></td>
                     <td class="relative">
