@@ -21,9 +21,11 @@
     <!-- Header with Back Button -->
     <div class="flex items-center justify-between my-4">
       <div class="flex items-center gap-4">
-        <a href="/branch" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-          <i class="fa-solid fa-arrow-left ml-2"></i>
-          Back to Branches
+        <a href="/branch" class="inline-flex items-center px-4 py-2 gap-x-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+          <i class="fa-solid fa-arrow-left"></i>
+          <p>
+            Back to Branch
+          </p>
         </a>
       </div>
 
@@ -34,6 +36,7 @@
       </div>
     </div>
 
+    <h1 class="text-2xl font-extrabold text-red-700 my-3"><?= $branchName ?> Branch</h1>
 
 
 
@@ -88,20 +91,21 @@
 
         </div>
       <?php endif; ?>
+
       <div>
 
         <!-- Action Buttons -->
         <div class="col-span-10 text-sm font-light flex justify-end gap-2 px-4 sticky top-0 shadow-sm py-2 z-10">
-          <button class="text-red-600 border px-2 py-1 text-sm rounded-sm mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-dept-modal">
+          <button class="text-red-600 border px-3 py-2 text-xs font-bold rounded-xl mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-dept-modal">
             Assign to Department
           </button>
-          <button class="text-red-600 border px-2 py-1 text-sm rounded-sm mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-employee-modal">
+          <button class="text-red-600 border px-3 py-2 text-xs font-bold rounded-xl mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-employee-modal">
             Assign to Employee
           </button>
-          <button class="text-amber-600 border px-2 py-1 text-sm rounded-sm mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-move-branch-modal">
+          <button class="text-amber-600 border px-3 py-2 text-xs font-bold rounded-xl mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-move-branch-modal">
             Move to Branch
           </button>
-          <button class="text-orange-600 border px-2 py-1 text-sm rounded-sm mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-return-employee-modal">
+          <button class="text-orange-600 border px-3 py-2 text-xs font-bold rounded-xl mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-return-employee-modal">
             Return to Department
           </button>
         </div>
@@ -137,7 +141,7 @@
                 <button type="button" class="border border-slate-300 block text-sm w-full px-4 py-2 text-slate-700 rounded-sm hover:bg-slate-50 cursor-pointer" id="cancel-dept-btn">
                   Cancel
                 </button>
-                <button type="submit" class="bg-blue-600 block w-full px-2 py-1 text-white rounded-sm hover:bg-blue-700 cursor-pointer">
+                <button type="submit" class="bg-red-600 block w-full px-2 py-1 text-white rounded-sm hover:bg-red-700 cursor-pointer">
                   Assign to Department
                 </button>
               </div>
@@ -213,7 +217,7 @@
                 <button type="button" class="border border-slate-300 block text-sm w-full px-4 py-2 text-slate-700 rounded-sm hover:bg-slate-50 cursor-pointer" id="cancel-employee-dept-btn">
                   Cancel
                 </button>
-                <button type="submit" class="bg-blue-600 block w-full px-2 py-1 text-white rounded-sm hover:bg-blue-700 cursor-pointer">
+                <button type="submit" class="bg-red-600 block w-full px-2 py-1 text-white text-xs font-bold rounded-sm hover:bg-red-700 cursor-pointer">
                   Assign to Employee
                 </button>
               </div>
@@ -284,7 +288,7 @@
         </div>
 
 
-        <h2 class="text-2xl font-extrabold text-red-700 my-3">Branch Assets</h2>
+        <!-- <h2 class="text-2xl font-extrabold text-red-700 my-3">Branch Assets</h2> -->
 
 
         <!-- Branch Summary Stats -->
@@ -315,21 +319,21 @@
 
 
         <div class="overflow-x-auto">
-          <table id="branchAssetTable" class="display text-left w-full">
+          <table id="branchAssetTable" class="row-border text-left w-full hover">
             <thead>
               <tr>
                 <th><input type="checkbox" id="headerCheckbox" class="select-all-checkbox"></th>
-                <th>No.</th>
-                <th>Image</th>
-                <th>Model</th>
-                <th>Category</th>
-                <th>Asset No.</th>
-                <th>Serial No.</th>
-                <th>Department</th>
-                <th>Assigned To</th>
-                <th>Status</th>
-                <th>Condition</th>
-                <th>Action</th>
+                <!-- <th>No.</th> -->
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Image</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Model</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Category</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Asset No.</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Serial No.</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Department</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Assigned To</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Status</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Condition</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Action</th>
               </tr>
             </thead>
             <tbody class="text-sm font-light">
@@ -345,12 +349,12 @@
                       <input type="checkbox" name="selected_assets[]" value="<?= htmlspecialchars($asset['asset_id']) ?>" class="asset-checkbox" data-status="<?= htmlspecialchars($asset['status']) ?>"
                         data-department-id="<?= $assetPath['department_id'] ?>">
                     </td>
-                    <td class="py-3 px-2"><?= $itemCounter++ ?></td>
-                    <td class="py-3 px-2">
+                    <!-- <td class="py-3 px-2"><?= $itemCounter++ ?></td> -->
+                    <td class="w-1/12 h-1/12 object-contain px-4 py-3 text-xs text-slate-900 font-normal">
                       <img
                         src="/<?= !empty($asset['photo']) ? htmlspecialchars($asset['photo']) : 'uploads/default-photo/laptop-charger.jpg' ?>"
                         alt="No image available"
-                        class="w-20 h-20 object-cover rounded">
+                        class="w-6/12 rounded-full object-contain">
                     </td>
                     <td class="py-3 px-2">
                       <?= htmlspecialchars(ucfirst($asset['manufacturer'] ?? '-')) ?>
@@ -389,13 +393,12 @@
 
                     <?php
                     $statusClassMap = [
-                      'Available' => 'text-emerald-500 bg-emerald-100',
-                      'Branch Assigned' => 'text-emerald-500 bg-emerald-100',
+                      'Branch Assigned' => 'text-emerald-700 bg-emerald-100',
                       'Department Assigned' => 'text-amber-700 bg-amber-100',
-                      'Employee Assigned' => 'text-blue-500 bg-blue-100',
+                      'Employee Assigned' => 'text-blue-700 bg-blue-100',
                       'Assigned' => 'text-blue-500 bg-blue-100',
-                      'Under Maintenance' => 'text-gray-500 bg-gray-100',
-                      'Uncommitted' => 'text-red-500 bg-red-100'
+                      'Under Maintenance' => 'text-orange-500 bg-orange-100',
+                      'Uncommitted' => 'text-red-700 bg-red-100'
 
                     ];
                     $currentStatus = $asset['status'] ?? '-';

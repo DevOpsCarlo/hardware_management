@@ -56,7 +56,12 @@
       <div>
         <h2 class="text-2xl font-extrabold text-red-700 ml-2">Inventory List</h2>
       </div>
-      <button class="text-red-700 border px-2 py-1 text-sm hover:bg-red-700 hover:text-white rounded-sm mr-6 cursor-pointer" id="toggle-add-inventory-form"> + Add inventory</button>
+      <button class="text-white bg-red-600 border px-3 py-2 text-sm hover:bg-red-700 hover:text-white rounded-xl flex items-center gap-x-1 mr-6 cursor-pointer" id="toggle-add-inventory-form">
+        <i class="fa-solid fa-plus"></i>
+        <span class="font-bold text-xs">
+          New Inventory
+        </span>
+      </button>
     </div>
 
     <!-- ADD INVENTORY FORM -->
@@ -239,40 +244,40 @@
 
             </div>
           <?php else: ?>
-            <table id="inventoryTable" class="display">
+            <table id="inventoryTable" class="row-border text-left w-full hover">
               <thead>
                 <tr>
-                  <th>No.</th>
-                  <th>Image</th>
-                  <!-- <th>Manufacturer</th>
-                  <th>Model</th> -->
-                  <th>Model</th>
-                  <th>Category</th>
-                  <th>Quantity</th>
-                  <th>Action</th>
+                  <!-- <th>No.</th> -->
+                  <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Image</th>
+                  <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Model</th>
+                  <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Category</th>
+                  <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Quantity</th>
+                  <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Action</th>
                 </tr>
               </thead>
               <tbody>
 
                 <?php foreach ($inventories as $index => $inventory): ?>
                   <tr>
-                    <td><?= $index + 1 ?></td>
-                    <td class="w-1/12 h-1/12 object-contain">
+                    <!-- <td><?= $index + 1 ?></td> -->
+                    <td class="w-1/12 h-1/12 object-contain px-4 py-3 text-xs text-slate-900 font-normal">
                       <?php
                       // Ensure photos field is not null or empty before calling explode
                       $photos = !empty($inventory['photos']) ? explode(',', $inventory['photos']) : [];
                       $photo = !empty($photos) ? $photos[0] : ''; // Use the first photo if available
                       ?>
                       <?php if ($photo): ?>
-                        <img src="/<?= htmlspecialchars(ucfirst($photo)) ?>" alt="" class="w-8/12">
+                        <img src="/<?= htmlspecialchars(ucfirst($photo)) ?>" alt="" class="w-6/12 rounded-full object-contain">
                       <?php else: ?>
-                        <img src="/uploads/default-photo/laptop-charger.jpg" alt="No image available" class="w-8/12">
+                        <img src="/uploads/default-photo/laptop-charger.jpg" alt="No image available" class="w-6/12 rounded-full object-contain">
                       <?php endif; ?>
                     </td>
-                    <td><?= htmlspecialchars(ucfirst($inventory['manufacturer'])) ?> / <?= htmlspecialchars(ucfirst($inventory['model'])) ?> </td>
-                    <td><?= htmlspecialchars(ucfirst($inventory['category_name'] ?? "Laptop charger")) ?></td>
-                    <td><?= htmlspecialchars($inventory['total_quantity']) ?></td>
-                    <td class="relative">
+                    <td class="px-4 text-xs text-slate-900 font-normal">
+
+                      <?= htmlspecialchars(ucfirst($inventory['manufacturer'])) ?> <?= htmlspecialchars(ucfirst($inventory['model'])) ?> </td>
+                    <td class="px-4 text-xs text-slate-900 font-normal"><?= htmlspecialchars(ucfirst($inventory['category_name'] ?? "Laptop charger")) ?></td>
+                    <td class="px-4 text-xs text-slate-900 font-normal"><?= htmlspecialchars($inventory['total_quantity']) ?></td>
+                    <td class="relative px-4 text-xs text-slate-900 font-normal">
                       <i class="fa-solid fa-ellipsis-vertical cursor-pointer select-menu"></i>
                       <div class="absolute top-3 left-5 mt-2 w-20 bg-white border rounded shadow group-hover:block z-10 hidden menu">
                         <ul class="text-xs text-slate-700 font-light">

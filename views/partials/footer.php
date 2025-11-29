@@ -18,6 +18,7 @@
   let departmentEmployeeTable = new DataTable("#departmentEmployeeTable");
   let departmentTableSection = new DataTable('#branchDepartmentTable');
   let branchAssetTable = new DataTable('#branchAssetTable');
+  let recentAssignmentTable = new DataTable('#recentAssignmentTable');
   let assetTable = new DataTable("#assetTable", {
     scrollY: '560px',
     scrollCollapse: true,
@@ -36,6 +37,7 @@
       targets: '_all',
       className: 'dt-left'
     }]
+
   });
   $('#categoryTable').DataTable({
     columnDefs: [{

@@ -37,7 +37,12 @@
 
     <div class="flex items-center justify-between my-4">
       <h2 class="text-2xl font-extrabold text-red-700 ml-2">Toprank Employee</h2>
-      <button class="text-red-700 border px-2 py-1 text-sm hover:bg-red-700 hover:text-white rounded-sm mr-2 cursor-pointer" id="toggle-modal"> + Add Employee</button>
+      <button class="text-white bg-red-600 flex items-center gap-x-1 rounded-xl border px-3 py-2 text-sm hover:bg-red-700 hover:text-white rounded-sm mr-2 cursor-pointer" id="toggle-modal">
+        <i class="fa-solid fa-plus"></i>
+        <span class="font-bold text-xs">
+          New Employee
+        </span>
+      </button>
     </div>
 
 

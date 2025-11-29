@@ -79,7 +79,6 @@ $branch = fetchBranchByName($pdo, $branchName);
 // $departments = fetchDepartmentsByBranch($pdo, $branch['id']);
 $deparmentStats = fetchDepartmentsWithAssetStats($pdo, $branch['id']);
 
-
 // dd($deparmentStats);
 // $departmentSummary = getDepartmentAssetSummary($pdo, $branch['id']);
 // dd($departmentSummary);

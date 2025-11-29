@@ -29,16 +29,16 @@
 
     <!-- Action Buttons -->
     <div class="col-span-10 text-sm font-light flex justify-end gap-2 px-4 sticky top-0 bg-white shadow-lg py-2 z-10">
-      <button class="text-red-700 border px-2 py-1 text-sm rounded-sm mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-branch-modal">
+      <button class="text-red-700 border px-3 py-2 text-xs rounded-xl font-bold mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-branch-modal">
         Assign to Branch
       </button>
-      <button class="text-red-700 border px-2 py-1 text-sm rounded-sm mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-employee-modal">
+      <button class="text-red-700 border px-3 py-2 text-xs rounded-xl font-bold mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-employee-modal">
         Assign to Employee
       </button>
-      <button class="text-orange-700 border px-2 py-1 text-sm rounded-sm mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-return-employee-modal">
+      <button class="text-orange-700 border px-3 py-2 text-xs rounded-xl font-bold mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-return-employee-modal">
         Return to Branch
       </button>
-      <button class="text-yellow-700 border px-2 py-1 text-sm rounded-sm mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-return-branch-modal">
+      <button class="text-yellow-700 border px-3 py-2 text-xs rounded-xl font-bold mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-return-branch-modal">
         Return to Pool
       </button>
     </div>
@@ -203,20 +203,20 @@
 
     <!-- Asset Table -->
     <article class="col-span-10 text-sm font-light px-2 pt-3" id="asset-table">
-      <table id="assetTable" class="display text-left">
+      <table id="assetTable" class="row-border text-left w-full hover">
         <thead>
           <tr>
             <th><input type="checkbox" id="headerCheckbox" class="select-all-checkbox"></th>
-            <th>No.</th>
-            <th>Image</th>
-            <th>Model</th>
-            <th>Category</th>
-            <th>Asset No.</th>
-            <th>Serial No.</th>
-            <th>Status</th>
-            <th>Assigned At</th>
-            <th>Assigned To</th>
-            <th>Action</th>
+            <!-- <th>No.</th> -->
+            <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Image</th>
+            <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Model</th>
+            <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Category</th>
+            <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Asset No.</th>
+            <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Serial No.</th>
+            <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Status</th>
+            <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Assigned At</th>
+            <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Assigned To</th>
+            <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Action</th>
           </tr>
         </thead>
         <tbody class="text-sm font-light">
@@ -228,9 +228,9 @@
                 <td>
                   <input type="checkbox" name="selected_assets[]" value="<?= htmlspecialchars($asset['asset_id']) ?>" class="asset-checkbox" data-status="<?= htmlspecialchars($asset['status']) ?>">
                 </td>
-                <td><?= $itemCounter++ ?></td>
-                <td class="w-1/12 h-1/12 object-contain">
-                  <img src="/<?= htmlspecialchars($asset['photo'] ?? 'uploads/default-photo/laptop-charger.jpg') ?>" alt="" class="w-8/12">
+                <!-- <td><?= $itemCounter++ ?></td> -->
+                <td class="w-1/12 h-1/12 object-contain px-4 py-3 text-xs text-slate-900 font-normal">
+                  <img src="/<?= htmlspecialchars($asset['photo'] ?? 'uploads/default-photo/laptop-charger.jpg') ?>" alt="" class="w-6/12 rounded-full object-contain">
                 </td>
                 <td><?= htmlspecialchars(ucfirst($asset['manufacturer'] ?? 'N/A')) ?> / <?= htmlspecialchars(ucfirst($asset['model'] ?? 'N/A')) ?></td>
                 <td><?= htmlspecialchars(ucfirst($asset['category_name'] ?? 'Empty')) ?></td>
@@ -241,10 +241,11 @@
                   'Available' => 'text-emerald-500 bg-emerald-100',
                   'Branch Assigned' => 'text-blue-500 bg-blue-100',
                   'Employee Assigned' => 'text-blue-500 bg-blue-100',
-                  'Department Assigned' => 'text-orange-500 bg-orange-100',
+                  'Department Assigned' => 'text-amber-500 bg-amber-100',
                   'Surrender' => 'text-orange-500 bg-orange-100',
-                  'Under Maintenance' => 'text-gray-500 bg-gray-100',
-                  'Defective' => 'text-red-500 bg-red-100'
+                  'Under Maintenance' => 'text-orange-500 bg-orange-100',
+                  'Defective' => 'text-red-500 bg-red-100',
+                  'Uncommitted' => 'text-red-500 bg-red-100'
                 ];
                 $currentStatus = $asset['status'] ?? '-';
                 $statusClass = $statusClassMap[$currentStatus] ?? 'text-gray-500 bg-gray-100';

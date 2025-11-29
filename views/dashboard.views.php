@@ -1,6 +1,5 @@
 <?php require("views/partials/head.php"); ?>
 
-
 <main class="grid grid-cols-1 sm:grid-cols-12 min-h-screen">
   <?php require("views/sidebar.php"); ?>
   <section class="col-span-12 md:col-span-10 space-y-7">
@@ -19,83 +18,119 @@
         </button>
       </div>
     </header>
-    <article class="my-6 px-6 text-2xl font-bold text-slate-800 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <h2 class="col-span-1 md:col-span-2 lg:col-span-4">Hardware Management Dashboard</h2>
-      <a href="">
-        <div class="shadow-sm p-2 sm:p-4 md:p-6 lg:p-8 rounded-sm flex items-center gap-4 flex-col lg:flex-row">
-          <div class="bg-slate-50 rounded-full p-4">
-            <i class="fa-solid fa-server"></i>
-          </div>
-          <div>
-            <h3 class="text-sm text-slate-500 whitespace-nowrap md:whitespace-normal">Total Hardware</h3>
-            <p class="font-bold text-center lg:text-start">20</p>
-          </div>
+
+    <!-- Dashboard Title -->
+    <article class="px-6">
+      <h2 class="text-2xl font-bold text-slate-800">Asset Inventory Management Dashboard</h2>
+    </article>
+
+    <!-- Main Statistics Cards -->
+    <article class="px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+      <!-- Total Hardware -->
+      <a href="/manage-hardware/add-asset" class="block p-4 bg-cyan-50 border border-cyan-200 rounded-lg hover:shadow-md hover:bg-cyan-100 transition-all cursor-pointer">
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-sm font-medium text-slate-600">Total Hardware</p>
+          <i class="fa-solid fa-server text-slate-500"></i>
         </div>
+        <p class="text-3xl font-bold text-slate-700"><?= $stats['total_assets'] ?? 0 ?></p>
+        <p class="text-xs text-slate-500 mt-2">All devices in system</p>
       </a>
 
-      <a href="">
-        <div class="shadow-sm rounded-sm p-2 sm:p-4 md:p-6 lg:p-8 flex items-center gap-4 flex-col lg:flex-row">
-          <div class="bg-slate-50 rounded-full p-4">
-            <i class="fa-solid fa-chalkboard-user"></i>
-          </div>
-          <div>
-            <h5 class="text-sm text-slate-500">Assigned</h5>
-            <p class="font-bold text-center lg:text-start">12</p>
-          </div>
-          <div>
-          </div>
+      <!-- Assigned Assets (Combined) -->
+      <a href="" class="block p-4 bg-blue-50 border border-blue-200 rounded-lg hover:shadow-md hover:bg-blue-100 transition-all cursor-pointer">
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-sm font-medium text-slate-600">Assigned Assets</p>
+          <i class="fa-solid fa-chalkboard-user text-blue-500"></i>
         </div>
+        <p class="text-3xl font-bold text-blue-700"><?= ($stats['employee_assigned'] ?? 0) + ($stats['branch_assigned'] ?? 0) + ($stats['department_assigned'] ?? 0) ?></p>
+        <p class="text-xs text-slate-500 mt-2">All assigned devices</p>
       </a>
 
-      <a href="">
-        <div class="shadow-sm rounded-sm p-2 sm:p-4 md:p-6 lg:p-8 flex items-center gap-4 flex-col lg:flex-row">
-          <div class="bg-slate-50 rounded-full p-4">
-            <i class="fa-solid fa-computer"></i>
-          </div>
-          <div>
-            <h5 class="text-sm text-slate-500 whitespace-nowrap lg:whitespace-normal">Available Device</h5>
-            <p class="font-bold text-center lg:text-start">60</p>
-          </div>
+      <!-- Available Devices -->
+      <a href="" class="block p-4 bg-green-50 border border-green-200 rounded-lg hover:shadow-md hover:bg-green-100 transition-all cursor-pointer">
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-sm font-medium text-slate-600">Available</p>
+          <i class="fa-solid fa-inbox text-green-500"></i>
         </div>
+        <p class="text-3xl font-bold text-green-700"><?= $stats['available'] ?? 0 ?></p>
+        <p class="text-xs text-slate-500 mt-2">Ready for assignment</p>
       </a>
 
-      <a href="">
-        <div class="shadow-sm rounded-sm p-2 sm:p-4 md:p-6 lg:p-8 flex items-center gap-4 flex-col lg:flex-row">
-          <div class="bg-slate-50 rounded-full p-4">
-            <i class="fa-solid fa-screwdriver-wrench"></i>
-          </div>
-          <div class="flex-col lg:flex-row">
-            <h5 class="text-slate-500 text-sm whitespace-nowrap md:whitespace-normal">Under Maintenance</h5>
-            <p class="font-bold text-center lg:text-start">4</p>
-          </div>
+      <!-- In Maintenance -->
+      <a href="" class="block p-4 bg-orange-50 border border-orange-200 rounded-lg hover:shadow-md hover:bg-orange-100 transition-all cursor-pointer">
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-sm font-medium text-slate-600">In Maintenance</p>
+          <i class="fa-solid fa-wrench text-orange-500"></i>
         </div>
+        <p class="text-3xl font-bold text-orange-700"><?= $stats['under_maintenance'] ?? 0 ?></p>
+        <p class="text-xs text-slate-500 mt-2">Under maintenance</p>
+      </a>
+
+      <!-- Defective Assets -->
+      <a href="" class="block p-4 bg-red-50 border border-red-200 rounded-lg hover:shadow-md hover:bg-red-100 transition-all cursor-pointer">
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-sm font-medium text-slate-600">Defective Assets</p>
+          <i class="fa-solid fa-ban text-red-500"></i>
+        </div>
+        <p class="text-3xl font-bold text-red-700"><?= $stats['uncommitted'] ?? 0 ?></p>
+        <p class="text-xs text-slate-500 mt-2">Uncommitted assets</p>
       </a>
     </article>
-    <!-- 
-    <article class="my-6 px-6">
-      <div>
-        <h4 class="text-slate-700 font-semibold">Recent Assignments</h4>
-        <div>
-          <table id="myTable" class="display">
-            <thead>
-              <tr>
-                <th>Hardware</th>
-                <th>Assigned To</th>
-                <th>Department</th>
-                <th>Date</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-          </table>
+
+
+
+    <!-- Recent Assignments Table -->
+    <?php if (!empty($recentAssignments)): ?>
+      <article class="px-6 pb-6">
+        <h3 class="text-lg font-bold text-slate-800 mb-4">Recent Assignments</h3>
+        <div class="border border-slate-200 rounded-lg overflow-hidden bg-white">
+          <div class="overflow-x-auto">
+            <table id="recentAssignmentTable" class="display text-left w-full">
+              <thead class="bg-slate-50 border-b border-slate-200">
+                <tr>
+                  <th class="px-4 py-3 text-left text-sm font-semibold text-slate-700">Asset Number</th>
+                  <th class="px-4 py-3 text-left text-sm font-semibold text-slate-700">Hardware</th>
+                  <th class="px-4 py-3 text-left text-sm font-semibold text-slate-700">Category</th>
+                  <th class="px-4 py-3 text-left text-sm font-semibold text-slate-700">Assigned To</th>
+                  <th class="px-4 py-3 text-left text-sm font-semibold text-slate-700">Last Update</th>
+                  <th class="px-4 py-3 text-left text-sm font-semibold text-slate-700">Status</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200">
+                <?php foreach ($recentAssignments as $assignment): ?>
+                  <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-4 py-3 text-sm font-medium text-slate-800"><?= htmlspecialchars($assignment['asset_number']) ?></td>
+                    <td class="px-4 py-3 text-sm text-slate-600">
+                      <?= htmlspecialchars($assignment['manufacturer'] ?? 'N/A') ?> <?= htmlspecialchars($assignment['model'] ?? '') ?>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-slate-600"><?= htmlspecialchars($assignment['category_name'] ?? 'N/A') ?></td>
+                    <td class="px-4 py-3 text-sm text-slate-600"><?= htmlspecialchars($assignment['assigned_to'] ?? 'Unassigned') ?></td>
+                    <td class="px-4 py-3 text-sm text-slate-600"><?= date('M d, Y', strtotime($assignment['last_update'])) ?></td>
+                    <td class="px-4 py-3 text-sm">
+                      <span class="px-3 py-1 rounded-full text-xs font-semibold inline-block
+                    <?php
+                    if ($assignment['status'] === 'Employee Assigned') echo 'bg-green-50 text-green-700 border border-green-200';
+                    elseif ($assignment['status'] === 'Branch Assigned') echo 'bg-purple-50 text-purple-700 border border-purple-200';
+                    elseif ($assignment['status'] === 'Department Assigned') echo 'bg-blue-50 text-blue-700 border border-blue-200';
+                    elseif ($assignment['status'] === 'Under Maintenance') echo 'bg-orange-50 text-orange-700 border border-orange-200';
+                    elseif ($assignment['status'] === 'Uncommitted') echo 'bg-red-50 text-red-700 border border-red-200';
+                    else echo 'bg-slate-50 text-slate-700 border border-slate-200';
+                    ?>
+                  ">
+                        <?= htmlspecialchars($assignment['status']) ?>
+                      </span>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
-    </article> -->
+      </article>
+    <?php endif; ?>
+
   </section>
 </main>
-
-
-
-
-
 
 <?php require("views/partials/footer.php"); ?>

@@ -157,14 +157,14 @@ document.querySelector("#branchTable").addEventListener("click", function (e) {
     !e.target.classList.contains("select-menu") &&
     !e.target.closest(".menu")
   ) {
-    const branchNameCell = clickedRow.querySelector("td:nth-child(2)");
+    const branchNameCell = clickedRow.querySelector("td:nth-child(1)");
     if (branchNameCell) {
       const branchNameText = branchNameCell.textContent.trim();
       if (branchNameText && branchNameText !== "Empty") {
         window.location.href = `/branch/${encodeURIComponent(branchNameText)}`;
       }
     }
-    return; // stop here so it won't trigger other actions
+    return; 
   }
 
     });

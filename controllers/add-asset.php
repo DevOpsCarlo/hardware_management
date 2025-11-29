@@ -7,8 +7,6 @@ if ($chargerCategory) {
     $chargerCategoryId = $chargerCategory['id'];
 }
 
-
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'Delete Asset') {
     header('Content-Type: application/json');
 

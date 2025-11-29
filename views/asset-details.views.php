@@ -25,8 +25,9 @@
             <?php
             $statusClassMap = [
               'Available' => 'text-emerald-600 bg-emerald-100',
-              'Employee Assigned' => 'text-blue-700 bg-blue-100',
+              'Employee Assigned' => 'text-blue-600 bg-blue-100',
               'Branch Assigned' => 'text-blue-600 bg-blue-100',
+              'Department Assigned' => 'text-amber-600 bg-amber-100',
               'Surrender' => 'text-orange-600 bg-orange-100',
               'Under Maintenance' => 'text-gray-600 bg-gray-100',
               'Defective' => 'text-red-600 bg-red-100'

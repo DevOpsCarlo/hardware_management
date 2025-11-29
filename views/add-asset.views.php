@@ -48,18 +48,18 @@
       <div>
         <h2 class="text-2xl font-extrabold text-red-700 my-3">Asset List</h2>
         <div>
-          <table id="detailedTable" class="display text-left">
+          <table id="detailedTable" class="row-border text-left w-full hover">
             <thead>
               <tr>
-                <th>No.</th>
-                <th>Image</th>
-                <th>Model</th>
-                <th>Category</th>
-                <th>Asset No.</th>
-                <th>Serial No.</th>
-                <th>Status</th>
-                <th>Conditions</th>
-                <th>Action</th>
+                <!-- <th>No.</th> -->
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Image</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Model</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Asset No.</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Category</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Serial No.</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Status</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Conditions</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Action</th>
               </tr>
             </thead>
             <tbody class="text-sm font-light">
@@ -88,11 +88,11 @@
                   $asset = isset($assetsForInventory[$i]) ? $assetsForInventory[$i] : null;
               ?>
                   <tr class="text-xs font-light text-left">
-                    <td><?= $itemCounter++ ?></td>
-                    <td class="w-1/12 h-1/12 object-contain">
-                      <img src="/<?= !empty($inventory['photo']) ? htmlspecialchars($inventory['photo']) : 'uploads/default-photo/laptop-charger.jpg' ?>" alt="No image available" class="w-8/12">
+                    <!-- <td><?= $itemCounter++ ?></td> -->
+                    <td class="w-1/12 h-1/12 object-contain px-4 py-3 text-xs text-slate-900 font-normal">
+                      <img src="/<?= !empty($inventory['photo']) ? htmlspecialchars($inventory['photo']) : 'uploads/default-photo/laptop-charger.jpg' ?>" alt="No image available" class="w-6/12 rounded-full object-contain">
                     </td>
-                    <td><?= htmlspecialchars(ucfirst($inventory['manufacturer'] ?? '-')) ?> / <?= htmlspecialchars(ucfirst($inventory['model'] ?? '-')) ?></td>
+                    <td><?= htmlspecialchars(ucfirst($inventory['manufacturer'] ?? '-')) ?> <?= htmlspecialchars(ucfirst($inventory['model'] ?? '-')) ?></td>
                     <td><?= htmlspecialchars(ucfirst($inventory['category_name'] ?? '-')) ?></td>
                     <td><?= htmlspecialchars($asset['asset_number'] ?? '-') ?></td>
                     <td><?= htmlspecialchars($asset['serial_number'] ?? '-') ?></td>
@@ -102,7 +102,8 @@
                       'Branch Assigned' => 'text-blue-700 bg-blue-100',
                       'Employee Assigned' => 'text-blue-500 bg-blue-100',
                       'Surrender' => 'text-orange-500 bg-orange-100',
-                      'Under Maintenance' => 'text-gray-500 bg-gray-100',
+                      'Under Maintenance' => 'text-orange-500 bg-orange-100',
+                      'Department Assigned' => 'text-amber-500 bg-amber-100',
                       'Uncommitted' => 'text-red-500 bg-red-100'
                     ];
                     $currentStatus = $asset['status'] ?? '-';

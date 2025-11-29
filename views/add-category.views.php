@@ -20,8 +20,11 @@ unset($_SESSION['category_error'], $_SESSION['category_form_data'], $_SESSION['c
       <div>
         <h2 class="text-2xl font-extrabold text-red-700 ml-6">Category List</h2>
       </div>
-      <button class="flex items-center text-red-700 border px-2 py-1 text-sm hover:bg-red-700 hover:text-white rounded-sm mr-6 cursor-pointer" id="add-category-btn">
-        + Add Category
+      <button class="flex items-center text-white bg-red-600 border px-3 py-2 text-sm hover:bg-red-700 hover:text-white rounded-xl flex items-center gap-x-1 mr-6 cursor-pointer" id="add-category-btn">
+        <i class="fa-solid fa-plus"></i>
+        <span class="font-bold text-xs">
+          New Category
+        </span>
       </button>
     </div>
     <article class="mt-6 px-6 text-2xl font-bold text-slate-800 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -105,7 +108,8 @@ unset($_SESSION['category_error'], $_SESSION['category_form_data'], $_SESSION['c
 
       <!-- CATEGORY TABLE  -->
       <article class="col-span-10 text-sm mt-0">
-        <div>
+        <!-- border border-slate-200 rounded-lg overflow-hidden bg-white px-4 -->
+        <div class="">
           <div>
             <?php if (empty($categories)): ?>
               <div class="col-span-full text-center py-12">
@@ -117,21 +121,20 @@ unset($_SESSION['category_error'], $_SESSION['category_form_data'], $_SESSION['c
 
               </div>
             <?php else: ?>
-              <table id="categoryTable" class="display font-light">
+              <table id="categoryTable" class="row-border text-left w-full">
                 <thead>
                   <tr>
-                    <th>No.</th>
-                    <th>Category</th>
-                    <th>Total Asset</th>
-                    <th>Action</th>
+                    <!-- <th class="px-4 py-3 text-left text-sm font-semibold text-slate-700">No.</th> -->
+                    <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Category</th>
+                    <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Total Asset</th>
+                    <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Action</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-slate-200">
                   <?php foreach ($categories as $index => $category): ?>
-                    <tr>
-                      <td><?= $index + 1 ?></td>
-                      <td><?= htmlspecialchars(ucfirst($category['category_name'])) ?></td>
-                      <td><?= $category['total_quantity'] > 0 ? $category['total_quantity'] : 0 ?></td>
+                    <tr class="">
+                      <td class="px-4 py-3 text-xs text-slate-900 font-normal"><?= htmlspecialchars(ucfirst($category['category_name'])) ?></td>
+                      <td class="px-4 py-3 text-xs text-slate-900 font-normal"><?= $category['total_quantity'] > 0 ? $category['total_quantity'] : 0 ?></td>
                       <td class="relative">
                         <i class="fa-solid fa-ellipsis-vertical cursor-pointer select-option"></i>
                         <div class="absolute top-3 left-5 mt-2 w-20 bg-white border rounded shadow group-hover:block z-10 hidden options">

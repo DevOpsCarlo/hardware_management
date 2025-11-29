@@ -35,7 +35,12 @@
 
     <div class="flex items-center justify-between my-4">
       <h2 class="text-2xl font-extrabold text-red-700 ml-2">Toprank Branches</h2>
-      <button class="text-red-700 border px-2 py-1 text-sm hover:bg-red-700 hover:text-white rounded-sm mr-2 cursor-pointer" id="toggle-modal">Add Branch</button>
+      <button class="text-white bg-red-600 border px-3 py-2 text-sm hover:bg-red-700 hover:text-white rounded-xl mr-2 cursor-pointer flex items-center gap-x-1" id="toggle-modal">
+        <i class="fa-solid fa-plus"></i>
+        <span class="font-bold text-xs">
+          New Branch
+        </span>
+      </button>
     </div>
 
     <!-- Add Branch Modal -->
@@ -80,24 +85,24 @@
     <!-- Branch Table -->
     <article class="col-span-10 text-sm font-light" id="branch-table">
       <div>
-        <table id="branchTable" class="display w-full">
+        <table id="branchTable" class="row-border text-left w-full hover">
           <thead class="text-left">
             <tr>
-              <th class="px-4 py-2">No.</th>
-              <th class="px-4 py-2">Branch</th>
-              <th class="px-4 py-2">Total Assets</th>
-              <th class="px-4 py-2">Assigned</th>
-              <th class="px-4 py-2">Available</th>
-              <th class="px-4 py-2">In Repair</th>
-              <th class="px-4 py-2">Uncommitted</th>
-              <th class="px-4 py-2">Action</th>
+              <!-- <th class="px-4 py-2">No.</th> -->
+              <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Branch</th>
+              <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Total Assets</th>
+              <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Assigned</th>
+              <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Available</th>
+              <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">In Repair</th>
+              <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Uncommitted</th>
+              <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Action</th>
             </tr>
           </thead>
           <tbody class="text-sm font-light">
             <?php if (!empty($branches)): ?>
               <?php foreach ($branches as $index => $branch): ?>
                 <tr class="text-xs font-light text-left hover:bg-slate-100 transition duration-150 cursor-pointer">
-                  <td class="px-4 py-2"><?= $index + 1 ?></td>
+                  <!-- <td class="px-4 py-2"><?= $index + 1 ?></td> -->
                   <td class="px-4 py-2"><?= htmlspecialchars($branch['branch_name'] ?? "Empty") ?></td>
 
                   <!-- TOTAL ASSETS -->
@@ -164,7 +169,7 @@
               <?php endforeach; ?>
             <?php else: ?>
               <tr>
-                <td colspan="8" class="text-center py-4 text-slate-500">No branches found</td>
+                <td colspan="7" class="text-center py-4 text-slate-500">No branches found</td>
               </tr>
             <?php endif; ?>
           </tbody>

@@ -37,13 +37,17 @@
     <!-- Header with Back Button -->
     <div class="flex items-center justify-between my-4 px-2">
       <div class="flex items-center gap-4">
-        <a href="/branch/<?= urlencode($branch['branch_name']) ?>" class="text-sm text-red-600 hover:underline">
-          ← Back to <?= htmlspecialchars($branch['branch_name']) ?> Branch
+        <a href="/branch/<?= htmlspecialchars($branch['branch_name']) ?>/department" class="inline-flex items-center gap-x-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+          <i class="fa-solid fa-arrow-left"></i>
+          <p>
+            Back to Department
+          </p>
         </a>
       </div>
+      <!-- 
       <button class="text-red-700 border px-2 py-1 text-sm hover:bg-red-700 hover:text-white rounded-sm mr-2 cursor-pointer" id="toggle-modal">
         + Add Employee
-      </button>
+      </button> -->
     </div>
     <div class="my-4 shadow-sm py-2 px-4">
       <h2 class="text-2xl font-extrabold text-red-700">
@@ -53,11 +57,11 @@
       <div class="flex items-center justify-between">
         <div>
           <p class="text-sm text-slate-800 mt-1 font-bold">
-            <span class="font-medium text-slate-600">Head Dept:</span>
+            <span class="font-medium text-slate-600">Department Head:</span>
             <?= htmlspecialchars($department['department_head'] ?? 'Not assigned') ?>
           </p>
           <p class="text-sm text-slate-800">
-            <span class="font-medium text-slate-600">Total Departments:</span>
+            <span class="font-medium text-slate-600">Total Assets:</span>
             <?= count($department) ?>
           </p>
         </div>
@@ -65,147 +69,100 @@
 
     </div>
 
-    <!-- Modal with Fixed Height and Scrollable Content -->
-    <div class="fixed inset-0 top-0 left-0 bg-black/30 backdrop-blur-xs flex items-center justify-center z-50 hidden" id="modal">
-      <div class="max-w-xl w-full mx-auto rounded-sm shadow-lg p-4 bg-white flex flex-col max-h-[90vh]" id="employee-modal-form-box">
-        <div class="flex items-center gap-4 border-b-2 border-slate-100 pb-5 flex-shrink-0">
-          <div class="">
-            <i class="fa-solid fa-users text-red-500 rounded-full bg-red-50 p-4"></i>
-          </div>
-          <h2 class="text-slate-800 font-bold text-2xl" id="employee-modal-title">Add Employees</h2>
-        </div>
-
-        <!-- Scrollable Form Content -->
-        <form class="space-y-4 bg-white text-slate-800 grid grid-cols-1 gap-2 form text-sm font-medium overflow-y-auto flex-grow" method="POST" id="employee-modal-form">
-          <!-- Table of Employees with Checkboxes -->
-          <div class="col-span-10 p-4">
-            <label for="input-department" class="block text-sm font-light text-slate-800">Select Employees<span class="text-red-600">*</span></label>
-            <?php if (!empty($fetchEmployees)): ?>
-              <table class="display w-full" id="addEmployeeTable">
-                <thead>
-                  <tr>
-                    <th class="border p-2">Select</th>
-                    <th class="border p-2">Employee Name</th>
-                    <th class="border p-2">Employee ID</th>
-                    <th class="border p-2">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <?php foreach ($fetchEmployees as $employee): ?>
-                    <tr>
-                      <td class="border p-2">
-                        <input type="checkbox" name="employee_ids[]" value="<?= $employee['id'] ?>" class="employee-checkbox" />
-                      </td>
-                      <td class="border p-2"><?= htmlspecialchars(ucfirst($employee['employee_name'])) ?></td>
-                      <td class="border p-2"><?= htmlspecialchars($employee['employee_id']) ?></td>
-                      <td class="border p-2"><?= htmlspecialchars($employee['option_status']) ?></td>
-
-                    </tr>
-                  <?php endforeach; ?>
-                </tbody>
-              </table>
-            <?php else: ?>
-              <div class="col-span-full text-center py-12">
-                <div class="text-slate-400 mb-4">
-                  <i class="fa-solid fa-building text-6xl"></i>
-                </div>
-                <h3 class="text-lg font-medium text-slate-600 mb-2">No employees added yet</h3>
-                <p class="text-slate-500 mb-4">Start by adding your first employee to this department.</p>
-                <button class="text-red-600 hover:text-red-700 font-medium cursor-pointer" id="add-first-employee">
-                  <i class="fa-solid fa-plus mr-2"></i>
-                  Add First Employee
-                </button>
-              </div>
-            <?php endif; ?>
-          </div>
-        </form>
-
-        <!-- Fixed Bottom Buttons -->
-        <div class="col-span-10 flex gap-4 pt-4 px-4 pb-4 border-t border-slate-100 flex-shrink-0">
-          <button type="button"
-            class="border border-slate-300 block text-sm w-full px-4 py-2 text-slate-700 rounded-sm hover:bg-slate-50 cursor-pointer"
-            id="modal-cancel-btn">
-            Cancel
-          </button>
-          <button type="submit"
-            class="bg-red-600 block text-sm font-bold w-full px-4 py-2 text-white rounded-sm hover:bg-red-700 cursor-pointer"
-            name="modalAddEmployee"
-            id="modal-add-btn"
-            form="employee-modal-form">
-            Add Employee
-          </button>
-        </div>
-      </div>
-    </div>
 
     <!-- Inventory table -->
     <article class="col-span-10 text-sm mt-4 font-light" id="department-employee-table">
+
+      <?php if (isset($deparmentStats) && $department): ?>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+          <!-- Assigned Assets Card -->
+          <a href=""
+            class="block p-4 bg-blue-50 border border-blue-200 rounded-lg hover:shadow-md hover:bg-blue-100 transition-all cursor-pointer">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-sm font-medium text-slate-600">Total Assets</p>
+              <i class="fa-solid fa-user text-blue-500"></i>
+            </div>
+            <p class="text-3xl font-bold text-blue-700"><?= $department['total_assets'] ?? 0 ?></p>
+            <p class="text-xs text-slate-500 mt-2">Total asset of <?= $department['department_name'] ?? '-' ?></p>
+          </a>
+
+          <!-- Assigned Assets Card -->
+          <a href=""
+            class="block p-4 bg-amber-50 border border-amber-200 rounded-lg hover:shadow-md hover:bg-amber-100 transition-all cursor-pointer">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-sm font-medium text-slate-600">Assigned Assets</p>
+              <i class="fa-solid fa-inbox text-amber-500"></i>
+            </div>
+            <p class="text-3xl font-bold text-amber-700"><?= ($department['assigned_count'] ?? 0) ?></p>
+            <p class="text-xs text-slate-500 mt-2">Assigned at Department level</p>
+          </a>
+
+          <!-- Unassigned Repair Card -->
+          <a href=""
+            class="block p-4 bg-orange-50 border border-orange-200 rounded-lg hover:shadow-md hover:bg-orange-100 transition-all cursor-pointer">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-sm font-medium text-slate-600">In Repair</p>
+              <i class="fa-solid fa-wrench text-orange-500"></i>
+            </div>
+            <p class="text-3xl font-bold text-orange-700"><?= $department['unassigned_count'] ?? 0 ?></p>
+            <p class="text-xs text-slate-500 mt-2">Under maintenance</p>
+          </a>
+
+          <!-- Defective Assets Card -->
+          <a href="/branch/<?= urlencode($branch['branch_name']) ?>/assets?filter=defective"
+            class="block p-4 bg-gray-50 border border-gray-200 rounded-lg hover:shadow-md hover:bg-gray-100 transition-all cursor-pointer">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-sm font-medium text-slate-600">In Repair Assets</p>
+              <i class="fa-solid fa-ban text-gray-500"></i>
+            </div>
+            <p class="text-3xl font-bold text-gray-700"><?= $department['in_repair_count'] ?? 0 ?></p>
+            <p class="text-xs text-slate-500 mt-2">In Repair assets</p>
+          </a>
+
+        </div>
+      <?php endif; ?>
       <div>
         <div>
 
           <table id="departmentEmployeeTable" class="display">
             <thead>
               <tr>
-                <th>Employee Name</th>
+                <th>No</th>
+                <th>Image</th>
+                <th>Assigned To</th>
                 <th>Asset No.</th>
                 <th>Equipment</th>
-                <th>Brand</th>
+                <th>Model</th>
                 <th>Serial No.</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              <?php if (!empty($departmentEmployees)): ?>
+              <?php if (!empty($deparmentAssets)): ?>
 
-                <?php foreach ($departmentEmployees as $employee): ?>
+                <?php foreach ($deparmentAssets as $index => $deparmentAsset): ?>
                   <tr>
-                    <td><?= htmlspecialchars($employee['employee_name']) ?></td>
-                    <td>TRA-01-0002</td>
-                    <td>Desktop Monitor</td>
-                    <td>Acer</td>
-                    <td>01cr23g</td>
-                    <td class="relative">
-                      <i class="fa-solid fa-ellipsis-vertical cursor-pointer select-menu"></i>
-                      <div class="absolute top-5 left-5 mb-2 w-20 bg-white border rounded shadow group-hover:block z-10 hidden menu">
-                        <ul class="text-xs text-slate-700 font-light">
-                          <!-- <li class="px-4 py-2 hover:bg-slate-100 border-b-1">
-                            <a href="/branch/<?= urlencode($branch['branch_name']) ?>" class="cursor-pointer w-full text-left">View</a>
-                          </li> -->
-
-                          <!-- Edit Asset -->
-                          <li class="px-4 py-2 hover:bg-slate-100 border-b-1">
-                            <button class="cursor-pointer block w-full text-left edit-btn" type="button"
-                              data-employee-id="<?= htmlspecialchars($employee['id']) ?>"
-                              data-employee-name="<?= htmlspecialchars($employee['employee_name']) ?>">
-                              Edit
-                            </button>
-                          </li>
-                          <!-- Delete -->
-                          <li class="px-4 py-2 hover:bg-slate-100">
-                            <button class="cursor-pointer w-full text-left delete-btn"
-                              data-employee-id="<?= htmlspecialchars($employee['id']) ?>"
-                              data-employee-name="<?= htmlspecialchars($employee['employee_name']) ?>">
-                              Remove
-                            </button>
-                          </li>
-
-                        </ul>
-                      </div>
+                    <td><?= $index + 1 ?></td>
+                    <td><img src="/<?= !empty($deparmentAsset['photo']) ? htmlspecialchars($deparmentAsset['photo']) : 'uploads/default-photo/laptop-charger.jpg' ?>"
+                        alt="No image available"
+                        class="w-20 h-20 object-cover rounded"></td>
+                    <td><?= htmlspecialchars($deparmentAsset['employee_name'] ?? '-') ?></td>
+                    <td><?= htmlspecialchars($deparmentAsset['asset_number']) ?></td>
+                    <td><?= htmlspecialchars($deparmentAsset['category_name'] ?? 'N/A') ?></td>
+                    <td>
+                      <?= htmlspecialchars($deparmentAsset['manufacturer'] ?? ' ')  ?>
+                      <?= htmlspecialchars($deparmentAsset['model'] ?? '-') ?>
+                    </td>
+                    <td><?= htmlspecialchars($deparmentAsset['serial_number'] ?? '-') ?></td>
+                    <td>
+                      <a href="/manage-hardware/assign-asset/asset-details?id=<?= htmlspecialchars($deparmentAsset['asset_id']) ?>">
+                        <i class="fa-solid fa-eye "></i>
+                      </a>
                     </td>
                   </tr>
                 <?php endforeach; ?>
-              <?php else: ?>
-                <div class="col-span-full text-center py-12">
-                  <div class="text-slate-400 mb-4">
-                    <i class="fa-solid fa-building text-6xl"></i>
-                  </div>
-                  <h3 class="text-lg font-medium text-slate-600 mb-2">Employee added in this department</h3>
-                  <p class="text-slate-500 mb-4">Start by adding your first employee to this department.</p>
-                  <button class="text-red-600 hover:text-red-700 font-medium cursor-pointer" id="add-first-department">
-                    <i class="fa-solid fa-plus mr-2"></i>
-                    Add First Employee
-                  </button>
-                </div>
+
               <?php endif; ?>
             </tbody>
           </table>

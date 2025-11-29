@@ -176,3 +176,23 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
+
+document.querySelector("#branchDepartmentTable").addEventListener("click", function (e) {
+    const clickedRow = e.target.closest("tr");
+
+    if (
+        clickedRow &&
+        !e.target.classList.contains("edit-btn") &&
+        !e.target.classList.contains("delete-btn") &&
+        !e.target.classList.contains("select-menu") &&
+        !e.target.closest(".menu")
+    ) {
+        const branchName = clickedRow.getAttribute("data-branch-name");
+        const departmentName = clickedRow.getAttribute("data-department-name");
+
+        if (branchName && departmentName) {
+            window.location.href =
+                `/branch/${encodeURIComponent(branchName)}/department/${encodeURIComponent(departmentName)}`;
+        }
+    }
+});

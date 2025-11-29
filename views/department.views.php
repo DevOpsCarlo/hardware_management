@@ -23,14 +23,17 @@
         <!-- Header with Back Button -->
         <div class="flex items-center justify-between my-4">
             <div class="flex items-center gap-4">
-                <a href="/branch/<?= htmlspecialchars($branch['branch_name']) ?>" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                <a href="/branch/<?= htmlspecialchars($branch['branch_name']) ?>" class="inline-flex items-center gap-x-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                     <i class="fa-solid fa-arrow-left ml-2"></i>
-                    Back to Branches
+                    Back to <?= htmlspecialchars($branch['branch_name'] ?? ' ') ?> Branch
                 </a>
             </div>
 
-            <button class="text-red-700 border px-2 py-1 text-sm hover:bg-red-700 hover:text-white rounded-sm mr-2 cursor-pointer" id="toggle-department-modal">
-                + Add Department
+            <button class="text-white bg-red-600 border px-3 py-2 text-sm hover:bg-red-700 rounded-sm mr-2 cursor-pointer rounded-xl flex items-center gap-x-1" id="toggle-department-modal">
+                <i class="fa-solid fa-plus"></i>
+                <span class="font-bold text-xs">
+                    New Department
+                </span>
             </button>
         </div>
 
@@ -120,7 +123,10 @@
                         <?php if (!empty($deparmentStats)): ?>
                             <?php $count = 1; ?>
                             <?php foreach ($deparmentStats as $department): ?>
-                                <tr class="border-b">
+                                <tr class="border-b text-xs font-light text-left hover:bg-slate-100 transition duration-150 cursor-pointer"
+                                    data-branch-name="<?= htmlspecialchars($branch['branch_name']) ?>"
+                                    data-department-name="<?= htmlspecialchars($department['department_name']) ?>"
+                                    data-department-id="<?= $department['id'] ?>">
                                     <td><?= $count++ ?></td>
 
                                     <td><?= htmlspecialchars($department['department_name'] ?? 'N/A') ?></td>
