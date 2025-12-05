@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const inputEmployeeName = document.getElementById("input-employee-name");
     const inputEmployeeId = document.getElementById("input-employee-id");
     const optionStatus = document.getElementById("option-status");
-
+    
     // Clear all fields
     modalTitle.textContent = "Add New Employee";
     modalAddBtn.textContent = "Add Employee";
@@ -21,11 +21,13 @@ document.addEventListener("DOMContentLoaded", function () {
     inputEmployeeName.value = "";
     inputEmployeeId.value = "";
     optionStatus.value = "";
-
+    
     // Hide validation messages
     document.getElementById("input-validation").classList.add("hidden");
     document.getElementById("input-validation-status").classList.add("hidden");
-
+     setTimeout(() => {
+    inputEmployeeName.focus();
+  }, 0);
     modal.classList.remove("hidden");
   });
 

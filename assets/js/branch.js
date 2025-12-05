@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   toggleModal.addEventListener("click", () => {
     modal.classList.remove("hidden");
+    const inputBranch = document.getElementById("input-branch");
+    inputBranch.focus();
   });
 
   closeModal.addEventListener("click", () => {

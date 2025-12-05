@@ -36,79 +36,31 @@
       </div>
     </div>
 
-    <h1 class="text-2xl font-extrabold text-red-700 my-3"><?= $branchName ?> Branch</h1>
 
 
 
     <article class="col-span-10 text-sm font-light px-2 pb-5" id="assigned-assets">
-      <!-- Asset Statistics Cards -->
-      <?php if (isset($branchSummary) && $branchSummary): ?>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div class="">
+        <div class="flex justify-between items-center col-span-10 text-sm font-light gap-2 px-4 sticky top-0 shadow-sm py-2 z-10">
+          <h1 class="text-2xl font-extrabold text-red-700 my-3"><?= $branchName ?> Branch</h1>
 
-          <!-- Assigned Assets Card -->
-          <a href="/branch/<?= urlencode($branch['branch_name']) ?>/assets?filter=assigned"
-            class="block p-4 bg-blue-50 border border-blue-200 rounded-lg hover:shadow-md hover:bg-blue-100 transition-all cursor-pointer">
-            <div class="flex items-center justify-between mb-2">
-              <p class="text-sm font-medium text-slate-600">Assigned Assets</p>
-              <i class="fa-solid fa-user text-blue-500"></i>
-            </div>
-            <p class="text-3xl font-bold text-blue-700"><?= $branchSummary['employee_level_assets'] ?? 0 ?></p>
-            <p class="text-xs text-slate-500 mt-2">Assigned to employees</p>
-          </a>
-
-          <!-- Unassigned Assets Card -->
-          <a href="/branch/<?= urlencode($branch['branch_name']) ?>/assets?filter=unassigned"
-            class="block p-4 bg-amber-50 border border-amber-200 rounded-lg hover:shadow-md hover:bg-amber-100 transition-all cursor-pointer">
-            <div class="flex items-center justify-between mb-2">
-              <p class="text-sm font-medium text-slate-600">Unassigned Assets</p>
-              <i class="fa-solid fa-inbox text-amber-500"></i>
-            </div>
-            <p class="text-3xl font-bold text-amber-700"><?= ($branchSummary['branch_level_assets'] ?? 0) + ($branchSummary['department_level_assets'] ?? 0) ?></p>
-            <p class="text-xs text-slate-500 mt-2">Available at branch level</p>
-          </a>
-
-          <!-- In Repair Card -->
-          <a href="/branch/<?= urlencode($branch['branch_name']) ?>/assets?filter=repair"
-            class="block p-4 bg-orange-50 border border-orange-200 rounded-lg hover:shadow-md hover:bg-orange-100 transition-all cursor-pointer">
-            <div class="flex items-center justify-between mb-2">
-              <p class="text-sm font-medium text-slate-600">In Repair</p>
-              <i class="fa-solid fa-wrench text-orange-500"></i>
-            </div>
-            <p class="text-3xl font-bold text-orange-700"><?= $branchSummary['under_maintenance'] ?? 0 ?></p>
-            <p class="text-xs text-slate-500 mt-2">Under maintenance</p>
-          </a>
-
-          <!-- Defective Assets Card -->
-          <a href="/branch/<?= urlencode($branch['branch_name']) ?>/assets?filter=defective"
-            class="block p-4 bg-red-50 border border-red-200 rounded-lg hover:shadow-md hover:bg-red-100 transition-all cursor-pointer">
-            <div class="flex items-center justify-between mb-2">
-              <p class="text-sm font-medium text-slate-600">Defective Assets</p>
-              <i class="fa-solid fa-ban text-red-500"></i>
-            </div>
-            <p class="text-3xl font-bold text-red-700"><?= $branchSummary['defective'] ?? 0 ?></p>
-            <p class="text-xs text-slate-500 mt-2">Uncommitted assets</p>
-          </a>
-
+          <!-- Action Buttons -->
+          <div class="">
+            <button class="text-red-600 border px-3 py-2 text-xs font-bold rounded-xl mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-dept-modal">
+              Assign to Department
+            </button>
+            <button class="text-red-600 border px-3 py-2 text-xs font-bold rounded-xl mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-employee-modal">
+              Assign to Employee
+            </button>
+            <button class="text-amber-600 border px-3 py-2 text-xs font-bold rounded-xl mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-move-branch-modal">
+              Move to Branch
+            </button>
+            <button class="text-orange-600 border px-3 py-2 text-xs font-bold rounded-xl mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-return-employee-modal">
+              Return to Department
+            </button>
+          </div>
         </div>
-      <?php endif; ?>
 
-      <div>
-
-        <!-- Action Buttons -->
-        <div class="col-span-10 text-sm font-light flex justify-end gap-2 px-4 sticky top-0 shadow-sm py-2 z-10">
-          <button class="text-red-600 border px-3 py-2 text-xs font-bold rounded-xl mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-dept-modal">
-            Assign to Department
-          </button>
-          <button class="text-red-600 border px-3 py-2 text-xs font-bold rounded-xl mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-employee-modal">
-            Assign to Employee
-          </button>
-          <button class="text-amber-600 border px-3 py-2 text-xs font-bold rounded-xl mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-move-branch-modal">
-            Move to Branch
-          </button>
-          <button class="text-orange-600 border px-3 py-2 text-xs font-bold rounded-xl mr-2 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed" id="toggle-return-employee-modal">
-            Return to Department
-          </button>
-        </div>
 
         <!-- MODAL 1: Assign to Department -->
         <div class="fixed inset-0 top-0 left-0 bg-black/30 backdrop-blur-xs flex items-center justify-center z-50 hidden" id="assign-dept-modal">
@@ -127,7 +79,8 @@
                   <option value="">-- Select Department --</option>
                   <?php foreach ($departments as $dept): ?>
                     <option value="<?= htmlspecialchars($dept['id']) ?>">
-                      <?= htmlspecialchars($dept['department_name']) ?>
+                      <?= htmlspecialchars_decode($dept['department_name'] ?? '') ?>
+
                     </option>
                   <?php endforeach; ?>
                 </select>
@@ -176,7 +129,7 @@
                   foreach ($employees as $employee): ?>
                     <option value="<?= htmlspecialchars($employee['id']) ?>">
                       <!-- data-branch="htmlspecialchars($employee['branch_id'] ?? '') ?>" -->
-                      <?= htmlspecialchars($employee['employee_name']) ?>
+                      <?= htmlspecialchars(ucwords($employee['employee_name'])) ?>
                     </option>
                   <?php endforeach; ?>
                 </select>
@@ -291,48 +244,57 @@
         <!-- <h2 class="text-2xl font-extrabold text-red-700 my-3">Branch Assets</h2> -->
 
 
-        <!-- Branch Summary Stats -->
+        <!-- Asset Statistics Cards -->
         <?php if (isset($branchSummary) && $branchSummary): ?>
-          <!-- <div class="grid grid-cols-5 gap-4 mb-6">
-            <div class="bg-blue-50 border border-blue-200 rounded p-3">
-              <p class="text-xs text-slate-600 font-medium">Total Assets</p>
-              <p class="text-2xl font-bold text-blue-700"><?= $branchSummary['total_assets'] ?? 0 ?></p>
+          <div class="mt-4 mb-0 px-4 pb-4 ">
+            <div class="flex flex-wrap gap-2 justify-end">
+              <!-- All Assets Button -->
+              <button class="filter-btn px-4 py-2 rounded-md text-xs font-medium border transition-all active cursor-pointer" data-filter="all">
+                <i class="fa-solid fa-list mr-2"></i>
+                All Assets (<?= $branchSummary['total_assets'] ?? 0 ?>)
+              </button>
+
+              <!-- Assigned to Employees -->
+              <button class="filter-btn px-4 py-2 rounded-md text-xs font-medium border transition-all cursor-pointer" data-filter="assigned">
+                <i class="fa-solid fa-user-check mr-2"></i>
+                Assigned (<?= $branchSummary['employee_level_assets'] ?? 0 ?>)
+              </button>
+
+              <!-- Department Level -->
+              <button class="filter-btn px-4 py-2 rounded-md text-xs font-medium border transition-all cursor-pointer" data-filter="department">
+                <i class="fa-solid fa-sitemap mr-2"></i>
+                Department Level (<?= $branchSummary['department_level_assets'] ?? 0 ?>)
+              </button>
+
+              <!-- In Repair -->
+              <button class="filter-btn px-4 py-2 rounded-md text-xs font-medium border transition-all cursor-pointer" data-filter="repair">
+                <i class="fa-solid fa-wrench mr-2"></i>
+                In Repair (<?= $branchSummary['under_maintenance'] ?? 0 ?>)
+              </button>
+
+              <!-- Defective Assets -->
+              <button class="filter-btn px-4 py-2 rounded-md text-xs font-medium border transition-all cursor-pointer" data-filter="defective">
+                <i class="fa-solid fa-ban mr-2"></i>
+                Defective (<?= $branchSummary['defective'] ?? 0 ?>)
+              </button>
+
             </div>
-            <div class="bg-purple-50 border border-purple-200 rounded p-3">
-              <p class="text-xs text-slate-600 font-medium">Branch Level</p>
-              <p class="text-2xl font-bold text-purple-700"><?= $branchSummary['branch_level_assets'] ?? 0 ?></p>
-            </div>
-            <div class="bg-amber-50 border border-amber-200 rounded p-3">
-              <p class="text-xs text-slate-600 font-medium">Department Level</p>
-              <p class="text-2xl font-bold text-amber-700"><?= $branchSummary['department_level_assets'] ?? 0 ?></p>
-            </div>
-            <div class="bg-emerald-50 border border-emerald-200 rounded p-3">
-              <p class="text-xs text-slate-600 font-medium">Employee Assigned</p>
-              <p class="text-2xl font-bold text-emerald-700"><?= $branchSummary['employee_level_assets'] ?? 0 ?></p>
-            </div>
-            <div class="bg-red-50 border border-red-200 rounded p-3">
-              <p class="text-xs text-slate-600 font-medium">Under Maintenance</p>
-              <p class="text-2xl font-bold text-red-700"><?= $branchSummary['under_maintenance'] ?? 0 ?></p>
-            </div>
-          </div> -->
+          </div>
         <?php endif; ?>
 
-
+        <!-- 
         <div class="overflow-x-auto">
           <table id="branchAssetTable" class="row-border text-left w-full hover">
             <thead>
               <tr>
                 <th><input type="checkbox" id="headerCheckbox" class="select-all-checkbox"></th>
-                <!-- <th>No.</th> -->
-                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Image</th>
-                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Model</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Asset</th>
                 <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Category</th>
                 <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Asset No.</th>
                 <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Serial No.</th>
                 <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Department</th>
                 <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Assigned To</th>
                 <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Status</th>
-                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Condition</th>
                 <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Action</th>
               </tr>
             </thead>
@@ -349,43 +311,40 @@
                       <input type="checkbox" name="selected_assets[]" value="<?= htmlspecialchars($asset['asset_id']) ?>" class="asset-checkbox" data-status="<?= htmlspecialchars($asset['status']) ?>"
                         data-department-id="<?= $assetPath['department_id'] ?>">
                     </td>
-                    <!-- <td class="py-3 px-2"><?= $itemCounter++ ?></td> -->
-                    <td class="w-1/12 h-1/12 object-contain px-4 py-3 text-xs text-slate-900 font-normal">
-                      <img
-                        src="/<?= !empty($asset['photo']) ? htmlspecialchars($asset['photo']) : 'uploads/default-photo/laptop-charger.jpg' ?>"
-                        alt="No image available"
-                        class="w-6/12 rounded-full object-contain">
-                    </td>
-                    <td class="py-3 px-2">
-                      <?= htmlspecialchars(ucfirst($asset['manufacturer'] ?? '-')) ?>
-                      /
-                      <?= htmlspecialchars(ucfirst($asset['model'] ?? '-')) ?>
-                    </td>
-                    <td class="py-3 px-2">
-                      <?= htmlspecialchars($asset['category_name'] ?? '-') ?>
-                    </td>
-                    <td class="py-3 px-2">
-                      <?= htmlspecialchars($asset['asset_number'] ?? '-') ?>
-                    </td>
-                    <td class="py-3 px-2">
-                      <?= htmlspecialchars($asset['serial_number'] ?? '-') ?>
-                    </td>
 
-                    <!-- Department Column -->
-                    <td class="py-3 px-2">
-                      <?php if (!empty($assetPath['department_name'])): ?>
-                        <span class="inline-block px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs font-medium">
-                          <?= htmlspecialchars($assetPath['department_name']) ?>
+                    <td class="w-2/12 object-contain px-4 py-3 text-xs text-slate-900 font-normal">
+                      <div class="flex items-center gap-x-2">
+                        <img
+                          src="/<?= !empty($asset['photo']) ? htmlspecialchars($asset['photo']) : 'uploads/default-photo/laptop-charger.jpg' ?>"
+                          alt="No image available"
+                          class="w-2/12 rounded-full object-contain">
+                        <span>
+                          <?= htmlspecialchars(ucfirst($asset['manufacturer'] ?? '—')) ?>
+                          <?= htmlspecialchars(ucfirst($asset['model'] ?? '—')) ?>
                         </span>
-                      <?php else: ?>
-                        <span class="text-slate-400 text-xs">—</span>
-                      <?php endif; ?>
+
+                      </div>
+                    </td>
+                    <td class="py-3 px-2">
+                      <?= htmlspecialchars($asset['category_name'] ?? '—') ?>
+                    </td>
+                    <td class="py-3 px-2 w-1/12 text-blue-500">
+                      <a href="/manage-hardware/assign-asset/asset-details?id=<?= htmlspecialchars($asset['asset_id']) ?>" class="hover:text-blue-700 hover:underline hover:font-bold">
+                        <?= htmlspecialchars($asset['asset_number'] ?? '—') ?>
+                      </a>
+                    </td>
+                    <td class="py-3 px-2">
+                      <?= htmlspecialchars($asset['serial_number'] ?? '—') ?>
                     </td>
 
-                    <!-- Assigned To Column -->
-                    <td class="py-3 px-2">
+                   
+                    <td class="py-3 px-2 italic">
+                      <?= htmlspecialchars_decode($assetPath['department_name'] ?? '—') ?>
+                    </td>
+
+                    <td class="py-3 px-2 font-bold text-xs italic">
                       <?php if (!empty($assetPath['employee_name'])): ?>
-                        <?= htmlspecialchars($assetPath['employee_name']) ?>
+                        <?= htmlspecialchars(ucwords($assetPath['employee_name'])) ?>
                       <?php else: ?>
                         <span class="text-slate-400 text-xs">—</span>
                       <?php endif; ?>
@@ -393,26 +352,26 @@
 
                     <?php
                     $statusClassMap = [
-                      'Branch Assigned' => 'text-emerald-700 bg-emerald-100',
-                      'Department Assigned' => 'text-amber-700 bg-amber-100',
-                      'Employee Assigned' => 'text-blue-700 bg-blue-100',
-                      'Assigned' => 'text-blue-500 bg-blue-100',
-                      'Under Maintenance' => 'text-orange-500 bg-orange-100',
-                      'Uncommitted' => 'text-red-700 bg-red-100'
+                      'Branch Assigned' => 'text-emerald-700 bg-emerald-50 border border-emerald-200',
+                      'Department Assigned' => 'text-amber-700 bg-amber-50 border border-amber-200',
+                      'Employee Assigned' => 'text-blue-700 bg-blue-50 border border-blue-200',
+                      'Assigned' => 'text-blue-700 bg-blue-50 border border-blue-200',
+                      'Under Maintenance' => 'text-orange-700 bg-orange-50 border border-orange-200',
+                      'Uncommitted' => 'text-red-700 bg-red-50 border border-red-200'
 
                     ];
                     $currentStatus = $asset['status'] ?? '-';
                     $statusClass = $statusClassMap[$currentStatus] ?? 'text-gray-500 bg-gray-100';
                     ?>
 
-                    <!-- Status Column -->
+                   
                     <td class="py-3 px-2">
-                      <span class="inline-block px-2 py-1 rounded text-xs font-semibold <?= $statusClass ?>">
+                      <span class="px-3 py-1 rounded-full text-xs font-semibold inline-block <?= $statusClass ?>">
                         <?php
                         $statusDisplay = [
                           'Available' => 'Available',
                           'Branch Assigned' => 'Available',
-                          'Department Assigned' => 'Department Assigned',
+                          'Department Assigned' => 'Dept Assigned',
                           'Employee Assigned' => 'Assigned',
                           'Under Maintenance' => 'Under Maintenance',
                           'Defective' => 'Defective',
@@ -424,9 +383,7 @@
                       </span>
                     </td>
 
-                    <td class="py-3 px-2">
-                      <?= htmlspecialchars($asset['conditions'] ?? '-') ?>
-                    </td>
+                
 
                     <td class="py-3 px-2 relative">
                       <a href="/manage-hardware/assign-asset/asset-details?id=<?= htmlspecialchars($asset['asset_id']) ?>">
@@ -439,13 +396,182 @@
               <?php endif; ?>
             </tbody>
           </table>
+        </div> -->
+        <div class="overflow-x-auto">
+          <table id="branchAssetTable" class="row-border text-left w-full hover">
+            <thead>
+              <tr>
+                <th><input type="checkbox" id="headerCheckbox" class="select-all-checkbox"></th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Asset</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Category</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Asset No.</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Serial No.</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Department</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Assigned To</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Status</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Action</th>
+              </tr>
+            </thead>
+            <tbody class="text-sm font-light">
+              <?php if (!empty($assets)): ?>
+                <?php foreach ($assets as $asset):
+                  $assetPath = getAssetAssignmentPath($pdo, $asset['asset_id']);
+                ?>
+                  <tr class="text-xs font-light text-left border-b hover:bg-slate-50 asset-row" data-status="<?= htmlspecialchars($asset['status']) ?>">
+                    <td class="py-3 px-2">
+                      <input type="checkbox" name="selected_assets[]" value="<?= htmlspecialchars($asset['asset_id']) ?>" class="asset-checkbox" data-status="<?= htmlspecialchars($asset['status']) ?>"
+                        data-department-id="<?= $assetPath['department_id'] ?>">
+                    </td>
+
+                    <td class="w-2/12 object-contain px-4 py-3 text-xs text-slate-900 font-normal">
+                      <div class="flex items-center gap-x-2">
+                        <img
+                          src="/<?= !empty($asset['photo']) ? htmlspecialchars($asset['photo']) : 'uploads/default-photo/laptop-charger.jpg' ?>"
+                          alt="No image available"
+                          class="w-2/12 rounded-full object-contain">
+                        <span>
+                          <?= htmlspecialchars(ucfirst($asset['manufacturer'] ?? '—')) ?>
+                          <?= htmlspecialchars(ucfirst($asset['model'] ?? '—')) ?>
+                        </span>
+                      </div>
+                    </td>
+                    <td class="py-3 px-2">
+                      <?= htmlspecialchars($asset['category_name'] ?? '—') ?>
+                    </td>
+                    <td class="py-3 px-2 w-1/12 text-blue-500">
+                      <a href="/manage-hardware/assign-asset/asset-details?id=<?= htmlspecialchars($asset['asset_id']) ?>" class="hover:text-blue-700 hover:underline hover:font-bold">
+                        <?= htmlspecialchars($asset['asset_number'] ?? '—') ?>
+                      </a>
+                    </td>
+                    <td class="py-3 px-2">
+                      <?= htmlspecialchars($asset['serial_number'] ?? '—') ?>
+                    </td>
+
+                    <!-- Department Column -->
+                    <td class="py-3 px-2 italic">
+                      <?= htmlspecialchars_decode($assetPath['department_name'] ?? '—') ?>
+                    </td>
+
+                    <!-- Assigned To Column -->
+                    <td class="py-3 px-2 font-bold text-xs italic">
+                      <?php if (!empty($assetPath['employee_name'])): ?>
+                        <?= htmlspecialchars(ucwords($assetPath['employee_name'])) ?>
+                      <?php else: ?>
+                        <span class="text-slate-400 text-xs">—</span>
+                      <?php endif; ?>
+                    </td>
+
+                    <?php
+                    $statusClassMap = [
+                      'Branch Assigned' => 'text-emerald-700 bg-emerald-50 border border-emerald-200',
+                      'Department Assigned' => 'text-amber-700 bg-amber-50 border border-amber-200',
+                      'Employee Assigned' => 'text-blue-700 bg-blue-50 border border-blue-200',
+                      'Assigned' => 'text-blue-700 bg-blue-50 border border-blue-200',
+                      'Under Maintenance' => 'text-orange-700 bg-orange-50 border border-orange-200',
+                      'Uncommitted' => 'text-red-700 bg-red-50 border border-red-200'
+                    ];
+                    $currentStatus = $asset['status'] ?? '-';
+                    $statusClass = $statusClassMap[$currentStatus] ?? 'text-gray-500 bg-gray-100';
+                    ?>
+
+                    <!-- Status Column -->
+                    <td class="py-3 px-2">
+                      <span class="px-3 py-1 rounded-full text-xs font-semibold inline-block <?= $statusClass ?>">
+                        <?php
+                        $statusDisplay = [
+                          'Available' => 'Available',
+                          'Branch Assigned' => 'Available',
+                          'Department Assigned' => 'Dept Assigned',
+                          'Employee Assigned' => 'Assigned',
+                          'Under Maintenance' => 'Under Maintenance',
+                          'Defective' => 'Defective',
+                          'Uncommitted' => 'Uncommitted'
+                        ];
+                        echo htmlspecialchars($statusDisplay[$currentStatus] ?? $currentStatus);
+                        ?>
+                      </span>
+                    </td>
+
+                    <td class="py-3 px-2 relative">
+                      <a href="/manage-hardware/assign-asset/asset-details?id=<?= htmlspecialchars($asset['asset_id']) ?>">
+                        <i class="fa-solid fa-eye"></i>
+                      </a>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            </tbody>
+          </table>
         </div>
+
       </div>
     </article>
 
   </section>
 </main>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    let table = $('#branchAssetTable').DataTable();
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    let currentFilter = 'all';
 
+    // Custom filter function for DataTables
+    $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+      const row = table.row(dataIndex).node();
+      const status = row.getAttribute('data-status');
+
+      if (currentFilter === 'all') {
+        return true;
+      } else if (currentFilter === 'assigned') {
+        return status === 'Employee Assigned';
+      } else if (currentFilter === 'department') {
+        return status === 'Department Assigned';
+      } else if (currentFilter === 'repair') {
+        return status === 'Under Maintenance';
+      } else if (currentFilter === 'defective') {
+        return status === 'Uncommitted';
+      }
+      return true;
+    });
+
+    // Filter button click handler
+    filterButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        currentFilter = this.getAttribute('data-filter');
+
+        // Update active button styling
+        filterButtons.forEach(btn => {
+          btn.classList.remove('active', 'bg-blue-700', 'text-white', 'border-blue-700');
+          btn.classList.add('bg-white', 'text-slate-700', 'border-slate-300');
+        });
+
+        this.classList.add('active', 'bg-blue-700', 'text-white', 'border-blue-700');
+        this.classList.remove('bg-white', 'text-slate-700', 'border-slate-300');
+
+        // Redraw DataTable with new filter
+        table.draw();
+      });
+    });
+  });
+</script>
+
+<style>
+  .filter-btn {
+    background-color: white;
+    color: #374151;
+    border-color: #e2e8f0;
+  }
+
+  .filter-btn.active {
+    background-color: #fb2c36;
+    color: white;
+    border-color: #c10007;
+  }
+
+  .filter-btn:hover {
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  }
+</style>
 
 <script src="/assets/js/branch-detail.js"></script>
 <?php require("views/partials/footer.php") ?>

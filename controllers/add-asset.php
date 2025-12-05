@@ -1,65 +1,63 @@
+
 <?php
+// IMPORTANT: This MUST be the very first line of the file - no whitespace or content before it
 $pageTitle = 'Add Asset';
 
-$chargerCategory = fetchLaptopChargerId($pdo);
+// Handle all POST requests first, before any output or includes
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Process deletion
+    if (isset($_POST['action']) && $_POST['action'] === 'Delete Asset') {
+        header('Content-Type: application/json');
 
-if ($chargerCategory) {
-    $chargerCategoryId = $chargerCategory['id'];
-}
+        $assetId = $_POST['asset_id'] ?? null;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'Delete Asset') {
-    header('Content-Type: application/json');
+        error_log("Delete request received for asset ID: " . $assetId);
 
-    $assetId = $_POST['asset_id'] ?? null;
-
-    error_log("Delete request received for asset ID: " . $assetId);
-
-    if (!$assetId || !is_numeric($assetId)) {
-        http_response_code(400);
-        echo json_encode(['success' => false, 'message' => 'Invalid asset ID for deletion.']);
-        exit;
-    }
-
-    try {
-        $pdo->beginTransaction();
-
-        // First, delete from asset_branch_assignment_history (child table)
-        $stmt = $pdo->prepare("DELETE FROM asset_branch_assignment_history WHERE asset_id = ?");
-        $stmt->execute([$assetId]);
-        error_log("Deleted from asset_branch_assignment_history. Rows affected: " . $stmt->rowCount());
-
-        // Then delete from asset_employee_assignment_history (if it exists and has foreign key)
-        $stmt = $pdo->prepare("DELETE FROM assignment_history WHERE asset_id = ?");
-        $stmt->execute([$assetId]);
-        error_log("Deleted from asset_employee_assignment_history. Rows affected: " . $stmt->rowCount());
-
-        // Finally, delete the asset itself
-        $stmt = $pdo->prepare("DELETE FROM asset WHERE id = ?");
-        $result = $stmt->execute([$assetId]);
-
-        error_log("Delete asset executed. Rows affected: " . $stmt->rowCount());
-
-        if ($stmt->rowCount() > 0) {
-            $pdo->commit();
-            echo json_encode(['success' => true, 'message' => 'Asset deleted successfully.']);
-            exit;
-        } else {
-            $pdo->rollback();
-            http_response_code(404);
-            echo json_encode(['success' => false, 'message' => 'Asset not found.']);
+        if (!$assetId || !is_numeric($assetId)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Invalid asset ID for deletion.']);
             exit;
         }
-    } catch (Exception $e) {
-        $pdo->rollback();
-        error_log("Delete error: " . $e->getMessage());
-        http_response_code(500);
-        echo json_encode(['success' => false, 'message' => 'Failed to delete asset: ' . $e->getMessage()]);
-        exit;
+
+        try {
+            $pdo->beginTransaction();
+
+            // First, delete from asset_branch_assignment_history (child table)
+            $stmt = $pdo->prepare("DELETE FROM asset_branch_assignment_history WHERE asset_id = ?");
+            $stmt->execute([$assetId]);
+            error_log("Deleted from asset_branch_assignment_history. Rows affected: " . $stmt->rowCount());
+
+            // Then delete from asset_employee_assignment_history (if it exists and has foreign key)
+            $stmt = $pdo->prepare("DELETE FROM assignment_history WHERE asset_id = ?");
+            $stmt->execute([$assetId]);
+            error_log("Deleted from asset_employee_assignment_history. Rows affected: " . $stmt->rowCount());
+
+            // Finally, delete the asset itself
+            $stmt = $pdo->prepare("DELETE FROM asset WHERE id = ?");
+            $result = $stmt->execute([$assetId]);
+
+            error_log("Delete asset executed. Rows affected: " . $stmt->rowCount());
+
+            if ($stmt->rowCount() > 0) {
+                $pdo->commit();
+                echo json_encode(['success' => true, 'message' => 'Asset deleted successfully.']);
+                exit;
+            } else {
+                $pdo->rollback();
+                http_response_code(404);
+                echo json_encode(['success' => false, 'message' => 'Asset not found.']);
+                exit;
+            }
+        } catch (Exception $e) {
+            $pdo->rollback();
+            error_log("Delete error: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Failed to delete asset: ' . $e->getMessage()]);
+            exit;
+        }
     }
-}
 
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Process add/update asset
     try {
         $pdo->beginTransaction();
 
@@ -77,9 +75,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Validation
         $errors = [];
 
-        if (empty($serialNumber)) {
-            $errors['serial'] = 'Serial number is required';
-        } else {
+        // Serial number is now optional - only validate if provided
+        if (!empty($serialNumber)) {
             // Check if serial number already exists for different asset
             $stmt = $pdo->prepare("SELECT id FROM asset WHERE serial_number = ? AND id != ?");
             $stmt->execute([$serialNumber, $assetId]);
@@ -113,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([
                 $inventoryId,
                 $assetNumber,
-                $serialNumber,
+                !empty($serialNumber) ? $serialNumber : null,
                 $ipAddress ?: null,
                 $condition,
                 $status
@@ -124,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 UPDATE asset SET serial_number = ?, ip_address = ?, conditions = ?, status = ?, updated_at = NOW() WHERE id = ?
             ");
             $stmt->execute([
-                $serialNumber,
+                !empty($serialNumber) ? $serialNumber : null,
                 $ipAddress ?: null,
                 $condition,
                 $status,
@@ -152,6 +149,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+// Fetch data after all header operations are complete
+$chargerCategory = fetchLaptopChargerId($pdo);
+
+if ($chargerCategory) {
+    $chargerCategoryId = $chargerCategory['id'];
+}
+
 $assets = fetchAssetsWithInventoryAndCategory($pdo);
 $assetsByInventory = [];
 foreach ($assets as $asset) {
@@ -162,4 +166,8 @@ foreach ($assets as $asset) {
     $assetsByInventory[$invId][] = $asset;
 }
 $inventories = fetchInventoryWithCategory($pdo);
+
+// dd($assets);
+// NOW load the view (output can happen after this)
 require("views/add-asset.views.php");
+?>

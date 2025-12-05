@@ -70,7 +70,7 @@
                   <tr class="text-xs font-light text-left">
                     <td><?= $index + 1 ?></td>
                     <!-- <td>htmlspecialchars($employee['employee_code'] ?? "Empty")</td> -->
-                    <td><?= htmlspecialchars($employee['employee_name'] ?? "Empty") ?></td>
+                    <td><?= htmlspecialchars(ucwords($employee['employee_name'] ?? "Empty")) ?></td>
 
                     <?php
                     $statusClassMap = [

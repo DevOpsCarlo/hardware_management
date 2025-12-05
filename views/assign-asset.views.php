@@ -60,7 +60,7 @@
               <option value="">-- Select Branch --</option>
               <?php foreach ($branches as $branch): ?>
                 <option value="<?= htmlspecialchars($branch['id']) ?>">
-                  <?= htmlspecialchars($branch['branch_name']) ?>
+                  <?= ucwords(htmlspecialchars($branch['branch_name'])) ?>
                 </option>
               <?php endforeach; ?>
             </select>
@@ -208,12 +208,13 @@
           <tr>
             <th><input type="checkbox" id="headerCheckbox" class="select-all-checkbox"></th>
             <!-- <th>No.</th> -->
-            <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Image</th>
-            <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Model</th>
+            <!-- <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Image</th> -->
+            <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Asset</th>
             <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Category</th>
             <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Asset No.</th>
             <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Serial No.</th>
             <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Status</th>
+            <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Conditions</th>
             <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Assigned At</th>
             <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Assigned To</th>
             <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Action</th>
@@ -229,34 +230,41 @@
                   <input type="checkbox" name="selected_assets[]" value="<?= htmlspecialchars($asset['asset_id']) ?>" class="asset-checkbox" data-status="<?= htmlspecialchars($asset['status']) ?>">
                 </td>
                 <!-- <td><?= $itemCounter++ ?></td> -->
-                <td class="w-1/12 h-1/12 object-contain px-4 py-3 text-xs text-slate-900 font-normal">
-                  <img src="/<?= htmlspecialchars($asset['photo'] ?? 'uploads/default-photo/laptop-charger.jpg') ?>" alt="" class="w-6/12 rounded-full object-contain">
+
+                <td class="w-2/12 object-contain px-4 py-3 text-xs text-slate-900 font-normal">
+                  <div class="flex items-center gap-x-2">
+                    <img src="/<?= htmlspecialchars($asset['photo'] ?? 'uploads/default-photo/laptop-charger.jpg') ?>" alt="" class="w-2/12 rounded-full object-contain">
+                    <span>
+                      <?= htmlspecialchars(ucfirst($asset['manufacturer'] ?? '—')) ?> <?= htmlspecialchars(ucfirst($asset['model'] ?? '')) ?>
+                    </span>
+
+                  </div>
+
                 </td>
-                <td><?= htmlspecialchars(ucfirst($asset['manufacturer'] ?? 'N/A')) ?> / <?= htmlspecialchars(ucfirst($asset['model'] ?? 'N/A')) ?></td>
-                <td><?= htmlspecialchars(ucfirst($asset['category_name'] ?? 'Empty')) ?></td>
-                <td><?= htmlspecialchars($asset['asset_number'] ?? 'Empty') ?></td>
-                <td><?= htmlspecialchars($asset['serial_number'] ?? 'Empty') ?></td>
+                <td><?= htmlspecialchars(ucfirst($asset['category_name'] ?? '—')) ?></td>
+                <td><?= htmlspecialchars($asset['asset_number'] ?? '—') ?></td>
+                <td class="w-1/12"><?= htmlspecialchars($asset['serial_number'] ?? '—') ?></td>
                 <?php
                 $statusClassMap = [
-                  'Available' => 'text-emerald-500 bg-emerald-100',
-                  'Branch Assigned' => 'text-blue-500 bg-blue-100',
-                  'Employee Assigned' => 'text-blue-500 bg-blue-100',
-                  'Department Assigned' => 'text-amber-500 bg-amber-100',
-                  'Surrender' => 'text-orange-500 bg-orange-100',
-                  'Under Maintenance' => 'text-orange-500 bg-orange-100',
-                  'Defective' => 'text-red-500 bg-red-100',
-                  'Uncommitted' => 'text-red-500 bg-red-100'
+                  'Available' => 'text-emerald-700 bg-emerald-50 border border-emerald-200',
+                  'Branch Assigned' => 'text-blue-700 bg-blue-50 border border-blue-200',
+                  'Employee Assigned' => 'text-blue-700 bg-blue-50 border border-blue-200',
+                  'Surrender' => 'text-orange-700 bg-orange-50 border border-orange-200',
+                  'Under Maintenance' => 'text-orange-700 bg-orange-50 border border-orange-200',
+                  'Department Assigned' => 'text-amber-700 bg-amber-50 border border-amber-200',
+                  'Uncommitted' => 'text-red-700 bg-red-50 border border-red-200'
                 ];
                 $currentStatus = $asset['status'] ?? '-';
                 $statusClass = $statusClassMap[$currentStatus] ?? 'text-gray-500 bg-gray-100';
                 ?>
                 <td>
-                  <span class="inline-block px-2 py-1 rounded text-xs font-semibold <?= $statusClass ?>">
+                  <span class="px-3 py-1 rounded-full text-xs font-semibold inline-block <?= $statusClass ?>">
                     <?= htmlspecialchars($currentStatus) ?>
                   </span>
                 </td>
-                <td><?= htmlspecialchars($asset['branch_name'] ?? '-') ?></td>
-                <td><?= htmlspecialchars($asset['assigned_employee_name'] ?? '-') ?></td>
+                <td><?= htmlspecialchars($asset['conditions'] ?? '—') ?></td>
+                <td><?= ucwords(htmlspecialchars($asset['branch_name'] ?? '—')) ?></td>
+                <td><?= htmlspecialchars($asset['assigned_employee_name'] ?? '—') ?></td>
                 <td>
                   <a href="/manage-hardware/assign-asset/asset-details?id=<?= htmlspecialchars($asset['asset_id']) ?>">
                     <i class="fa-solid fa-eye"></i>

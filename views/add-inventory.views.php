@@ -248,8 +248,8 @@
               <thead>
                 <tr>
                   <!-- <th>No.</th> -->
-                  <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Image</th>
-                  <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Model</th>
+                  <!-- <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Image</th> -->
+                  <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Asset</th>
                   <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Category</th>
                   <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Quantity</th>
                   <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Action</th>
@@ -260,21 +260,30 @@
                 <?php foreach ($inventories as $index => $inventory): ?>
                   <tr>
                     <!-- <td><?= $index + 1 ?></td> -->
-                    <td class="w-1/12 h-1/12 object-contain px-4 py-3 text-xs text-slate-900 font-normal">
-                      <?php
-                      // Ensure photos field is not null or empty before calling explode
-                      $photos = !empty($inventory['photos']) ? explode(',', $inventory['photos']) : [];
-                      $photo = !empty($photos) ? $photos[0] : ''; // Use the first photo if available
-                      ?>
-                      <?php if ($photo): ?>
-                        <img src="/<?= htmlspecialchars(ucfirst($photo)) ?>" alt="" class="w-6/12 rounded-full object-contain">
-                      <?php else: ?>
-                        <img src="/uploads/default-photo/laptop-charger.jpg" alt="No image available" class="w-6/12 rounded-full object-contain">
-                      <?php endif; ?>
-                    </td>
-                    <td class="px-4 text-xs text-slate-900 font-normal">
+                    <td class="w-3/12 object-contain px-4 py-3 text-xs text-slate-900 font-normal">
 
-                      <?= htmlspecialchars(ucfirst($inventory['manufacturer'])) ?> <?= htmlspecialchars(ucfirst($inventory['model'])) ?> </td>
+                      <div class="flex items-center gap-x-2">
+                        <?php
+                        $photo = $inventory['photos'];
+                        $firstPhoto = '';
+
+                        if (!empty($photo)) {
+                          $photoArray = explode(',', $photo);
+                          $firstPhoto = trim($photoArray[0]);   // get first image only
+                        }
+                        ?>
+                        <img
+                          src="/<?= !empty($firstPhoto) ? htmlspecialchars($firstPhoto) : 'uploads/default-photo/laptop-charger.jpg' ?>"
+                          alt="No image available"
+                          class="w-2/12 rounded-full object-contain">
+                        <span>
+                          <?= htmlspecialchars(ucfirst($inventory['manufacturer'])) ?> <?= htmlspecialchars(ucfirst($inventory['model'])) ?>
+                        </span>
+                      </div>
+
+                    </td>
+
+
                     <td class="px-4 text-xs text-slate-900 font-normal"><?= htmlspecialchars(ucfirst($inventory['category_name'] ?? "Laptop charger")) ?></td>
                     <td class="px-4 text-xs text-slate-900 font-normal"><?= htmlspecialchars($inventory['total_quantity']) ?></td>
                     <td class="relative px-4 text-xs text-slate-900 font-normal">

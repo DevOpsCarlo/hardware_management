@@ -28,9 +28,9 @@
     <article class="px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
 
       <!-- Total Hardware -->
-      <a href="/manage-hardware/add-asset" class="block p-4 bg-cyan-50 border border-cyan-200 rounded-lg hover:shadow-md hover:bg-cyan-100 transition-all cursor-pointer">
+      <a href="/dashboard-filter?type=total" class="block p-4 bg-cyan-50 border border-cyan-200 rounded-lg hover:shadow-md hover:bg-cyan-100 transition-all cursor-pointer">
         <div class="flex items-center justify-between mb-2">
-          <p class="text-sm font-medium text-slate-600">Total Hardware</p>
+          <p class="text-sm font-medium text-slate-600">Total Asset</p>
           <i class="fa-solid fa-server text-slate-500"></i>
         </div>
         <p class="text-3xl font-bold text-slate-700"><?= $stats['total_assets'] ?? 0 ?></p>
@@ -38,7 +38,7 @@
       </a>
 
       <!-- Assigned Assets (Combined) -->
-      <a href="" class="block p-4 bg-blue-50 border border-blue-200 rounded-lg hover:shadow-md hover:bg-blue-100 transition-all cursor-pointer">
+      <a href="/dashboard-filter?type=assigned" class="block p-4 bg-blue-50 border border-blue-200 rounded-lg hover:shadow-md hover:bg-blue-100 transition-all cursor-pointer">
         <div class="flex items-center justify-between mb-2">
           <p class="text-sm font-medium text-slate-600">Assigned Assets</p>
           <i class="fa-solid fa-chalkboard-user text-blue-500"></i>
@@ -48,7 +48,7 @@
       </a>
 
       <!-- Available Devices -->
-      <a href="" class="block p-4 bg-green-50 border border-green-200 rounded-lg hover:shadow-md hover:bg-green-100 transition-all cursor-pointer">
+      <a href="/dashboard-filter?type=available" class="block p-4 bg-green-50 border border-green-200 rounded-lg hover:shadow-md hover:bg-green-100 transition-all cursor-pointer">
         <div class="flex items-center justify-between mb-2">
           <p class="text-sm font-medium text-slate-600">Available</p>
           <i class="fa-solid fa-inbox text-green-500"></i>
@@ -58,7 +58,7 @@
       </a>
 
       <!-- In Maintenance -->
-      <a href="" class="block p-4 bg-orange-50 border border-orange-200 rounded-lg hover:shadow-md hover:bg-orange-100 transition-all cursor-pointer">
+      <a href="/dashboard-filter?type=maintenance" class="block p-4 bg-orange-50 border border-orange-200 rounded-lg hover:shadow-md hover:bg-orange-100 transition-all cursor-pointer">
         <div class="flex items-center justify-between mb-2">
           <p class="text-sm font-medium text-slate-600">In Maintenance</p>
           <i class="fa-solid fa-wrench text-orange-500"></i>
@@ -68,7 +68,7 @@
       </a>
 
       <!-- Defective Assets -->
-      <a href="" class="block p-4 bg-red-50 border border-red-200 rounded-lg hover:shadow-md hover:bg-red-100 transition-all cursor-pointer">
+      <a href="/dashboard-filter?type=defective" class="block p-4 bg-red-50 border border-red-200 rounded-lg hover:shadow-md hover:bg-red-100 transition-all cursor-pointer">
         <div class="flex items-center justify-between mb-2">
           <p class="text-sm font-medium text-slate-600">Defective Assets</p>
           <i class="fa-solid fa-ban text-red-500"></i>

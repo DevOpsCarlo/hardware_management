@@ -20,12 +20,21 @@ unset($_SESSION['category_error'], $_SESSION['category_form_data'], $_SESSION['c
       <div>
         <h2 class="text-2xl font-extrabold text-red-700 ml-6">Category List</h2>
       </div>
-      <button class="flex items-center text-white bg-red-600 border px-3 py-2 text-sm hover:bg-red-700 hover:text-white rounded-xl flex items-center gap-x-1 mr-6 cursor-pointer" id="add-category-btn">
-        <i class="fa-solid fa-plus"></i>
-        <span class="font-bold text-xs">
-          New Category
+      <?php
+      $isAdmin = hasRole("admin");
+      ?>
+      <?php if ($isAdmin): ?>
+        <button class="flex items-center text-white bg-red-600 border px-3 py-2 text-sm hover:bg-red-700 hover:text-white rounded-xl flex items-center gap-x-1 mr-6 cursor-pointer" id="add-category-btn">
+          <i class="fa-solid fa-plus"></i>
+          <span class="font-bold text-xs">
+            New Category
+          </span>
+        </button>
+      <?php else: ?>
+        <span class="text-xs rounded-full text-slate-400 disabled border px-3 py-1">
+          Admin Only
         </span>
-      </button>
+      <?php endif; ?>
     </div>
     <article class="mt-6 px-6 text-2xl font-bold text-slate-800 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
@@ -121,8 +130,8 @@ unset($_SESSION['category_error'], $_SESSION['category_form_data'], $_SESSION['c
 
               </div>
             <?php else: ?>
-              <table id="categoryTable" class="row-border text-left w-full">
-                <thead>
+              <table id="categoryTable" class="row-border text-left w-full hover">
+                <thead class="bg-slate-50 border-b border-slate-200">
                   <tr>
                     <!-- <th class="px-4 py-3 text-left text-sm font-semibold text-slate-700">No.</th> -->
                     <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Category</th>
@@ -139,9 +148,15 @@ unset($_SESSION['category_error'], $_SESSION['category_form_data'], $_SESSION['c
                         <i class="fa-solid fa-ellipsis-vertical cursor-pointer select-option"></i>
                         <div class="absolute top-3 left-5 mt-2 w-20 bg-white border rounded shadow group-hover:block z-10 hidden options">
                           <ul class="text-xs text-slate-700 font-light ">
-                            <li class="px-4 py-2 hover:bg-slate-100 border-b-1"><button class="cursor-pointer block w-full text-left edit-category-btn" data-id="<?= $category['category_id'] ?>" data-name="<?= htmlspecialchars($category['category_name']) ?>">Edit</button></li>
-                            <li class="px-4 py-2 hover:bg-slate-100 border-b-1"><button class="cursor-pointer w-full text-left delete-category-btn" data-name="<?= htmlspecialchars($category['category_name']) ?>" data-id="<?= $category['category_id'] ?>">Delete</button></li>
-                            <li class="px-4 py-2 hover:bg-slate-100"><a href="/view" class="cursor-pointer w-full text-left">View</a></li>
+                            <?php if ($isAdmin): ?>
+                              <li class="px-4 py-2 hover:bg-slate-100 border-b-1"><button class="cursor-pointer block w-full text-left edit-category-btn" data-id="<?= $category['category_id'] ?>" data-name="<?= htmlspecialchars($category['category_name']) ?>">Edit</button></li>
+                              <li class="px-4 py-2 hover:bg-slate-100 border-b-1"><button class="cursor-pointer w-full text-left delete-category-btn" data-name="<?= htmlspecialchars($category['category_name']) ?>" data-id="<?= $category['category_id'] ?>">Delete</button></li>
+                              <li class="px-4 py-2 hover:bg-slate-100"><a href="/view" class="cursor-pointer w-full text-left">View</a></li>
+                            <?php else: ?>
+                              <li class="px-4 py-2 text-slate-400">
+                                <span class="text-xs">Admin only</span>
+                              </li>
+                            <?php endif; ?>
                           </ul>
                         </div>
                       </td>

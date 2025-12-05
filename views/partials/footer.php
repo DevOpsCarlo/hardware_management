@@ -19,6 +19,7 @@
   let departmentTableSection = new DataTable('#branchDepartmentTable');
   let branchAssetTable = new DataTable('#branchAssetTable');
   let recentAssignmentTable = new DataTable('#recentAssignmentTable');
+  let dashboardFilterTable = new DataTable('#dashboardFilterTable');
   let assetTable = new DataTable("#assetTable", {
     scrollY: '560px',
     scrollCollapse: true,

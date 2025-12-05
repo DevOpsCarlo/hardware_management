@@ -12,7 +12,8 @@ $department = getDepartmentByName($pdo, $branch['id'], $departmentName);
 $employees = getEmployeesByDepartment($pdo, $department['id']);
 $deparmentStats = fetchDepartmentsWithAssetStats($pdo, $branch['id']);
 // Fetch all assets for this department
+$departmentStats = getDepartmentAssetStats($pdo, $department['id']);
 $deparmentAssets = getDepartmentAssets($pdo, $department['id']);
 
-// dd($deparmentAssets);
+// dd($departmentStats);
 require("views/department-detail.views.php");

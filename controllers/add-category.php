@@ -1,4 +1,5 @@
 <?php
+require("auth.php");
 $pageTitle = 'Add Category';
 
 

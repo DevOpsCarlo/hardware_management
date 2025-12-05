@@ -27,7 +27,7 @@ function getDashboardAssetStats($pdo)
         SUM(CASE WHEN status = 'Employee Assigned' THEN 1 ELSE 0 END) as employee_assigned,
         SUM(CASE WHEN status = 'Branch Assigned' THEN 1 ELSE 0 END) as branch_assigned,
         SUM(CASE WHEN status = 'Department Assigned' THEN 1 ELSE 0 END) as department_assigned,
-        SUM(CASE WHEN status IN ('Available', 'Uncommitted') THEN 1 ELSE 0 END) as available,
+        SUM(CASE WHEN status IN ('Available') THEN 1 ELSE 0 END) as available,
         SUM(CASE WHEN status = 'Under Maintenance' THEN 1 ELSE 0 END) as under_maintenance,
         SUM(CASE WHEN status = 'Uncommitted' THEN 1 ELSE 0 END) as uncommitted
       FROM asset
@@ -240,7 +240,7 @@ function fetchInventoryWithCategory($pdo)
             categories.name AS category_name
         FROM inventory
         INNER JOIN categories ON inventory.category_id = categories.id
-        ORDER BY inventory.manufacturer ASC
+        ORDER BY categories.name ASC, inventory.manufacturer ASC
     ");
   $stmt->execute();
   return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -283,6 +283,202 @@ function fetchAssetsWithInventoryAndCategory($pdo)
   return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+function fetchInventoryExpanded($pdo)
+{
+  $query = "
+    SELECT 
+      i.id as inventory_id,
+      i.manufacturer,
+      i.model,
+      i.photo,
+      i.quantity,
+      i.purchase_date,
+      i.warranty_years,
+      i.category_id,
+      c.name as category_name,
+      i.created_at,
+      i.updated_at,
+      a.id AS asset_id,
+      a.asset_number,
+      a.serial_number,
+      a.ip_address,
+      a.conditions,
+      a.status,
+      a.related_laptop_id,
+      a.assigned_to_branch,
+      a.assigned_to,
+      a.assigned_department_id,
+      a.created_at AS asset_created_at,
+      a.updated_at AS asset_updated_at,
+      e.employee_name as assigned_employee_name,
+      e.id as assigned_employee_id,
+      b.branch_name,
+      b.id as branch_id,
+      d.department_name,
+      d.id as department_id
+    FROM inventory i
+    LEFT JOIN categories c ON i.category_id = c.id
+    LEFT JOIN asset a ON i.id = a.inventory_id
+    LEFT JOIN employee e ON a.assigned_to = e.id
+    LEFT JOIN branch b ON a.assigned_to_branch = b.id
+    LEFT JOIN departments d ON a.assigned_department_id = d.id
+    ORDER BY 
+      CASE 
+        WHEN a.asset_number IS NULL OR a.asset_number = '' OR a.asset_number = '-' THEN 1 
+        ELSE 0 
+      END ASC,
+      a.asset_number ASC
+  ";
+
+  try {
+    $stmt = $pdo->prepare($query);
+    $stmt->execute();
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Group by inventory and expand by quantity
+    $inventoryMap = [];
+    foreach ($results as $row) {
+      $invId = $row['inventory_id'];
+      if (!isset($inventoryMap[$invId])) {
+        $inventoryMap[$invId] = [
+          'inventory_id' => $row['inventory_id'],
+          'manufacturer' => $row['manufacturer'],
+          'model' => $row['model'],
+          'photo' => $row['photo'],
+          'quantity' => $row['quantity'],
+          'purchase_date' => $row['purchase_date'],
+          'warranty_years' => $row['warranty_years'],
+          'category_id' => $row['category_id'],
+          'category_name' => $row['category_name'],
+          'created_at' => $row['created_at'],
+          'updated_at' => $row['updated_at'],
+          'assets' => []
+        ];
+      }
+
+      // Add asset if it exists
+      if ($row['asset_id']) {
+        $inventoryMap[$invId]['assets'][] = [
+          'asset_id' => $row['asset_id'],
+          'asset_number' => $row['asset_number'],
+          'serial_number' => $row['serial_number'],
+          'ip_address' => $row['ip_address'],
+          'conditions' => $row['conditions'],
+          'status' => $row['status'],
+          'related_laptop_id' => $row['related_laptop_id'],
+          'asset_created_at' => $row['asset_created_at'],
+          'asset_updated_at' => $row['asset_updated_at'],
+          'assigned_to_branch' => $row['assigned_to_branch'],
+          'assigned_to' => $row['assigned_to'],
+          'assigned_department_id' => $row['assigned_department_id'],
+          'assigned_employee_name' => $row['assigned_employee_name'],
+          'assigned_employee_id' => $row['assigned_employee_id'],
+          'branch_name' => $row['branch_name'],
+          'branch_id' => $row['branch_id'],
+          'department_name' => $row['department_name'],
+          'department_id' => $row['department_id']
+        ];
+      }
+    }
+
+    // Expand items by quantity
+    $expandedItems = [];
+    foreach ($inventoryMap as $inventory) {
+      $quantity = (int)($inventory['quantity'] ?? 1);
+      $assetCount = count($inventory['assets']);
+
+      for ($i = 0; $i < $quantity; $i++) {
+        $expandedItem = $inventory;
+        $expandedItem['item_number'] = $i + 1;
+        $expandedItem['total_quantity'] = $quantity;
+
+        // Assign asset if available, otherwise null
+        if ($i < $assetCount) {
+          $expandedItem['asset_id'] = $inventory['assets'][$i]['asset_id'];
+          $expandedItem['asset_number'] = $inventory['assets'][$i]['asset_number'];
+          $expandedItem['serial_number'] = $inventory['assets'][$i]['serial_number'];
+          $expandedItem['ip_address'] = $inventory['assets'][$i]['ip_address'];
+          $expandedItem['conditions'] = $inventory['assets'][$i]['conditions'];
+          $expandedItem['status'] = $inventory['assets'][$i]['status'];
+          $expandedItem['related_laptop_id'] = $inventory['assets'][$i]['related_laptop_id'];
+          $expandedItem['asset_created_at'] = $inventory['assets'][$i]['asset_created_at'];
+          $expandedItem['asset_updated_at'] = $inventory['assets'][$i]['asset_updated_at'];
+          $expandedItem['assigned_to_branch'] = $inventory['assets'][$i]['assigned_to_branch'];
+          $expandedItem['assigned_to'] = $inventory['assets'][$i]['assigned_to'];
+          $expandedItem['assigned_department_id'] = $inventory['assets'][$i]['assigned_department_id'];
+          $expandedItem['assigned_employee_name'] = $inventory['assets'][$i]['assigned_employee_name'];
+          $expandedItem['assigned_employee_id'] = $inventory['assets'][$i]['assigned_employee_id'];
+          $expandedItem['branch_name'] = $inventory['assets'][$i]['branch_name'];
+          $expandedItem['branch_id'] = $inventory['assets'][$i]['branch_id'];
+          $expandedItem['department_name'] = $inventory['assets'][$i]['department_name'];
+          $expandedItem['department_id'] = $inventory['assets'][$i]['department_id'];
+        } else {
+          $expandedItem['asset_id'] = null;
+          $expandedItem['asset_number'] = null;
+          $expandedItem['serial_number'] = null;
+          $expandedItem['ip_address'] = null;
+          $expandedItem['conditions'] = null;
+          $expandedItem['status'] = null;
+          $expandedItem['related_laptop_id'] = null;
+          $expandedItem['asset_created_at'] = null;
+          $expandedItem['asset_updated_at'] = null;
+          $expandedItem['assigned_to_branch'] = null;
+          $expandedItem['assigned_to'] = null;
+          $expandedItem['assigned_department_id'] = null;
+          $expandedItem['assigned_employee_name'] = null;
+          $expandedItem['assigned_employee_id'] = null;
+          $expandedItem['branch_name'] = null;
+          $expandedItem['branch_id'] = null;
+          $expandedItem['department_name'] = null;
+          $expandedItem['department_id'] = null;
+        }
+
+        $expandedItems[] = $expandedItem;
+      }
+    }
+
+
+    return $expandedItems;
+  } catch (PDOException $e) {
+    error_log("Error fetching expanded inventory: " . $e->getMessage());
+    return [];
+  }
+}
+//NEW NEW NEW
+// function fetchAssetsWithInventoryAndCategoryAndEmployee($pdo)
+// {
+//   $query = "
+//         SELECT 
+//             a.id as asset_id,
+//             a.asset_number,
+//             a.serial_number,
+//             a.ip_address,
+//             a.status,
+//             a.conditions,
+//             a.assigned_to_branch,
+//             a.assigned_to,
+//             b.branch_name,
+//             i.id as inventory_id,
+//             i.manufacturer,
+//             i.model,
+//             i.photo,
+//             i.category_id,
+//             c.name AS category_name,
+//             e.employee_name as assigned_employee_name,
+//             e.id as assigned_employee_id
+//         FROM asset a
+//         LEFT JOIN inventory i ON a.inventory_id = i.id
+//         LEFT JOIN branch b ON a.assigned_to_branch = b.id
+//         LEFT JOIN categories c ON i.category_id = c.id
+//         LEFT JOIN employee e ON a.assigned_to = e.id
+//         ORDER BY i.manufacturer, i.model, a.asset_number
+//     ";
+
+//   $stmt = $pdo->prepare($query);
+//   $stmt->execute();
+//   return $stmt->fetchAll(PDO::FETCH_ASSOC);
+// }
+
 function fetchAssetsWithInventoryAndCategoryAndEmployee($pdo)
 {
   $query = "
@@ -295,6 +491,7 @@ function fetchAssetsWithInventoryAndCategoryAndEmployee($pdo)
             a.conditions,
             a.assigned_to_branch,
             a.assigned_to,
+            a.assigned_department_id,
             b.branch_name,
             i.id as inventory_id,
             i.manufacturer,
@@ -303,12 +500,15 @@ function fetchAssetsWithInventoryAndCategoryAndEmployee($pdo)
             i.category_id,
             c.name AS category_name,
             e.employee_name as assigned_employee_name,
-            e.id as assigned_employee_id
+            e.id as assigned_employee_id,
+            d.department_name,
+            d.id as department_id
         FROM asset a
         LEFT JOIN inventory i ON a.inventory_id = i.id
         LEFT JOIN branch b ON a.assigned_to_branch = b.id
         LEFT JOIN categories c ON i.category_id = c.id
         LEFT JOIN employee e ON a.assigned_to = e.id
+        LEFT JOIN departments d ON a.assigned_department_id = d.id
         ORDER BY i.manufacturer, i.model, a.asset_number
     ";
 
@@ -1806,5 +2006,46 @@ function getDepartmentAssetsViaEmployees($pdo, $departmentId)
   } catch (PDOException $e) {
     error_log("Error fetching department assets via employees: " . $e->getMessage());
     return [];
+  }
+}
+
+// ============================================
+// Department Detail Page
+// ============================================
+
+function getDepartmentAssetStats($pdo, $departmentId)
+{
+  $query = "
+    SELECT 
+      COUNT(*) as total_assets,
+      SUM(CASE WHEN a.status = 'Employee Assigned' THEN 1 ELSE 0 END) as assigned_count,
+      SUM(CASE WHEN a.status = 'Under Maintenance' THEN 1 ELSE 0 END) as in_repair_count,
+      SUM(CASE WHEN a.status = 'Uncommitted' THEN 1 ELSE 0 END) as uncommitted_count,
+      SUM(CASE WHEN a.status IN ('Department Assigned', 'Available') THEN 1 ELSE 0 END) as available_count
+    FROM asset a
+    WHERE a.assigned_department_id = ?
+  ";
+
+  try {
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$departmentId]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return [
+      'total_assets'      => (int)($result['total_assets'] ?? 0),
+      'assigned_count'    => (int)($result['assigned_count'] ?? 0),
+      'in_repair_count'   => (int)($result['in_repair_count'] ?? 0),
+      'uncommitted_count' => (int)($result['uncommitted_count'] ?? 0),
+      'available_count'   => (int)($result['available_count'] ?? 0)
+    ];
+  } catch (PDOException $e) {
+    error_log("Error fetching department asset stats: " . $e->getMessage());
+    return [
+      'total_assets'      => 0,
+      'assigned_count'    => 0,
+      'in_repair_count'   => 0,
+      'uncommitted_count' => 0,
+      'available_count'   => 0
+    ];
   }
 }

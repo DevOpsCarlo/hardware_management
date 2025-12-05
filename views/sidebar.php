@@ -4,7 +4,7 @@
   </div>
   <nav class="flex flex-col space-y-10 px-4 text-base">
     <div class="flex flex-col space-y-1 font-bold sm:space-y-0 md:space-y-4 tracking-wide">
-      <a href="/dashboard" class="sidebar-link <?= urlIs("/dashboard") ? 'active' : '' ?> flex items-center gap-x-2"> <i class="fa-solid fa-house"></i>
+      <a href="/dashboard" class="sidebar-link <?= urlContains("/dashboard") ? 'active' : '' ?> flex items-center gap-x-2"> <i class="fa-solid fa-house"></i>
         <p>Dashboard</p>
       </a>
 
@@ -35,6 +35,12 @@
       <a href="/branch" class="sidebar-link <?= urlContains("/branch") ? "active" : "" ?> flex items-center gap-x-2">
         <i class="fa-solid fa-building"></i>
         <p>Branch</p>
+      </a>
+
+      <a href="/user" class="sidebar-link <?= urlIs("/user") ? "active" : "" ?> flex items-center gap-x-2">
+        <?php  ?>
+        <i class="fa-solid fa-user-gear"></i>
+        <p>Manage Users</p>
       </a>
 
 

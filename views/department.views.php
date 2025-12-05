@@ -129,7 +129,9 @@
                                     data-department-id="<?= $department['id'] ?>">
                                     <td><?= $count++ ?></td>
 
-                                    <td><?= htmlspecialchars($department['department_name'] ?? 'N/A') ?></td>
+                                    <td>
+                                        <?= htmlspecialchars_decode($department['department_name'] ?? 'N/A') ?>
+                                    </td>
                                     <td><?= htmlspecialchars($department['department_head'] ?? '-') ?></td>
 
                                     <!-- TOTAL ASSETS -->

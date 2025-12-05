@@ -2,6 +2,22 @@
 $pageTitle = "Manage Hardware";
 
 // Handling the DELETE request for category deletion
+
+function getExistingPhotoForManufacturerModel($pdo, $manufacturer, $model)
+{
+  $stmt = $pdo->prepare("
+    SELECT photo 
+    FROM inventory 
+    WHERE manufacturer = ? AND model = ? AND photo IS NOT NULL AND photo != ''
+    LIMIT 1
+  ");
+  $stmt->execute([$manufacturer, $model]);
+  $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+  return $result ? $result['photo'] : null;
+}
+
+
 if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['delete_inventory_id'])) {
   $inventoryIdToDelete = $_POST['delete_inventory_id'];
 
@@ -52,40 +68,43 @@ function generateBatchId($pdo)
   return $batch_id;
 }
 
-function addLaptopCharger($pdo, $laptopQuantity, $laptopManufacturer, $model, $purchaseDate) {
-    // Get or create "Laptop Charger" category
-    $stmt = $pdo->prepare("SELECT id FROM categories WHERE LOWER(name) = 'laptop charger' LIMIT 1");
+function addLaptopCharger($pdo, $laptopQuantity, $laptopManufacturer, $model, $purchaseDate)
+{
+  // Get or create "Laptop Charger" category
+  $stmt = $pdo->prepare("SELECT id FROM categories WHERE LOWER(name) = 'laptop charger' LIMIT 1");
+  $stmt->execute();
+  $chargerCategory = $stmt->fetch(PDO::FETCH_ASSOC);
+
+  if (!$chargerCategory) {
+    // Create laptop charger category if it doesn't exist
+    $stmt = $pdo->prepare("INSERT INTO categories (name, created_at) VALUES ('Laptop Charger', NOW())");
     $stmt->execute();
-    $chargerCategory = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if (!$chargerCategory) {
-        // Create laptop charger category if it doesn't exist
-        $stmt = $pdo->prepare("INSERT INTO categories (name, created_at) VALUES ('Laptop Charger', NOW())");
-        $stmt->execute();
-        $chargerCategoryId = $pdo->lastInsertId();
-    } else {
-        $chargerCategoryId = $chargerCategory['id'];
-    }
-    
-    // Generate batch ID for charger
-    $chargerBatchId = generateBatchId($pdo);
-    
-    // Insert laptop charger with same quantity as laptop
-    $stmt = $pdo->prepare("INSERT INTO inventory (batch_id, manufacturer, model, purchase_date, quantity, warranty_years, category_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 1, ?, NOW(), NOW())");
-    $stmt->execute([
-        $chargerBatchId,
-        $laptopManufacturer,
-        $model,
-        $purchaseDate,
-        $laptopQuantity,
-        $chargerCategoryId
-    ]);
-    
-    return $chargerBatchId;
+    $chargerCategoryId = $pdo->lastInsertId();
+  } else {
+    $chargerCategoryId = $chargerCategory['id'];
+  }
+
+  // Generate batch ID for charger
+  $chargerBatchId = generateBatchId($pdo);
+
+  // Insert laptop charger with same quantity as laptop
+  $stmt = $pdo->prepare("INSERT INTO inventory (batch_id, manufacturer, model, purchase_date, quantity, warranty_years, category_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 1, ?, NOW(), NOW())");
+  $stmt->execute([
+    $chargerBatchId,
+    $laptopManufacturer,
+    $model,
+    $purchaseDate,
+    $laptopQuantity,
+    $chargerCategoryId
+  ]);
+
+  return $chargerBatchId;
 }
 
 
 // Main form processing - your existing code with batch ID integration
+
+
 // if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['add-inventory-btn'])) {
 //   $inventoryId = intval($_POST['inventory_id'] ?? 0);
 //   $categoryId = intval($_POST['category_id'] ?? 0);
@@ -161,9 +180,24 @@ function addLaptopCharger($pdo, $laptopQuantity, $laptopManufacturer, $model, $p
 //       $insertStmt = $pdo->prepare("INSERT INTO inventory (batch_id, manufacturer, model, purchase_date, quantity, warranty_years, category_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
 //       $insertStmt->execute([$batchId, $manufacturer, $model, $purchaseDate, $quantity, $warranty, $categoryId]);
 //     }
-    
 
-//     $_SESSION['inventory_added'] = "Successfully added [$quantity qty] of [$manufacturer $model] - Batch ID: $batchId";
+//     // Check if the added item is a laptop, then auto-add charger
+//     $stmt = $pdo->prepare("SELECT name FROM categories WHERE id = ?");
+//     $stmt->execute([$categoryId]);
+//     $categoryName = $stmt->fetchColumn();
+
+//     $chargerBatchId = null;
+//     if (strtolower($categoryName) === 'laptop') {
+//       $chargerBatchId = addLaptopCharger($pdo, $quantity, $manufacturer, $model, $purchaseDate);
+//     }
+
+//     // Success message
+//     if ($chargerBatchId) {
+//       $_SESSION['inventory_added'] = "Successfully added [$quantity qty] of [$manufacturer $model] - Batch ID: $batchId<br>Automatically added [$quantity qty] of [$manufacturer Laptop Charger] - Batch ID: $chargerBatchId";
+//     } else {
+//       $_SESSION['inventory_added'] = "Successfully added [$quantity qty] of [$manufacturer $model] - Batch ID: $batchId";
+//     }
+
 //     header("Location: /manage-hardware/add-inventory");
 //     exit;
 //   } else {
@@ -172,6 +206,7 @@ function addLaptopCharger($pdo, $laptopQuantity, $laptopManufacturer, $model, $p
 //     exit;
 //   }
 // }
+
 
 if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['add-inventory-btn'])) {
   $inventoryId = intval($_POST['inventory_id'] ?? 0);
@@ -183,26 +218,23 @@ if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['add-inventory-btn']))
   $warranty = intval($_POST['input-warranty'] ?? 0);
   $photoPath = null;
 
-  // Handle file upload (your existing logic)
+  // Handle file upload
   if (isset($_FILES['photo']) && $_FILES['photo']['error'] == UPLOAD_ERR_OK) {
     $uploadDir = 'uploads/assets/';
 
-    // Create directory if it doesn't exist
     if (!is_dir($uploadDir)) {
       mkdir($uploadDir, 0755, true);
     }
 
-    // Validate file type
     $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
     $fileExtension = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
 
     if (in_array($fileExtension, $allowedExtensions)) {
-      // Generate unique filename to prevent conflicts
       $uniqueFilename = uniqid('inventory_') . '.' . $fileExtension;
       $photoPath = $uploadDir . $uniqueFilename;
 
       if (!move_uploaded_file($_FILES['photo']['tmp_name'], $photoPath)) {
-        $photoPath = null; // Reset if upload failed
+        $photoPath = null;
         $_SESSION['inventory_error'] = "Failed to upload photo.";
       }
     } else {
@@ -210,19 +242,24 @@ if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['add-inventory-btn']))
       header("Location: /manage-hardware/add-inventory");
       exit;
     }
+  } else {
+    // ========== NEW: If no photo uploaded, check for existing photo ==========
+    $existingPhoto = getExistingPhotoForManufacturerModel($pdo, $manufacturer, $model);
+    if ($existingPhoto) {
+      $photoPath = $existingPhoto;
+    }
+    // ========== END NEW LOGIC ==========
   }
 
-  // Validation (your existing logic)
+  // Validation
   if ($manufacturer && $quantity > 0 && $categoryId > 0) {
 
     // UPDATE EXISTING INVENTORY (Edit mode)
     if ($inventoryId > 0) {
-      // If a new photo is uploaded, include it in the update
       if ($photoPath) {
         $stmt = $pdo->prepare("UPDATE inventory SET manufacturer = ?, model = ?, purchase_date = ?, quantity = ?, warranty_years = ?, photo = ?, category_id = ?, updated_at = NOW() WHERE id = ?");
         $stmt->execute([$manufacturer, $model, $purchaseDate, $quantity, $warranty, $photoPath, $categoryId, $inventoryId]);
       } else {
-        // If no new photo is uploaded, don't update the photo_path field (retain existing photo)
         $stmt = $pdo->prepare("UPDATE inventory SET manufacturer = ?, model = ?, purchase_date = ?, quantity = ?, warranty_years = ?, category_id = ?, updated_at = NOW() WHERE id = ?");
         $stmt->execute([$manufacturer, $model, $purchaseDate, $quantity, $warranty, $categoryId, $inventoryId]);
       }
@@ -237,8 +274,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['add-inventory-btn']))
       exit;
     }
 
-    // INSERT NEW INVENTORY (Always create new record - no merging) - MODIFIED WITH BATCH ID
-    // Generate batch ID for new inventory
+    // INSERT NEW INVENTORY
     $batchId = generateBatchId($pdo);
 
     if ($photoPath) {
@@ -256,16 +292,16 @@ if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['add-inventory-btn']))
 
     $chargerBatchId = null;
     if (strtolower($categoryName) === 'laptop') {
-        $chargerBatchId = addLaptopCharger($pdo, $quantity, $manufacturer, $model, $purchaseDate);
+      $chargerBatchId = addLaptopCharger($pdo, $quantity, $manufacturer, $model, $purchaseDate);
     }
 
     // Success message
     if ($chargerBatchId) {
-        $_SESSION['inventory_added'] = "Successfully added [$quantity qty] of [$manufacturer $model] - Batch ID: $batchId<br>Automatically added [$quantity qty] of [$manufacturer Laptop Charger] - Batch ID: $chargerBatchId";
+      $_SESSION['inventory_added'] = "Successfully added [$quantity qty] of [$manufacturer $model] - Batch ID: $batchId<br>Automatically added [$quantity qty] of [$manufacturer Laptop Charger] - Batch ID: $chargerBatchId";
     } else {
-        $_SESSION['inventory_added'] = "Successfully added [$quantity qty] of [$manufacturer $model] - Batch ID: $batchId";
+      $_SESSION['inventory_added'] = "Successfully added [$quantity qty] of [$manufacturer $model] - Batch ID: $batchId";
     }
-    
+
     header("Location: /manage-hardware/add-inventory");
     exit;
   } else {
@@ -274,7 +310,6 @@ if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['add-inventory-btn']))
     exit;
   }
 }
-
 
 function getAllInventory($pdo)
 {
@@ -359,5 +394,5 @@ function getWarrantyStatus($purchase_date, $warranty_years)
 // Fetch database
 $inventories = getAllInventory($pdo);
 $categories = getAllCategories($pdo);
-
+// dd($inventories);
 require("views/add-inventory.views.php");

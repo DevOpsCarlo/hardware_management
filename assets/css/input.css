@@ -10,7 +10,7 @@ body {
   
 }
 
-#inventoryTable.dataTable td, #detailedTable.dataTable td, #assetTable.dataTable td, #branchAssetTable.dataTable td {
+#inventoryTable.dataTable td, #detailedTable.dataTable td, #assetTable.dataTable td, #branchAssetTable.dataTable td, #dashboardFilterTable.dataTable td, #departmentEmployeeTable.dataTable td {
     padding: 1px 6px;       /* makes rows smaller */
 }
 

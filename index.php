@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+
 require("db.php");
 
 require("functions.php");
@@ -33,8 +34,8 @@ $routes = [
   '/employee' => 'controllers/employee.php',
   '/branch' => 'controllers/branch.php',
   '/branch/branch-asset' => 'controllers/branch.php',
-
-
+  '/dashboard-filter' => 'controllers/dashboard-filter.php',
+  '/user' => 'controllers/user.php'
 ];
 
 

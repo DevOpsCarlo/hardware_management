@@ -99,79 +99,73 @@
             </tr>
           </thead>
           <tbody class="text-sm font-light">
-            <?php if (!empty($branches)): ?>
-              <?php foreach ($branches as $index => $branch): ?>
-                <tr class="text-xs font-light text-left hover:bg-slate-100 transition duration-150 cursor-pointer">
-                  <!-- <td class="px-4 py-2"><?= $index + 1 ?></td> -->
-                  <td class="px-4 py-2"><?= htmlspecialchars($branch['branch_name'] ?? "Empty") ?></td>
+            <?php foreach ($branches as $index => $branch): ?>
+              <tr class="text-xs font-semibold text-left hover:bg-slate-100 transition duration-150 cursor-pointer">
+                <td class="px-4 py-2"><?= htmlspecialchars(strtoupper($branch['branch_name'] ?? "Empty")) ?></td>
 
-                  <!-- TOTAL ASSETS -->
-                  <td class="px-4 py-2">
-                    <span class="inline-block bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold">
-                      <?= $branch['total_assets'] ?? 0 ?>
-                    </span>
-                  </td>
+                <!-- TOTAL ASSETS -->
+                <td class="px-4 py-2">
+                  <span class="inline-block bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold">
+                    <?= $branch['total_assets'] ?? 0 ?>
+                  </span>
+                </td>
 
-                  <!-- ASSIGNED ASSETS -->
-                  <td class="px-4 py-2">
-                    <span class="inline-block bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">
-                      <?= $branch['assigned_count'] ?? 0 ?>
-                    </span>
-                  </td>
+                <!-- ASSIGNED ASSETS -->
+                <td class="px-4 py-2">
+                  <span class="inline-block bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">
+                    <?= $branch['assigned_count'] ?? 0 ?>
+                  </span>
+                </td>
 
-                  <!-- UNASSIGNED ASSETS -->
-                  <td class="px-4 py-2">
-                    <span class="inline-block bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-semibold">
-                      <?= $branch['unassigned_count'] ?? 0 ?>
-                    </span>
-                  </td>
+                <!-- UNASSIGNED ASSETS -->
+                <td class="px-4 py-2">
+                  <span class="inline-block bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-semibold">
+                    <?= $branch['unassigned_count'] ?? 0 ?>
+                  </span>
+                </td>
 
-                  <!-- IN REPAIR -->
-                  <td class="px-4 py-2">
-                    <span class="inline-block bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-semibold">
-                      <?= $branch['in_repair_count'] ?? 0 ?>
-                    </span>
-                  </td>
+                <!-- IN REPAIR -->
+                <td class="px-4 py-2">
+                  <span class="inline-block bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-semibold">
+                    <?= $branch['in_repair_count'] ?? 0 ?>
+                  </span>
+                </td>
 
-                  <!-- Uncommited -->
-                  <td class="px-4 py-2">
-                    <span class="inline-block bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold">
-                      <?= $branch['uncommitted_count'] ?? 0 ?>
-                    </span>
-                  </td>
+                <!-- Uncommited -->
+                <td class="px-4 py-2">
+                  <span class="inline-block bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold">
+                    <?= $branch['uncommitted_count'] ?? 0 ?>
+                  </span>
+                </td>
 
-                  <!-- ACTIONS -->
-                  <td class="px-4 py-2 relative">
-                    <i class="fa-solid fa-ellipsis-vertical cursor-pointer select-menu"></i>
-                    <div class="absolute top-5 left-5 mb-2 w-20 bg-white border rounded shadow z-10 hidden menu">
-                      <ul class="text-xs text-slate-700 font-light">
-                        <li class="px-4 py-2 hover:bg-slate-100 border-b">
-                          <a href="/branch/<?= urlencode($branch['branch_name']) ?>" class="cursor-pointer w-full text-left">View</a>
-                        </li>
-                        <li class="px-4 py-2 hover:bg-slate-100 border-b">
-                          <button class="cursor-pointer block w-full text-left edit-btn" type="button"
-                            data-branch-id="<?= htmlspecialchars($branch['id'] ?? 0) ?>"
-                            data-branch-name="<?= htmlspecialchars($branch['branch_name']) ?>">
-                            Edit
-                          </button>
-                        </li>
-                        <li class="px-4 py-2 hover:bg-slate-100">
-                          <button class="cursor-pointer w-full text-left delete-btn"
-                            data-branch-id="<?= htmlspecialchars($branch['id'] ?? 0) ?>"
-                            data-branch-name="<?= htmlspecialchars($branch['branch_name']) ?>">
-                            Delete
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-              <?php endforeach; ?>
-            <?php else: ?>
-              <tr>
-                <td colspan="7" class="text-center py-4 text-slate-500">No branches found</td>
+                <!-- ACTIONS -->
+                <td class="px-4 py-2 relative">
+                  <i class="fa-solid fa-ellipsis-vertical cursor-pointer select-menu"></i>
+                  <div class="absolute top-5 left-5 mb-2 w-20 bg-white border rounded shadow z-10 hidden menu">
+                    <ul class="text-xs text-slate-700 font-light">
+                      <li class="px-4 py-2 hover:bg-slate-100 border-b">
+                        <a href="/branch/<?= urlencode($branch['branch_name']) ?>" class="cursor-pointer w-full text-left">View</a>
+                      </li>
+                      <li class="px-4 py-2 hover:bg-slate-100 border-b">
+                        <button class="cursor-pointer block w-full text-left edit-btn" type="button"
+                          data-branch-id="<?= htmlspecialchars($branch['id'] ?? 0) ?>"
+                          data-branch-name="<?= htmlspecialchars($branch['branch_name']) ?>">
+                          Edit
+                        </button>
+                      </li>
+                      <li class="px-4 py-2 hover:bg-slate-100">
+                        <button class="cursor-pointer w-full text-left delete-btn"
+                          data-branch-id="<?= htmlspecialchars($branch['id'] ?? 0) ?>"
+                          data-branch-name="<?= htmlspecialchars($branch['branch_name']) ?>">
+                          Delete
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                </td>
               </tr>
-            <?php endif; ?>
+            <?php endforeach; ?>
+
           </tbody>
         </table>
       </div>

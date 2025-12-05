@@ -52,10 +52,10 @@
             <thead>
               <tr>
                 <!-- <th>No.</th> -->
-                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Image</th>
-                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Model</th>
-                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Asset No.</th>
+                <!-- <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Image</th> -->
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Asset</th>
                 <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Category</th>
+                <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Asset No.</th>
                 <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Serial No.</th>
                 <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Status</th>
                 <th class="px-3 py-2 text-left text-xs font-bold text-slate-700">Conditions</th>
@@ -88,33 +88,50 @@
                   $asset = isset($assetsForInventory[$i]) ? $assetsForInventory[$i] : null;
               ?>
                   <tr class="text-xs font-light text-left">
-                    <!-- <td><?= $itemCounter++ ?></td> -->
-                    <td class="w-1/12 h-1/12 object-contain px-4 py-3 text-xs text-slate-900 font-normal">
-                      <img src="/<?= !empty($inventory['photo']) ? htmlspecialchars($inventory['photo']) : 'uploads/default-photo/laptop-charger.jpg' ?>" alt="No image available" class="w-6/12 rounded-full object-contain">
+                    <td class="w-3/12 object-contain px-4 py-3 text-xs text-slate-900 font-normal">
+                      <div class="flex items-center gap-x-2">
+                        <?php
+                        // Determine the appropriate photo based on category
+                        $photoToDisplay = $inventory['photo'];
+
+                        // If category is "Laptop Charger" and no photo, use default charger image
+                        if ($inventory['category_name'] === 'Laptop Charger' && empty($inventory['photo'])) {
+                          $photoToDisplay = 'uploads/default-photo/laptop-charger.jpg';
+                        }
+                        // If category is "Laptop" and no photo, use default laptop image (or adjust as needed)
+                        elseif ($inventory['category_name'] === 'Laptop' && empty($inventory['photo'])) {
+                          $photoToDisplay = 'uploads/default-photo/laptop.jpg'; // adjust path if needed
+                        }
+                        ?>
+                        <img src="/<?= htmlspecialchars($photoToDisplay) ?>" alt="No image available" class="w-2/12 rounded-full object-contain">
+                        <?= htmlspecialchars(ucfirst($inventory['manufacturer'] ?? '—')) ?> <?= htmlspecialchars(ucfirst($inventory['model'] ?? '—')) ?>
+                        </span>
+                      </div>
+
                     </td>
-                    <td><?= htmlspecialchars(ucfirst($inventory['manufacturer'] ?? '-')) ?> <?= htmlspecialchars(ucfirst($inventory['model'] ?? '-')) ?></td>
-                    <td><?= htmlspecialchars(ucfirst($inventory['category_name'] ?? '-')) ?></td>
-                    <td><?= htmlspecialchars($asset['asset_number'] ?? '-') ?></td>
-                    <td><?= htmlspecialchars($asset['serial_number'] ?? '-') ?></td>
+                    <td><?= htmlspecialchars(ucfirst($inventory['category_name'] ?? '—')) ?></td>
+                    <td><?= htmlspecialchars($asset['asset_number'] ?? '—') ?></td>
+
+                    <td><?= htmlspecialchars($asset['serial_number'] ?? '—') ?></td>
                     <?php
                     $statusClassMap = [
-                      'Available' => 'text-emerald-500 bg-emerald-100',
-                      'Branch Assigned' => 'text-blue-700 bg-blue-100',
-                      'Employee Assigned' => 'text-blue-500 bg-blue-100',
-                      'Surrender' => 'text-orange-500 bg-orange-100',
-                      'Under Maintenance' => 'text-orange-500 bg-orange-100',
-                      'Department Assigned' => 'text-amber-500 bg-amber-100',
-                      'Uncommitted' => 'text-red-500 bg-red-100'
+                      'Available' => 'text-emerald-700 bg-emerald-50 border border-emerald-200',
+                      'Branch Assigned' => 'text-blue-700 bg-blue-50 border border-blue-200',
+                      'Employee Assigned' => 'text-blue-700 bg-blue-50 border border-blue-200',
+                      'Surrender' => 'text-orange-700 bg-orange-50 border border-orange-200',
+                      'Under Maintenance' => 'text-orange-700 bg-orange-50 border border-orange-200',
+                      'Department Assigned' => 'text-amber-700 bg-amber-50 border border-amber-200',
+                      'Uncommitted' => 'text-red-700 bg-red-50 border border-red-200'
                     ];
-                    $currentStatus = $asset['status'] ?? '-';
+                    $currentStatus = $asset['status'] ?? '—';
                     $statusClass = $statusClassMap[$currentStatus] ?? 'text-gray-500 bg-gray-100';
                     ?>
                     <td>
-                      <span class="inline-block px-2 py-1 rounded text-xs font-semibold <?= $statusClass ?>">
+                      <span class="px-3 py-1 rounded-full text-xs font-semibold inline-block <?= $statusClass ?>">
                         <?= htmlspecialchars($currentStatus) ?>
                       </span>
                     </td>
-                    <td><?= htmlspecialchars($asset['conditions'] ?? '-') ?></td>
+                    <td><?= htmlspecialchars($asset['conditions'] ?? '—') ?></td>
                     <td class="relative">
                       <i class="fa-solid fa-ellipsis-vertical cursor-pointer select-menu"></i>
                       <div class="absolute top-10 right-5 mt-2 w-20 bg-white border rounded shadow group-hover:block z-10 hidden menu">
@@ -191,7 +208,8 @@
           <figure class="border border-slate-200 p-4 grid gap-2">
             <div class="flex justify-between items-center">
               <h4 class="mb-2 text-slate-600 text-lg font-semibold" id="figure-title"></h4>
-              <img src="/<?= htmlspecialchars($inventory['photo'] ?? '') ?>" alt="" class="w-20 h-20 object-contain" id="photo-preview">
+
+              <img src="/<?= htmlspecialchars($inventory['photo'] ?? 'uploads/default-photo/laptop-charger.jpg') ?>" alt="" class="w-20 h-20 object-contain" id="photo-preview">
             </div>
 
             <span id="has-error" class="text-sm text-pink-600"></span>

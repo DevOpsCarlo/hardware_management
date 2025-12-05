@@ -410,6 +410,9 @@
   .mr-6 {
     margin-right: calc(var(--spacing) * 6);
   }
+  .mb-0 {
+    margin-bottom: calc(var(--spacing) * 0);
+  }
   .mb-2 {
     margin-bottom: calc(var(--spacing) * 2);
   }
@@ -455,9 +458,6 @@
   .table {
     display: table;
   }
-  .h-1\/12 {
-    height: calc(1/12 * 100%);
-  }
   .h-5\/6 {
     height: calc(5/6 * 100%);
   }
@@ -479,11 +479,14 @@
   .w-1\/12 {
     width: calc(1/12 * 100%);
   }
+  .w-2\/12 {
+    width: calc(2/12 * 100%);
+  }
   .w-3\/4 {
     width: calc(3/4 * 100%);
   }
-  .w-6\/12 {
-    width: calc(6/12 * 100%);
+  .w-3\/12 {
+    width: calc(3/12 * 100%);
   }
   .w-11\/12 {
     width: calc(11/12 * 100%);
@@ -533,11 +536,11 @@
   .grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .grid-cols-5 {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-  }
   .flex-col {
     flex-direction: column;
+  }
+  .flex-wrap {
+    flex-wrap: wrap;
   }
   .items-center {
     align-items: center;
@@ -713,6 +716,9 @@
   .border-blue-200 {
     border-color: var(--color-blue-200);
   }
+  .border-blue-700 {
+    border-color: var(--color-blue-700);
+  }
   .border-cyan-200 {
     border-color: var(--color-cyan-200);
   }
@@ -781,6 +787,9 @@
   }
   .bg-blue-100 {
     background-color: var(--color-blue-100);
+  }
+  .bg-blue-700 {
+    background-color: var(--color-blue-700);
   }
   .bg-cyan-50 {
     background-color: var(--color-cyan-50);
@@ -860,9 +869,6 @@
   .p-2 {
     padding: calc(var(--spacing) * 2);
   }
-  .p-3 {
-    padding: calc(var(--spacing) * 3);
-  }
   .p-4 {
     padding: calc(var(--spacing) * 4);
   }
@@ -928,6 +934,9 @@
   }
   .pr-4 {
     padding-right: calc(var(--spacing) * 4);
+  }
+  .pb-4 {
+    padding-bottom: calc(var(--spacing) * 4);
   }
   .pb-5 {
     padding-bottom: calc(var(--spacing) * 5);
@@ -1110,6 +1119,9 @@
   .text-slate-200 {
     color: var(--color-slate-200);
   }
+  .text-slate-300 {
+    color: var(--color-slate-300);
+  }
   .text-slate-400 {
     color: var(--color-slate-400);
   }
@@ -1136,6 +1148,9 @@
   }
   .text-yellow-700 {
     color: var(--color-yellow-700);
+  }
+  .italic {
+    font-style: italic;
   }
   .opacity-30 {
     opacity: 30%;
@@ -1208,13 +1223,6 @@
       }
     }
   }
-  .hover\:bg-amber-100 {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--color-amber-100);
-      }
-    }
-  }
   .hover\:bg-amber-200 {
     &:hover {
       @media (hover: hover) {
@@ -1247,13 +1255,6 @@
     &:hover {
       @media (hover: hover) {
         background-color: var(--color-gray-50);
-      }
-    }
-  }
-  .hover\:bg-gray-100 {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--color-gray-100);
       }
     }
   }
@@ -1320,6 +1321,28 @@
       }
     }
   }
+  .hover\:font-bold {
+    &:hover {
+      @media (hover: hover) {
+        --tw-font-weight: var(--font-weight-bold);
+        font-weight: var(--font-weight-bold);
+      }
+    }
+  }
+  .hover\:text-blue-700 {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-blue-700);
+      }
+    }
+  }
+  .hover\:text-blue-800 {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-blue-800);
+      }
+    }
+  }
   .hover\:text-emerald-800 {
     &:hover {
       @media (hover: hover) {
@@ -1352,6 +1375,13 @@
     &:hover {
       @media (hover: hover) {
         color: var(--color-white);
+      }
+    }
+  }
+  .hover\:underline {
+    &:hover {
+      @media (hover: hover) {
+        text-decoration-line: underline;
       }
     }
   }
@@ -1502,7 +1532,7 @@ body {
   box-sizing: border-box;
   font-family: "Inter", sans-serif;
 }
-#inventoryTable.dataTable td, #detailedTable.dataTable td, #assetTable.dataTable td, #branchAssetTable.dataTable td {
+#inventoryTable.dataTable td, #detailedTable.dataTable td, #assetTable.dataTable td, #branchAssetTable.dataTable td, #dashboardFilterTable.dataTable td, #departmentEmployeeTable.dataTable td {
   padding: 1px 6px;
 }
 @layer components {
