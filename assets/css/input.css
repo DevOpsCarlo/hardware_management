@@ -15,12 +15,28 @@ body {
 }
 
 @layer components {
+
+  .filter-btn {
+    @apply bg-white text-[#374151] border-[#e2e8f0];
+  }
+
+  .filter-btn.active {
+    @apply bg-[#fb2c36] text-white border border-[#c10007];
+  }
+
+  .filter-btn:hover {
+    @apply shadow-md; 
+  }
+
   .sidebar-link {
     @apply hover:bg-[#ffffff0d] hover:text-white hover:rounded-sm p-2;
   }
   .active {
     @apply bg-[#ffffff0d] text-white rounded-sm p-2;
   }
+
+  
+  
 }
 
 

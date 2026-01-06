@@ -8,18 +8,7 @@
         <p>Dashboard</p>
       </a>
 
-      <!-- Inventory -->
       <div class="">
-        <!-- Menu toggle -->
-        <!-- <div class="flex justify-between items-center toggle-submenu cursor-pointer sidebar-link">
-          <a class="">Inventory</a>
-          <i class="fa-solid fa-chevron-down mr-5 icon"></i>
-        </div> -->
-        <!-- Submenu -->
-        <!-- <div class="flex flex-col px-3 gap-2 mt-4 <?= urlContains("/add-category") || urlContains("/manage-hardware") || urlContains("/manage-hardware.inventory-list") || urlContains("/hardwares") ? "" : "hidden" ?> submenu">
-          <a href="/manage-hardware/add-category" class="sidebar-link <?= urlIs("/manage-hardware/add-inventory") || urlIs("/manage-hardware/add-category") || urlIs("/manage-hardware/add-asset") || urlIs("/manage-hardware/assign-asset") ? "active" : "" ?>">Manage Hardware</a>
-          <a href="" class="sidebar-link <?= urlIs("/hardwares") ? "active" : "" ?>">Hardwares</a>
-        </div> -->
         <div class="flex flex-col space-y-1 font-bold sm:space-y-0 md:space-y-4 tracking-wide <?= urlContains("/manage-hardware") ?> ">
           <a href="/manage-hardware/add-category" class="sidebar-link <?= urlContains("/manage-hardware") ? "active" : "" ?>  flex items-center gap-x-2">
             <i class="fa-solid fa-boxes-stacked"></i>

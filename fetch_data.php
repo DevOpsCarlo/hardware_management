@@ -720,7 +720,7 @@ function generateAssetNumber($categoryId, $categoryName)
   $categoryMappings = [
     'laptop' => ['code' => '01', 'suffix' => ''],
     'tv' => ['code' => '02', 'suffix' => ''],
-    'desktop' => ['code' => '03', 'suffix' => ''],
+    'desktop monitor' => ['code' => '03', 'suffix' => ''],
     'monitor' => ['code' => '04', 'suffix' => ''],
     'printer' => ['code' => '05', 'suffix' => ''],
     'scanner' => ['code' => '07', 'suffix' => ''],
@@ -736,8 +736,7 @@ function generateAssetNumber($categoryId, $categoryName)
     'laptop charger' => ['code' => '01', 'suffix' => 'C'],
     'headset' => ['code' => '01', 'suffix' => 'H'],
     'bracket' => ['code' => '02', 'suffix' => 'BK'],
-    'desktop monitor' => ['code' => '03', 'suffix' => 'MO'],
-    'desktop mouse' => ['code' => '03', 'suffix' => 'M'],
+    'desktop mouse' => ['code' => '03', 'suffix' => 'MO'],
     'system unit' => ['code' => '03', 'suffix' => 'SU'],
   ];
 
@@ -786,59 +785,6 @@ function generateAssetNumber($categoryId, $categoryName)
 }
 
 
-// Assign asset deitals 
-
-// function fetchAssetDetailsById($pdo, $assetId)
-// {
-//   $query = "
-//         SELECT 
-//             a.id as asset_id,
-//             a.asset_number,
-//             a.serial_number,
-//             a.ip_address,
-//             a.status,
-//             a.conditions,
-//             a.assigned_to,
-//             a.related_laptop_id,
-//             a.created_at as asset_created_at,
-//             a.updated_at as asset_updated_at,
-
-//             i.id as inventory_id,
-//             i.manufacturer,
-//             i.model,
-//             i.photo,
-//             i.quantity,
-//             i.purchase_date,
-//             i.warranty_years,
-//             i.created_at as inventory_created_at,
-//             i.updated_at as inventory_updated_at,
-
-//             c.id as category_id,
-//             c.name AS category_name,
-
-//             e.employee_name as assigned_employee_name,
-//             e.id as assigned_employee_id,
-//             e.employee_id as assigned_employee_code,
-
-//             d.department_name as assigned_employee_department,
-//             d.id as department_id,
-//             b.branch_name as assigned_employee_branch,
-//             b.id as branch_id
-
-//         FROM asset a
-//         LEFT JOIN inventory i ON a.inventory_id = i.id
-//         LEFT JOIN categories c ON i.category_id = c.id
-//         LEFT JOIN employee e ON a.assigned_to = e.id
-//         LEFT JOIN department_employee de ON e.id = de.employee_id
-//         LEFT JOIN departments d ON de.department_id = d.id
-//         LEFT JOIN branch b ON d.branch_id = b.id
-//         WHERE a.id = ?
-//     ";
-
-//   $stmt = $pdo->prepare($query);
-//   $stmt->execute([$assetId]);
-//   return $stmt->fetch(PDO::FETCH_ASSOC);
-// }
 function fetchAssetDetailsById($pdo, $assetId)
 {
   $query = "
@@ -1230,47 +1176,6 @@ function fetchEmployeeAssetSummary($pdo)
 
 
 
-
-// Branch fetch 
-// Add these functions to your database functions file (e.g., database.php or functions.php)
-
-/**
- * Get asset statistics for a specific branch
- * Returns: total_assets, assigned_count, unassigned_count, in_repair_count
- */
-// function getBranchAssetStats($pdo, $branchId)
-// {
-//   $query = "
-//     SELECT 
-//       COUNT(*) as total_assets,
-//       SUM(CASE WHEN a.status = 'Employee Assigned' THEN 1 ELSE 0 END) as assigned_count,
-//       SUM(CASE WHEN a.status = 'Branch Assigned' OR a.status = 'Available' THEN 1 ELSE 0 END) as unassigned_count,
-//       SUM(CASE WHEN a.status = 'Under Maintenance' THEN 1 ELSE 0 END) as in_repair_count
-//     FROM asset a
-//     WHERE a.assigned_to_branch = ?
-//   ";
-
-//   try {
-//     $stmt = $pdo->prepare($query);
-//     $stmt->execute([$branchId]);
-//     $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-//     return [
-//       'total_assets' => $result['total_assets'] ?? 0,
-//       'assigned_count' => $result['assigned_count'] ?? 0,
-//       'unassigned_count' => $result['unassigned_count'] ?? 0,
-//       'in_repair_count' => $result['in_repair_count'] ?? 0
-//     ];
-//   } catch (PDOException $e) {
-//     error_log("Error fetching branch asset stats: " . $e->getMessage());
-//     return [
-//       'total_assets' => 0,
-//       'assigned_count' => 0,
-//       'unassigned_count' => 0,
-//       'in_repair_count' => 0
-//     ];
-//   }
-// }
 function getBranchAssetStats($pdo, $branchId)
 {
   $query = "

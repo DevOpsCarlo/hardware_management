@@ -746,6 +746,9 @@
   .border-red-200 {
     border-color: var(--color-red-200);
   }
+  .border-red-700 {
+    border-color: var(--color-red-700);
+  }
   .border-slate-100 {
     border-color: var(--color-slate-100);
   }
@@ -787,9 +790,6 @@
   }
   .bg-blue-100 {
     background-color: var(--color-blue-100);
-  }
-  .bg-blue-700 {
-    background-color: var(--color-blue-700);
   }
   .bg-cyan-50 {
     background-color: var(--color-cyan-50);
@@ -1536,6 +1536,22 @@ body {
   padding: 1px 6px;
 }
 @layer components {
+  .filter-btn {
+    border-color: #e2e8f0;
+    background-color: var(--color-white);
+    color: #374151;
+  }
+  .filter-btn.active {
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+    border-color: #c10007;
+    background-color: #fb2c36;
+    color: var(--color-white);
+  }
+  .filter-btn:hover {
+    --tw-shadow: 0 4px 6px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 2px 4px -2px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
   .sidebar-link {
     padding: calc(var(--spacing) * 2);
     &:hover {

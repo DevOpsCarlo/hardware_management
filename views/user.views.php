@@ -1,11 +1,19 @@
 <?php require("views/partials/head.php"); ?>
-
 <main class="grid grid-cols-1 sm:grid-cols-12 min-h-screen">
     <?php require("views/sidebar.php"); ?>
     <section class="col-span-12 md:col-span-10">
-        <article class="py-2 px-6 text-2xl font-bold text-slate-800 grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-2 gap-6 space-y-5 bg-red-800">
-            <?php require("views/banner.php") ?>
-        </article>
+        <header class="flex justify-between items-center pr-4 shadow-sm">
+            <div class="flex items-center ">
+                <img src="assets/images/toprank-logo.png" alt="" class="w-3/12 py-1 px-2">
+            </div>
+            <div>
+                <button class="flex items-center bg-red-500 hover:bg-red-600 text-white w-full rounded-sm font-bold text-sm py-3 px-4 cursor-pointer">
+                    <i class="fa-solid fa-plus"></i>
+                    <p class="whitespace-nowrap ml-2">Add Hardware</p>
+                </button>
+            </div>
+        </header>
+
 
         <div class="flex items-center justify-between col-span-1 md:col-span-2 lg:col-span-10 my-4">
             <div>

@@ -249,7 +249,7 @@
           <div class="mt-4 mb-0 px-4 pb-4 ">
             <div class="flex flex-wrap gap-2 justify-end">
               <!-- All Assets Button -->
-              <button class="filter-btn px-4 py-2 rounded-md text-xs font-medium border transition-all active cursor-pointer" data-filter="all">
+              <button class="filter-btn cursor-pointer px-4 py-2 rounded-md text-xs font-medium border transition-all active" data-filter="all">
                 <i class="fa-solid fa-list mr-2"></i>
                 All Assets (<?= $branchSummary['total_assets'] ?? 0 ?>)
               </button>
@@ -509,69 +509,8 @@
 
   </section>
 </main>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    let table = $('#branchAssetTable').DataTable();
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    let currentFilter = 'all';
 
-    // Custom filter function for DataTables
-    $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
-      const row = table.row(dataIndex).node();
-      const status = row.getAttribute('data-status');
 
-      if (currentFilter === 'all') {
-        return true;
-      } else if (currentFilter === 'assigned') {
-        return status === 'Employee Assigned';
-      } else if (currentFilter === 'department') {
-        return status === 'Department Assigned';
-      } else if (currentFilter === 'repair') {
-        return status === 'Under Maintenance';
-      } else if (currentFilter === 'defective') {
-        return status === 'Uncommitted';
-      }
-      return true;
-    });
-
-    // Filter button click handler
-    filterButtons.forEach(button => {
-      button.addEventListener('click', function() {
-        currentFilter = this.getAttribute('data-filter');
-
-        // Update active button styling
-        filterButtons.forEach(btn => {
-          btn.classList.remove('active', 'bg-blue-700', 'text-white', 'border-blue-700');
-          btn.classList.add('bg-white', 'text-slate-700', 'border-slate-300');
-        });
-
-        this.classList.add('active', 'bg-blue-700', 'text-white', 'border-blue-700');
-        this.classList.remove('bg-white', 'text-slate-700', 'border-slate-300');
-
-        // Redraw DataTable with new filter
-        table.draw();
-      });
-    });
-  });
-</script>
-
-<style>
-  .filter-btn {
-    background-color: white;
-    color: #374151;
-    border-color: #e2e8f0;
-  }
-
-  .filter-btn.active {
-    background-color: #fb2c36;
-    color: white;
-    border-color: #c10007;
-  }
-
-  .filter-btn:hover {
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
-  }
-</style>
 
 <script src="/assets/js/branch-detail.js"></script>
 <?php require("views/partials/footer.php") ?>

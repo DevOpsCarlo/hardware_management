@@ -264,7 +264,7 @@
                 </td>
                 <td><?= htmlspecialchars($asset['conditions'] ?? '—') ?></td>
                 <td><?= ucwords(htmlspecialchars($asset['branch_name'] ?? '—')) ?></td>
-                <td><?= htmlspecialchars($asset['assigned_employee_name'] ?? '—') ?></td>
+                <td><?= htmlspecialchars(ucwords($asset['assigned_employee_name'] ?? '—')) ?></td>
                 <td>
                   <a href="/manage-hardware/assign-asset/asset-details?id=<?= htmlspecialchars($asset['asset_id']) ?>">
                     <i class="fa-solid fa-eye"></i>

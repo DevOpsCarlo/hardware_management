@@ -1,22 +1,5 @@
 <?php require("views/partials/head.php") ?>
-<style>
-  .filter-btn {
-    background-color: white;
-    color: #374151;
-    border-color: #e2e8f0;
-  }
 
-  .filter-btn.active {
-    background-color: #fb2c36;
-    ;
-    color: white;
-    border-color: #c10007;
-  }
-
-  .filter-btn:hover {
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
-  }
-</style>
 <main class="grid grid-cols-1 sm:grid-cols-12 min-h-screen">
   <?php require("views/sidebar.php"); ?>
   <section class="col-span-12 md:col-span-10 ">

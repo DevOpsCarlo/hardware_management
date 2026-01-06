@@ -260,11 +260,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Update active button styling
         filterButtons.forEach(btn => {
-          btn.classList.remove('active', 'bg-blue-700', 'text-white', 'border-blue-700');
+          btn.classList.remove('active', 'bg-red-500', 'text-white', 'border-red-700');
           btn.classList.add('bg-white', 'text-slate-700', 'border-slate-300');
         });
 
-        this.classList.add('active', 'bg-blue-700', 'text-white', 'border-blue-700');
+        this.classList.add('active', 'bg-red-500', 'text-white', 'border-red-700');
         this.classList.remove('bg-white', 'text-slate-700', 'border-slate-300');
 
         // Redraw DataTable with new filter

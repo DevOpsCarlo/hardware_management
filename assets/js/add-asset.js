@@ -424,8 +424,8 @@ document.addEventListener("DOMContentLoaded", function () {
     "laptop charger": { code: "01", suffix: "C" },
     headset: { code: "01", suffix: "H" },
     bracket: { code: "02", suffix: "BK" },
-    "desktop monitor": { code: "03", suffix: "MO" },
-    "desktop mouse": { code: "03", suffix: "M" },
+    "desktop monitor": { code: "03", suffix: "" },
+    "desktop mouse": { code: "03", suffix: "MO" },
     "system unit": { code: "03", suffix: "SU" },
   };
 
